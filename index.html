@@ -53,7 +53,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2); /* Border halus untuk mempertegas efek kaca */
             border-radius: 12px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            /* overflow: hidden; <-- Dihapus untuk mengaktifkan sticky header */
         }
 
         header {
@@ -67,6 +67,8 @@
             top: 0;
             z-index: 100;
             transition: all 0.4s ease-in-out;
+            border-top-left-radius: 12px; /* Menjaga sudut melengkung */
+            border-top-right-radius: 12px;
         }
         
         /* Style untuk header saat di-scroll (efek pita transparan) */
@@ -77,6 +79,8 @@
             -webkit-backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border-top-left-radius: 0; /* Menghilangkan radius saat menempel */
+            border-top-right-radius: 0;
         }
         
         header.scrolled .logo-image {
