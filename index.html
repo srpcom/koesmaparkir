@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Layanan Parkir</title>
+    <!-- Favicon Baru -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png">
     <style>
         /* CSS untuk tampilan profesional dan modern */
         :root {
@@ -43,19 +45,12 @@
             border-bottom: 5px solid #00487a;
         }
 
-        header .logo-placeholder {
+        /* Style untuk logo baru */
+        header .logo-image {
             width: 70px;
-            height: 70px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
+            height: auto;
             margin: 0 auto 15px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: var(--primary-color);
-            font-weight: bold;
-            border: 3px solid white;
+            display: block;
         }
 
         header h1 {
@@ -352,7 +347,8 @@
 
     <div class="container">
         <header>
-            <div class="logo-placeholder">LOGO RSUD</div>
+            <!-- Logo RSUD Baru -->
+            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD dr. R. Koesma" class="logo-image">
             <h1>FORMULIR LAYANAN PARKIR</h1>
             <p>RSUD dr. R. KOESMA TUBAN</p>
         </header>
@@ -492,7 +488,7 @@
                     <label><input type="radio" name="jenisKendaraan" value="Sepeda Motor"> Sepeda Motor</label>
                 </div>
                 <div class="form-group">
-                    <label for="noPolisiBaru">Nomor Polisi Baru</label>
+                    <label for="noPolisiBarU">Nomor Polisi Baru</label>
                     <input type="text" id="noPolisiBaru" name="noPolisiBaru" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
                     <p class="input-description">Isikan tanpa spasi. Misal: S4966EP</p>
                 </div>
