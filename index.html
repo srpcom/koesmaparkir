@@ -20,20 +20,31 @@
 
         body {
             font-family: var(--font-family);
-            background-color: #f4f7f9;
+            /* Mengubah latar belakang menjadi gambar */
+            background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg');
+            background-size: cover; /* Membuat gambar menutupi seluruh halaman */
+            background-position: center; /* Memposisikan gambar di tengah */
+            background-attachment: fixed; /* Membuat gambar tidak bergerak saat scroll */
             color: var(--text-color);
             margin: 0;
-            padding: 10px; /* Padding dikurangi untuk mobile */
+            padding: 20px; /* Padding disesuaikan untuk desktop & mobile */
             display: flex;
             justify-content: center;
+            align-items: center; /* Menengahkan container secara vertikal */
+            min-height: 100vh; /* Memastikan body mengisi seluruh tinggi layar */
+            box-sizing: border-box;
         }
 
         .container {
             max-width: 800px;
             width: 100%;
-            background-color: #fff;
+            /* Mengubah warna latar menjadi lebih transparan lagi */
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px); /* Efek blur untuk tampilan kaca (glassmorphism) */
+            -webkit-backdrop-filter: blur(15px); /* Dukungan untuk Safari */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Border halus untuk mempertegas efek kaca */
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -66,7 +77,7 @@
         }
 
         form {
-            padding: 20px;
+            padding: 30px;
         }
 
         fieldset {
@@ -75,6 +86,7 @@
             padding: 20px 15px; /* Padding disesuaikan */
             margin-bottom: 25px;
             transition: all 0.3s ease-in-out;
+            background-color: rgba(255, 255, 255, 0.4); /* Memberi sedikit latar pada fieldset agar lebih terbaca */
         }
 
         legend {
@@ -303,12 +315,6 @@
                 display: inline-flex;
                 margin-bottom: 0;
                 margin-right: 15px;
-            }
-            body {
-                padding: 20px;
-            }
-            form {
-                padding: 30px;
             }
         }
     </style>
