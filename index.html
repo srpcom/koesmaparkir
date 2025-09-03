@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir Layanan Parkir</title>
+    <style>
+        /* CSS untuk tampilan profesional dan modern */
+        :root {
+            --primary-color: #005A9C; /* Warna biru khas instansi kesehatan/pemerintah */
+            --secondary-color: #F0F8FF; /* Warna latar belakang lembut */
+            --border-color: #DCDCDC; /* Warna border abu-abu terang */
+            --text-color: #333;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: #f4f7f9;
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px; /* Padding dikurangi untuk mobile */
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid #00487a;
+        }
+
+        header .logo-placeholder {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: var(--primary-color);
+            font-weight: bold;
+            border: 3px solid white;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em; /* Ukuran font disesuaikan */
+            font-weight: 700;
+        }
+        
+        header p {
+            margin: 5px 0 0;
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        form {
+            padding: 20px;
+        }
+
+        fieldset {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px 15px; /* Padding disesuaikan */
+            margin-bottom: 25px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        legend {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--primary-color);
+            padding: 0 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        select,
+        textarea,
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px; /* Mencegah zoom otomatis di iOS */
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        textarea {
+            resize: vertical;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.2);
+        }
+
+        .radio-group label {
+            display: flex; /* Menggunakan flexbox */
+            align-items: center;
+            margin-bottom: 10px; /* Memberi jarak antar pilihan */
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .radio-group input {
+           margin-right: 10px;
+           flex-shrink: 0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .checkbox-group input {
+            margin-top: 5px;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #00487a;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        .hidden-section, .hidden {
+            display: none;
+        }
+
+        .keterangan-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .keterangan-text {
+            margin: 0;
+            font-size: 0.9em;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .input-description {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            flex-direction: column;
+            padding: 15px;
+            box-sizing: border-box;
+            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(5px);
+        }
+        
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid var(--primary-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #loading-overlay p {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        /* --- Style untuk Modal --- */
+        .modal-container {
+            background-color: white;
+            color: var(--text-color);
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: left;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+        .modal-container h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            text-align: center;
+        }
+        .summary-content p {
+            margin: 10px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            line-height: 1.6;
+        }
+        .summary-content p strong {
+            display: block;
+            color: #555;
+            font-size: 0.9em;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .modal-buttons button {
+            width: 100%; /* Default width */
+        }
+        .modal-buttons .edit-button {
+            background-color: #6c757d;
+            width: 50%;
+        }
+        .modal-buttons .edit-button:hover {
+            background-color: #5a6268;
+        }
+        .modal-buttons .confirm-button {
+             width: 50%;
+        }
+        
+        /* --- Style Notifikasi --- */
+        #notification-modal .modal-container {
+            text-align: center;
+        }
+        #notification-modal h2 {
+            font-size: 1.8em;
+        }
+        #notification-modal .icon {
+            font-size: 50px;
+            line-height: 1;
+        }
+        #notification-modal.success .icon { color: var(--success-color); }
+        #notification-modal.error .icon { color: var(--error-color); }
+
+        /* Responsif untuk layar lebar */
+         @media (min-width: 600px) {
+            .radio-group label {
+                display: inline-flex;
+                margin-bottom: 0;
+                margin-right: 15px;
+            }
+            body {
+                padding: 20px;
+            }
+            form {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay" class="overlay">
+        <div class="spinner"></div>
+        <p>Mengirim data, mohon tunggu...</p>
+    </div>
+
+    <div id="confirmation-overlay" class="overlay">
+        <div class="modal-container">
+            <h2>Konfirmasi Data Anda</h2>
+            <p>Mohon periksa kembali data yang telah Anda isikan. Pastikan semua informasi sudah benar sebelum melanjutkan.</p>
+            <div id="summary-content" class="summary-content">
+                <!-- Konten ringkasan akan diisi oleh JavaScript -->
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="edit-button" class="edit-button">Perbaiki Data</button>
+                <button type="button" id="final-submit-button" class="confirm-button">Ya, Kirim & Selesaikan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-modal" class="overlay">
+        <div class="modal-container">
+            <p id="notification-icon" class="icon"></p>
+            <h2 id="notification-title"></h2>
+            <p id="notification-message"></p>
+            <div class="modal-buttons">
+                 <button type="button" id="notification-close-button">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <header>
+            <div class="logo-placeholder">LOGO RSUD</div>
+            <h1>FORMULIR LAYANAN PARKIR</h1>
+            <p>RSUD dr. R. KOESMA TUBAN</p>
+        </header>
+
+        <form id="parkingForm">
+            <fieldset>
+                <legend>Tujuan Pengisian</legend>
+                <div class="form-group radio-group">
+                    <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
+                    <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
+                    <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
+                    <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
+                    <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
+                    <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
+                </div>
+                <div id="keterangan-tujuan" class="keterangan-box hidden">
+                    <p id="desc-pendaftaran-baru" class="keterangan-text hidden">Untuk mendaftarkan kendaraan pertama Anda pada sistem parkir.</p>
+                    <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK 5 tahunan) namun kendaraannya masih sama.</p>
+                    <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar untuk parkir di RSUD.</p>
+                    <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil).</p>
+                    <p id="desc-penggantian-kartu" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang atau rusak.</p>
+                    <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci.</p>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Informasi Karyawan</legend>
+                <div class="form-group">
+                    <label for="namaLengkap">Nama Lengkap</label>
+                    <input type="text" id="namaLengkap" name="namaLengkap" required>
+                </div>
+                <div class="form-group">
+                    <label for="unitKerja">Unit / Bagian Kerja</label>
+                    <select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)">
+                        <option value="">-- Pilih Unit --</option>
+                        <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
+                        <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
+                        <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
+                        <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
+                        <option value="ICU">ICU</option>
+                        <option value="ICCU">ICCU</option>
+                        <option value="HCU">HCU</option>
+                        <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
+                        <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
+                        <option value="INSTALASI GIZI">INSTALASI GIZI</option>
+                        <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
+                        <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
+                        <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
+                        <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
+                        <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
+                        <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
+                        <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
+                        <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
+                        <option value="INSTALASI PKRS">INSTALASI PKRS</option>
+                        <option value="POLI KIR">POLI KIR</option>
+                        <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
+                        <option value="POLI TMS">POLI TMS</option>
+                        <option value="POLI EEG">POLI EEG</option>
+                        <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
+                        <option value="POLI ESWL">POLI ESWL</option>
+                        <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
+                        <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
+                        <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
+                        <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
+                        <option value="RUANG PAVILIUN">RUANG PAVILIUN</option>
+                        <option value="RUANG ISOLASI">RUANG ISOLASI</option>
+                        <option value="RUANG PERINATOLOGI">RUANG PERINATOLOGI</option>
+                        <option value="POLI ANAK">POLI ANAK</option>
+                        <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
+                        <option value="POLI KEBIDANAN">POLI KEBIDANAN</option>
+                        <option value="POLI BEDAH">POLI BEDAH</option>
+                        <option value="POLI MATA">POLI MATA</option>
+                        <option value="POLI THT">POLI THT</option>
+                        <option value="POLI SYARAF">POLI SYARAF</option>
+                        <option value="POLI JANTUNG">POLI JANTUNG</option>
+                        <option value="POLI PARU">POLI PARU</option>
+                        <option value="POLI GIGI">POLI GIGI</option>
+                        <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
+                        <option value="POLI JIWA">POLI JIWA</option>
+                        <option value="POLI TB">POLI TB</option>
+                        <option value="POLI VCT">POLI VCT</option>
+                        <option value="POLI DOTS">POLI DOTS</option>
+                        <option value="POLI UMUM">POLI UMUM</option>
+                        <option value="BAGIAN PERENCANAAN">BAGIAN PERENCANAAN</option>
+                        <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
+                        <option value="BAGIAN UMUM DAN SDM">BAGIAN UMUM DAN SDM</option>
+                        <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
+                        <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
+                        <option value="BIDANG PENUNJANG">BIDANG PENUNJANG</option>
+                        <option value="KOMITE MEDIK">KOMITE MEDIK</option>
+                        <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
+                        <option value="KOMITE PPI">KOMITE PPI</option>
+                        <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
+                        <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
+                        <option value="Lainnya">Lainnya...</option>
+                    </select>
+                </div>
+                <div class="form-group hidden" id="unitKerjaLainnya-group">
+                    <label for="unitKerjaLainnya">Silakan Tulis Nama Unit / Bagian Anda</label>
+                    <input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya">
+                </div>
+                <div class="form-group">
+                    <label for="telepon">Nomor Telepon / WA (Aktif)</label>
+                    <input type="tel" id="telepon" name="telepon" required>
+                </div>
+                 <div class="form-group">
+                    <label for="fileKtp">Upload Identitas (KTP/SIM)</label>
+                    <input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required>
+                </div>
+            </fieldset>
+
+            <fieldset id="update-section" class="hidden-section">
+                <legend>Data Kendaraan Lama</legend>
+                <div class="form-group radio-group">
+                    <label>Jenis Kendaraan Lama</label><br>
+                    <label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label>
+                    <label><input type="radio" name="jenisKendaraanLama" value="Sepeda Motor"> Sepeda Motor</label>
+                </div>
+                <div class="form-group">
+                    <label for="noPolisiLama">Nomor Polisi Lama</label>
+                    <input type="text" id="noPolisiLama" name="noPolisiLama" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
+                </div>
+            </fieldset>
+
+            <fieldset id="card-replacement-section" class="hidden-section">
+                <legend>Informasi Penggantian Kartu</legend>
+                 <div class="form-group">
+                    <label for="alasanPenggantian">Alasan Penggantian (Contoh: Hilang, Rusak)</label>
+                    <textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea>
+                </div>
+            </fieldset>
+            
+            <fieldset id="new-vehicle-section" class="hidden-section">
+                <legend>Detail Kendaraan Baru</legend>
+                <div class="form-group radio-group">
+                    <label><input type="radio" name="jenisKendaraan" value="Mobil"> Mobil</label>
+                    <label><input type="radio" name="jenisKendaraan" value="Sepeda Motor"> Sepeda Motor</label>
+                </div>
+                <div class="form-group">
+                    <label for="noPolisiBaru">Nomor Polisi Baru</label>
+                    <input type="text" id="noPolisiBaru" name="noPolisiBaru" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
+                    <p class="input-description">Isikan tanpa spasi. Misal: S4966EP</p>
+                </div>
+            </fieldset>
+
+             <fieldset id="lainnya-section" class="hidden-section">
+                <legend>Keterangan Lainnya</legend>
+                <div class="form-group">
+                    <label for="keteranganLainnya">Silakan tulis tujuan/keterangan lengkap Anda di sini</label>
+                    <textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea>
+                </div>
+            </fieldset>
+            
+            <fieldset id="agreement-section" class="hidden-section">
+                <legend>Persetujuan</legend>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="agreement" name="agreement" required>
+                    <label for="agreement">Saya menyatakan bahwa seluruh data yang saya isikan adalah benar dan saya bersedia mematuhi semua peraturan parkir yang berlaku di lingkungan RSUD.</label>
+                </div>
+            </fieldset>
+
+            <button type="submit" id="submit-button">Kirim Formulir</button>
+        </form>
+    </div>
+
+    <script>
+        // --- Bagian Logika Formulir ---
+
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycby-hZe9ddrkYlshHsKBbH2_8-se5kej9zFzRov2qcmi_fDcteD8Yup9kfupBt3ZG_Mb/exec';
+
+        const allSections = {
+            update: document.getElementById('update-section'),
+            cardReplacement: document.getElementById('card-replacement-section'),
+            newVehicle: document.getElementById('new-vehicle-section'),
+            lainnya: document.getElementById('lainnya-section'),
+            agreement: document.getElementById('agreement-section')
+        };
+
+        const allDescriptions = {
+            box: document.getElementById('keterangan-tujuan'),
+            'Pendaftaran Baru': document.getElementById('desc-pendaftaran-baru'),
+            'Rubah Nomor Kendaraan': document.getElementById('desc-rubah-nomor-kendaraan'),
+            'Hapus Nomor Kendaraan': document.getElementById('desc-hapus-nomor-kendaraan'),
+            'Tambah Kendaraan Baru': document.getElementById('desc-tambah-kendaraan-baru'),
+            'Penggantian Kartu': document.getElementById('desc-penggantian-kartu'),
+            'Lainnya': document.getElementById('desc-lainnya')
+        };
+        
+        let formDataObject = {};
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const confirmationOverlay = document.getElementById('confirmation-overlay');
+        const notificationModal = document.getElementById('notification-modal');
+
+        function setRequired(element, isRequired) {
+            const inputs = element.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if(input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
+                    input.required = (element.style.display !== 'none') ? isRequired : false;
+                }
+            });
+        }
+
+        function toggleSections() {
+            const choice = document.querySelector('input[name="jenisPengajuan"]:checked').value;
+            for (const key in allSections) { allSections[key].style.display = 'none'; setRequired(allSections[key], false); }
+            for (const key in allDescriptions) { if(key !== 'box') allDescriptions[key].style.display = 'none'; }
+            allDescriptions.box.style.display = 'block';
+            if (allDescriptions[choice]) { allDescriptions[choice].style.display = 'block'; }
+            switch(choice) {
+                case 'Pendaftaran Baru':
+                case 'Tambah Kendaraan Baru':
+                    allSections.newVehicle.style.display = 'block';
+                    allSections.agreement.style.display = 'block';
+                    setRequired(allSections.newVehicle, true);
+                    break;
+                case 'Rubah Nomor Kendaraan':
+                    allSections.update.style.display = 'block';
+                    allSections.newVehicle.style.display = 'block';
+                    allSections.agreement.style.display = 'block';
+                    setRequired(allSections.update, true);
+                    setRequired(allSections.newVehicle, true);
+                    break;
+                case 'Hapus Nomor Kendaraan':
+                    allSections.update.style.display = 'block';
+                    allSections.agreement.style.display = 'block';
+                    setRequired(allSections.update, true);
+                    break;
+                case 'Penggantian Kartu':
+                    allSections.update.style.display = 'block';
+                    allSections.cardReplacement.style.display = 'block';
+                    allSections.agreement.style.display = 'block';
+                    setRequired(allSections.update, true);
+                    setRequired(allSections.cardReplacement, true);
+                    break;
+                case 'Lainnya':
+                    allSections.lainnya.style.display = 'block';
+                    allSections.agreement.style.display = 'block';
+                    setRequired(allSections.lainnya, true);
+                    break;
+            }
+        }
+
+        function handleUnitKerjaChange(selectElement) {
+            const lainnyaGroup = document.getElementById('unitKerjaLainnya-group');
+            const lainnyaInput = document.getElementById('unitKerjaLainnya');
+            lainnyaInput.required = (selectElement.value === 'Lainnya');
+            lainnyaGroup.classList.toggle('hidden', selectElement.value !== 'Lainnya');
+            if(selectElement.value !== 'Lainnya') lainnyaInput.value = '';
+        }
+
+        function readFileAsBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64String = reader.result.split(',')[1];
+                    resolve({ base64: base64String, type: file.type, name: file.name });
+                };
+                reader.onerror = (error) => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function populateSummary(data) {
+            const summaryContent = document.getElementById('summary-content');
+            summaryContent.innerHTML = `<p><strong>Tujuan Pengisian:</strong> <span>${data.jenisPengajuan || '-'}</span></p><p><strong>Nama Lengkap:</strong> <span>${data.namaLengkap || '-'}</span></p><p><strong>Unit / Bagian Kerja:</strong> <span>${(data.unitKerja === 'Lainnya' ? data.unitKerjaLainnya : data.unitKerja) || '-'}</span></p><p><strong>Nomor Telepon / WA:</strong> <span>${data.telepon || '-'}</span></p><p><strong>File Identitas (KTP/SIM):</strong> <span>${document.getElementById('fileKtp').files[0]?.name || 'Tidak ada file'}</span></p>`;
+            const addSummaryRow = (label, value) => { if (value) { const p = document.createElement('p'); p.innerHTML = `<strong>${label}:</strong> ${value}`; summaryContent.appendChild(p); } };
+            addSummaryRow('Jenis Kendaraan Lama', data.jenisKendaraanLama);
+            addSummaryRow('Nomor Polisi Lama', data.noPolisiLama);
+            addSummaryRow('Jenis Kendaraan Baru', data.jenisKendaraan);
+            addSummaryRow('Nomor Polisi Baru', data.noPolisiBaru);
+            addSummaryRow('Alasan Penggantian Kartu', data.alasanPenggantian);
+            addSummaryRow('Keterangan Lainnya', data.keteranganLainnya);
+        }
+
+        function showNotification(isSuccess, message) {
+            const title = document.getElementById('notification-title');
+            const icon = document.getElementById('notification-icon');
+            const msg = document.getElementById('notification-message');
+            
+            notificationModal.className = 'overlay ' + (isSuccess ? 'success' : 'error');
+            title.textContent = isSuccess ? 'Berhasil Terkirim' : 'Terjadi Kesalahan';
+            icon.textContent = isSuccess ? '✓' : '✗';
+            msg.textContent = message;
+            notificationModal.style.display = 'flex';
+        }
+
+        document.getElementById('parkingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formDataObject = Object.fromEntries(formData.entries());
+            populateSummary(formDataObject);
+            confirmationOverlay.style.display = 'flex';
+        });
+
+        document.getElementById('edit-button').addEventListener('click', () => confirmationOverlay.style.display = 'none');
+        document.getElementById('notification-close-button').addEventListener('click', () => notificationModal.style.display = 'none');
+
+        document.getElementById('final-submit-button').addEventListener('click', async function() {
+            confirmationOverlay.style.display = 'none';
+            loadingOverlay.style.display = 'flex';
+            const submitButton = document.getElementById('submit-button');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Mengirim...';
+
+            let dataToSubmit = { ...formDataObject };
+            if (dataToSubmit.unitKerja === 'Lainnya') { dataToSubmit.unitKerja = dataToSubmit.unitKerjaLainnya; }
+            delete dataToSubmit.unitKerjaLainnya;
+
+            try {
+                const fileKtpInput = document.getElementById('fileKtp').files[0];
+                if (fileKtpInput) { dataToSubmit.fileKtp = await readFileAsBase64(fileKtpInput); }
+            
+                const response = await fetch(webAppUrl, { method: 'POST', body: JSON.stringify(dataToSubmit) });
+
+                // Meskipun responsnya opaque-redirect, jika tidak ada error, kita anggap berhasil
+                if (response.ok || response.type === 'opaque') { 
+                    showNotification(true, 'Pengajuan Anda telah berhasil dikirim. Data akan diproses dalam waktu maksimal 3 (tiga) hari kerja. Untuk informasi lebih lanjut, silakan hubungi Bagian Administrasi melalui WhatsApp di 081330639240.');
+                    document.getElementById('parkingForm').reset();
+                    for (const key in allSections) { allSections[key].style.display = 'none'; }
+                    allDescriptions.box.style.display = 'none';
+                    document.getElementById('unitKerjaLainnya-group').classList.add('hidden');
+                } else {
+                     // Jika ada status error yang jelas dari server
+                    const errorResult = await response.json();
+                    showNotification(false, `Gagal mengirim data: ${errorResult.message || 'Server mengembalikan error.'}`);
+                }
+
+            } catch (error) {
+                showNotification(false, `Gagal mengirim data. Periksa koneksi internet Anda atau hubungi administrator. Error: ${error}`);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Kirim Formulir';
+                loadingOverlay.style.display = 'none';
+            }
+        });
+        
+    </script>
+</body>
+</html>
+
