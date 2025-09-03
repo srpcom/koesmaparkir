@@ -27,11 +27,19 @@
             background-attachment: fixed; /* Membuat gambar tidak bergerak saat scroll */
             color: var(--text-color);
             margin: 0;
-            padding: 20px; /* Padding disesuaikan untuk desktop & mobile */
+            /* Padding, display, justify-content, align-items dihapus agar scroll normal */
+            min-height: 100vh; /* Memastikan body mengisi seluruh tinggi layar */
+            box-sizing: border-box;
+        }
+
+        /* Wrapper baru untuk menengahkan container */
+        .wrapper {
             display: flex;
             justify-content: center;
-            align-items: center; /* Menengahkan container secara vertikal */
-            min-height: 100vh; /* Memastikan body mengisi seluruh tinggi layar */
+            align-items: center;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px 0; /* Memberi padding vertikal */
             box-sizing: border-box;
         }
 
@@ -54,6 +62,35 @@
             padding: 20px;
             text-align: center;
             border-bottom: 5px solid #00487a;
+            /* Properti untuk efek sticky */
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.4s ease-in-out;
+        }
+        
+        /* Style untuk header saat di-scroll (efek pita transparan) */
+        header.scrolled {
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        header.scrolled .logo-image {
+             width: 50px;
+             margin-bottom: 5px;
+        }
+        
+        header.scrolled h1 {
+            font-size: 1.2em;
+            color: #333; /* Mengubah warna teks agar terbaca di pita transparan */
+        }
+        
+        header.scrolled p {
+            display: none; /* Sembunyikan sub-judul untuk menghemat ruang */
         }
 
         /* Style untuk logo baru */
@@ -62,18 +99,21 @@
             height: auto;
             margin: 0 auto 15px auto;
             display: block;
+            transition: all 0.4s ease-in-out;
         }
 
         header h1 {
             margin: 0;
             font-size: 1.5em; /* Ukuran font disesuaikan */
             font-weight: 700;
+            transition: all 0.4s ease-in-out;
         }
         
         header p {
             margin: 5px 0 0;
             opacity: 0.9;
             font-size: 0.9em;
+            transition: opacity 0.4s ease-in-out;
         }
 
         form {
@@ -320,6 +360,176 @@
     </style>
 </head>
 <body>
+    <div class="wrapper">
+        <div class="container">
+            <header>
+                <!-- Logo RSUD Baru -->
+                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD dr. R. Koesma" class="logo-image">
+                <h1>FORMULIR LAYANAN PARKIR</h1>
+                <p>RSUD dr. R. KOESMA TUBAN</p>
+            </header>
+
+            <form id="parkingForm">
+                <fieldset>
+                    <legend>Tujuan Pengisian</legend>
+                    <div class="form-group radio-group">
+                        <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
+                    </div>
+                    <div id="keterangan-tujuan" class="keterangan-box hidden">
+                        <p id="desc-pendaftaran-baru" class="keterangan-text hidden">Untuk mendaftarkan kendaraan pertama Anda pada sistem parkir.</p>
+                        <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK 5 tahunan) namun kendaraannya masih sama.</p>
+                        <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar untuk parkir di RSUD.</p>
+                        <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil).</p>
+                        <p id="desc-penggantian-kartu" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang atau rusak.</p>
+                        <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci.</p>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Informasi Karyawan</legend>
+                    <div class="form-group">
+                        <label for="namaLengkap">Nama Lengkap</label>
+                        <input type="text" id="namaLengkap" name="namaLengkap" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unitKerja">Unit / Bagian Kerja</label>
+                        <select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)">
+                            <option value="">-- Pilih Unit --</option>
+                            <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
+                            <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
+                            <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
+                            <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
+                            <option value="ICU">ICU</option>
+                            <option value="ICCU">ICCU</option>
+                            <option value="HCU">HCU</option>
+                            <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
+                            <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
+                            <option value="INSTALASI GIZI">INSTALASI GIZI</option>
+                            <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
+                            <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
+                            <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
+                            <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
+                            <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
+                            <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
+                            <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
+                            <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
+                            <option value="INSTALASI PKRS">INSTALASI PKRS</option>
+                            <option value="POLI KIR">POLI KIR</option>
+                            <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
+                            <option value="POLI TMS">POLI TMS</option>
+                            <option value="POLI EEG">POLI EEG</option>
+                            <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
+                            <option value="POLI ESWL">POLI ESWL</option>
+                            <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
+                            <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
+                            <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
+                            <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
+                            <option value="RUANG PAVILIUN">RUANG PAVILIUN</option>
+                            <option value="RUANG ISOLASI">RUANG ISOLASI</option>
+                            <option value="RUANG PERINATOLOGI">RUANG PERINATOLOGI</option>
+                            <option value="POLI ANAK">POLI ANAK</option>
+                            <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
+                            <option value="POLI BEDAH">POLI BEDAH</option>
+                            <option value="POLI MATA">POLI MATA</option>
+                            <option value="POLI THT">POLI THT</option>
+                            <option value="POLI SYARAF">POLI SYARAF</option>
+                            <option value="POLI JANTUNG">POLI JANTUNG</option>
+                            <option value="POLI PARU">POLI PARU</option>
+                            <option value="POLI GIGI">POLI GIGI</option>
+                            <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
+                            <option value="POLI JIWA">POLI JIWA</option>
+                            <option value="POLI TB">POLI TB</option>
+                            <option value="POLI VCT">POLI VCT</option>
+                            <option value="POLI UMUM">POLI UMUM</option>
+                            <option value="BAGIAN PROGPEL">BAGIAN PROGPEL</option>
+                            <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
+                            <option value="BAGIAN ADMINISTRASI DAN UMUM DAN SDM">BAGIAN ADMINISTRASI DAN UMUM</option>
+                            <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
+                            <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
+                            <option value="BIDANG PELAYANAN PENUNJANG">BIDANG PENUNJANG</option>
+                            <option value="KOMITE MEDIK">KOMITE MEDIK</option>
+                            <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
+                            <option value="KOMITE PPI">KOMITE PPI</option>
+                            <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
+                            <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
+                            <option value="Lainnya">Lainnya...</option>
+                        </select>
+                    </div>
+                    <div class="form-group hidden" id="unitKerjaLainnya-group">
+                        <label for="unitKerjaLainnya">Silakan Tulis Nama Unit / Bagian Anda</label>
+                        <input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya">
+                    </div>
+                    <div class="form-group">
+                        <label for="telepon">Nomor Telepon / WA (Aktif)</label>
+                        <input type="tel" id="telepon" name="telepon" required>
+                    </div>
+                     <div class="form-group">
+                        <label for="fileKtp">Upload Identitas (KTP/SIM)</label>
+                        <input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required>
+                    </div>
+                </fieldset>
+
+                <fieldset id="update-section" class="hidden-section">
+                    <legend>Data Kendaraan Lama</legend>
+                    <div class="form-group radio-group">
+                        <label>Jenis Kendaraan Lama</label><br>
+                        <label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label>
+                        <label><input type="radio" name="jenisKendaraanLama" value="Sepeda Motor"> Sepeda Motor</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="noPolisiLama">Nomor Polisi Lama</label>
+                        <input type="text" id="noPolisiLama" name="noPolisiLama" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
+                    </div>
+                </fieldset>
+
+                <fieldset id="card-replacement-section" class="hidden-section">
+                    <legend>Informasi Penggantian Kartu</legend>
+                     <div class="form-group">
+                        <label for="alasanPenggantian">Alasan Penggantian (Contoh: Hilang, Rusak)</label>
+                        <textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea>
+                    </div>
+                </fieldset>
+                
+                <fieldset id="new-vehicle-section" class="hidden-section">
+                    <legend>Detail Kendaraan Baru</legend>
+                    <div class="form-group radio-group">
+                        <label><input type="radio" name="jenisKendaraan" value="Mobil"> Mobil</label>
+                        <label><input type="radio" name="jenisKendaraan" value="Sepeda Motor"> Sepeda Motor</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="noPolisiBarU">Nomor Polisi Baru</label>
+                        <input type="text" id="noPolisiBaru" name="noPolisiBaru" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
+                        <p class="input-description">Isikan tanpa spasi. Misal: S4966EP</p>
+                    </div>
+                </fieldset>
+
+                 <fieldset id="lainnya-section" class="hidden-section">
+                    <legend>Keterangan Lainnya</legend>
+                    <div class="form-group">
+                        <label for="keteranganLainnya">Silakan tulis tujuan/keterangan lengkap Anda di sini</label>
+                        <textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea>
+                    </div>
+                </fieldset>
+                
+                <fieldset id="agreement-section" class="hidden-section">
+                    <legend>Persetujuan</legend>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="agreement" name="agreement" required>
+                        <label for="agreement">Saya menyatakan bahwa seluruh data yang saya isikan adalah benar dan saya bersedia mematuhi semua peraturan parkir yang berlaku di lingkungan RSUD.</label>
+                    </div>
+                </fieldset>
+
+                <button type="submit" id="submit-button">Kirim Formulir</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Div Overlay dipindahkan ke luar wrapper agar tidak terpengaruh oleh alignment -->
     <div id="loading-overlay" class="overlay">
         <div class="spinner"></div>
         <p>Mengirim data, mohon tunggu...</p>
@@ -350,179 +560,20 @@
         </div>
     </div>
 
-
-    <div class="container">
-        <header>
-            <!-- Logo RSUD Baru -->
-            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD dr. R. Koesma" class="logo-image">
-            <h1>FORMULIR LAYANAN PARKIR</h1>
-            <p>RSUD dr. R. KOESMA TUBAN</p>
-        </header>
-
-        <form id="parkingForm">
-            <fieldset>
-                <legend>Tujuan Pengisian</legend>
-                <div class="form-group radio-group">
-                    <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
-                </div>
-                <div id="keterangan-tujuan" class="keterangan-box hidden">
-                    <p id="desc-pendaftaran-baru" class="keterangan-text hidden">Untuk mendaftarkan kendaraan pertama Anda pada sistem parkir.</p>
-                    <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK 5 tahunan) namun kendaraannya masih sama.</p>
-                    <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar untuk parkir di RSUD.</p>
-                    <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil).</p>
-                    <p id="desc-penggantian-kartu" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang atau rusak.</p>
-                    <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci.</p>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Informasi Karyawan</legend>
-                <div class="form-group">
-                    <label for="namaLengkap">Nama Lengkap</label>
-                    <input type="text" id="namaLengkap" name="namaLengkap" required>
-                </div>
-                <div class="form-group">
-                    <label for="unitKerja">Unit / Bagian Kerja</label>
-                    <select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)">
-                        <option value="">-- Pilih Unit --</option>
-                        <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
-                        <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
-                        <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
-                        <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
-                        <option value="ICU">ICU</option>
-                        <option value="ICCU">ICCU</option>
-                        <option value="HCU">HCU</option>
-                        <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
-                        <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
-                        <option value="INSTALASI GIZI">INSTALASI GIZI</option>
-                        <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
-                        <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
-                        <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
-                        <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
-                        <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
-                        <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
-                        <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
-                        <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
-                        <option value="INSTALASI PKRS">INSTALASI PKRS</option>
-                        <option value="POLI KIR">POLI KIR</option>
-                        <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
-                        <option value="POLI TMS">POLI TMS</option>
-                        <option value="POLI EEG">POLI EEG</option>
-                        <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
-                        <option value="POLI ESWL">POLI ESWL</option>
-                        <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
-                        <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
-                        <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
-                        <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
-                        <option value="RUANG PAVILIUN">RUANG PAVILIUN</option>
-                        <option value="RUANG ISOLASI">RUANG ISOLASI</option>
-                        <option value="RUANG PERINATOLOGI">RUANG PERINATOLOGI</option>
-                        <option value="POLI ANAK">POLI ANAK</option>
-                        <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
-                        <option value="POLI BEDAH">POLI BEDAH</option>
-                        <option value="POLI MATA">POLI MATA</option>
-                        <option value="POLI THT">POLI THT</option>
-                        <option value="POLI SYARAF">POLI SYARAF</option>
-                        <option value="POLI JANTUNG">POLI JANTUNG</option>
-                        <option value="POLI PARU">POLI PARU</option>
-                        <option value="POLI GIGI">POLI GIGI</option>
-                        <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
-                        <option value="POLI JIWA">POLI JIWA</option>
-                        <option value="POLI TB">POLI TB</option>
-                        <option value="POLI VCT">POLI VCT</option>
-                        <option value="POLI UMUM">POLI UMUM</option>
-                        <option value="BAGIAN PROGPEL">BAGIAN PROGPEL</option>
-                        <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
-                        <option value="BAGIAN ADMINISTRASI DAN UMUM DAN SDM">BAGIAN ADMINISTRASI DAN UMUM</option>
-                        <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
-                        <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
-                        <option value="BIDANG PELAYANAN PENUNJANG">BIDANG PENUNJANG</option>
-                        <option value="KOMITE MEDIK">KOMITE MEDIK</option>
-                        <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
-                        <option value="KOMITE PPI">KOMITE PPI</option>
-                        <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
-                        <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
-                        <option value="Lainnya">Lainnya...</option>
-                    </select>
-                </div>
-                <div class="form-group hidden" id="unitKerjaLainnya-group">
-                    <label for="unitKerjaLainnya">Silakan Tulis Nama Unit / Bagian Anda</label>
-                    <input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya">
-                </div>
-                <div class="form-group">
-                    <label for="telepon">Nomor Telepon / WA (Aktif)</label>
-                    <input type="tel" id="telepon" name="telepon" required>
-                </div>
-                 <div class="form-group">
-                    <label for="fileKtp">Upload Identitas (KTP/SIM)</label>
-                    <input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required>
-                </div>
-            </fieldset>
-
-            <fieldset id="update-section" class="hidden-section">
-                <legend>Data Kendaraan Lama</legend>
-                <div class="form-group radio-group">
-                    <label>Jenis Kendaraan Lama</label><br>
-                    <label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label>
-                    <label><input type="radio" name="jenisKendaraanLama" value="Sepeda Motor"> Sepeda Motor</label>
-                </div>
-                <div class="form-group">
-                    <label for="noPolisiLama">Nomor Polisi Lama</label>
-                    <input type="text" id="noPolisiLama" name="noPolisiLama" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
-                </div>
-            </fieldset>
-
-            <fieldset id="card-replacement-section" class="hidden-section">
-                <legend>Informasi Penggantian Kartu</legend>
-                 <div class="form-group">
-                    <label for="alasanPenggantian">Alasan Penggantian (Contoh: Hilang, Rusak)</label>
-                    <textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea>
-                </div>
-            </fieldset>
-            
-            <fieldset id="new-vehicle-section" class="hidden-section">
-                <legend>Detail Kendaraan Baru</legend>
-                <div class="form-group radio-group">
-                    <label><input type="radio" name="jenisKendaraan" value="Mobil"> Mobil</label>
-                    <label><input type="radio" name="jenisKendaraan" value="Sepeda Motor"> Sepeda Motor</label>
-                </div>
-                <div class="form-group">
-                    <label for="noPolisiBarU">Nomor Polisi Baru</label>
-                    <input type="text" id="noPolisiBaru" name="noPolisiBaru" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
-                    <p class="input-description">Isikan tanpa spasi. Misal: S4966EP</p>
-                </div>
-            </fieldset>
-
-             <fieldset id="lainnya-section" class="hidden-section">
-                <legend>Keterangan Lainnya</legend>
-                <div class="form-group">
-                    <label for="keteranganLainnya">Silakan tulis tujuan/keterangan lengkap Anda di sini</label>
-                    <textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea>
-                </div>
-            </fieldset>
-            
-            <fieldset id="agreement-section" class="hidden-section">
-                <legend>Persetujuan</legend>
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="agreement" name="agreement" required>
-                    <label for="agreement">Saya menyatakan bahwa seluruh data yang saya isikan adalah benar dan saya bersedia mematuhi semua peraturan parkir yang berlaku di lingkungan RSUD.</label>
-                </div>
-            </fieldset>
-
-            <button type="submit" id="submit-button">Kirim Formulir</button>
-        </form>
-    </div>
-
     <script>
+        // --- Bagian Logika Efek Scroll ---
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            // Tambahkan kelas 'scrolled' jika scroll lebih dari 10px, jika tidak, hapus
+            if (window.scrollY > 10) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
         // --- Bagian Logika Formulir ---
-
         const webAppUrl = 'https://script.google.com/macros/s/AKfycby-hZe9ddrkYlshHsKBbH2_8-se5kej9zFzRov2qcmi_fDcteD8Yup9kfupBt3ZG_Mb/exec';
-
         const allSections = {
             update: document.getElementById('update-section'),
             cardReplacement: document.getElementById('card-replacement-section'),
@@ -530,7 +581,6 @@
             lainnya: document.getElementById('lainnya-section'),
             agreement: document.getElementById('agreement-section')
         };
-
         const allDescriptions = {
             box: document.getElementById('keterangan-tujuan'),
             'Pendaftaran Baru': document.getElementById('desc-pendaftaran-baru'),
@@ -540,7 +590,6 @@
             'Penggantian Kartu': document.getElementById('desc-penggantian-kartu'),
             'Lainnya': document.getElementById('desc-lainnya')
         };
-        
         let formDataObject = {};
         const loadingOverlay = document.getElementById('loading-overlay');
         const confirmationOverlay = document.getElementById('confirmation-overlay');
