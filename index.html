@@ -773,7 +773,7 @@
                 // NOTE: Karena menggunakan mode 'no-cors', kita tidak bisa membaca response.ok atau response.json().
                 // Kita anggap pengiriman berhasil jika tidak ada error network.
                 // Notifikasi sukses akan didasarkan pada asumsi ini.
-                const successMessage = `Pengajuan Anda telah berhasil dikirim dan sedang diproses.\n\nData akan diproses dalam waktu maksimal 3 (tiga) hari kerja. Untuk informasi lebih lanjut, silakan hubungi Bagian Administrasi.`;
+                const successMessage = `Pengajuan Anda telah berhasil dikirim dan sedang diproses.\n\nData akan diproses dalam waktu maksimal 7 (hari) hari kerja. Untuk informasi lebih lanjut, silakan hubungi Bagian Administrasi.`;
                 showNotification(true, successMessage);
                 
                 document.getElementById('parkingForm').reset();
