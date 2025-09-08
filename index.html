@@ -30,7 +30,7 @@
         button { width: 100%; padding: 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.3s; }
         button:hover:not(:disabled) { background-color: #00487a; }
         button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -69,7 +69,7 @@
         <p>Mohon maaf, halaman ini sedang dalam pemeliharaan. Kami akan segera kembali.</p>
     </div>
     
-    <div id="main-content" class="hidden">
+    <div id="main-content">
         <div id="loading-overlay" class="overlay" style="color:white; flex-direction:column;"> <div class="spinner"></div> <p>Mengirim data, mohon tunggu...</p> </div>
         <div id="confirmation-overlay" class="overlay"> <div class="modal-container"> <h2>Konfirmasi Data Anda</h2> <p>Mohon periksa kembali data Anda.</p> <div id="summary-content"></div> <div class="modal-buttons"> <button type="button" id="edit-button">Perbaiki</button> <button type="button" id="final-submit-button">Ya, Kirim</button> </div> </div> </div>
         <div id="notification-modal" class="overlay"> <div class="modal-container" style="text-align:center;"> <p id="notification-icon" style="font-size:50px; line-height:1;"></p> <h2 id="notification-title"></h2> <p id="notification-message"></p> <div class="modal-buttons"> <button type="button" id="notification-close-button">Tutup</button> </div> </div> </div>
@@ -120,7 +120,6 @@
     </div>
 
     <script>
-        const isMaintenanceOnFromTemplate = typeof maintenanceMode !== 'undefined' ? (<?!= maintenanceMode ?>) : undefined;
         const webAppUrl = 'https://script.google.com/macros/s/AKfycbyyGFR-VxH8DWoTu7PlPjDCkp7d-QkmrC6vzxlU36WfWOxZgOKUItV0SppH0OcoCB4/exec';
         
         const mainContent = document.getElementById('main-content');
@@ -128,10 +127,12 @@
         const adminPanel = document.getElementById('admin-panel');
 
         function showContent(mode) {
+             // Sembunyikan semua container utama terlebih dahulu
              mainContent.style.display = 'none';
              maintenanceContent.style.display = 'none';
              adminPanel.style.display = 'none';
 
+             // Tampilkan container yang sesuai
              switch(mode) {
                 case 'admin':
                     adminPanel.style.display = 'flex';
@@ -153,14 +154,13 @@
         }
 
         window.addEventListener('load', async () => {
+            // Logika utama untuk menentukan konten apa yang ditampilkan saat halaman dimuat
             if (window.location.hash === '#admin') {
                 showContent('admin');
-                return;
+                return; // Hentikan eksekusi lebih lanjut jika ini adalah halaman admin
             }
-            if (typeof isMaintenanceOnFromTemplate !== 'undefined') {
-                 showContent(isMaintenanceOnFromTemplate ? 'maintenance' : 'form');
-                 return;
-            }
+            
+            // Jika bukan halaman admin, ambil status dari server
             try {
                 const response = await fetch(webAppUrl + '?action=getStatus');
                 if (!response.ok) throw new Error('Network response error');
@@ -238,7 +238,7 @@
                     updateDashboard(isEnabled);
                 } else {
                     alert('Gagal mengubah status: ' + (result.message || 'Error'));
-                    toggle.checked = !isEnabled; // Revert on failure
+                    toggle.checked = !isEnabled; // Kembalikan jika gagal
                 }
             }
             
@@ -276,7 +276,7 @@
             
             const unitKerjaSelect = document.getElementById('unitKerja');
             if (unitKerjaSelect.options.length <= 1) {
-                const units = ["INSTALASI FARMASI", "INSTALASI RADIOLOGI", "INSTALASI BEDAH SENTRAL", "INSTALASI GAWAT DARURAT", "ICU", "ICCU", "HCU", "INSTALASI LABORATORIUM", "INSTALASI HEMODIALISA", "INSTALASI GIZI", "INSTALASI REKAM MEDIK", "INSTALASI PEMELIHARAAN SARANA", "INSTALASI PENYEHATAN LINGKUNGAN", "INSTALASI FORENSIK DAN MEDIKOLEGAL", "INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER", "INSTALASI MATERNAL DAN PERINATAL", "INSTALASI REHABILITASI MEDIK", "INSTALASI SIM RS", "INSTALASI PKRS", "POLI KIR", "POLI EKSKUTIF", "POLI TMS", "POLI EEG", "POLI ENDOSKOPI", "POLI ESWL", "RUANG MAWAR/ASTER", "RUANG ANYELIR/MELATI", "RUANG ANGGREK/DAHLIA", "RUANG BOUGENVILLE", "RUANG PAVILIUN", "RUANG ISOLASI", "RUANG PERINATOLOGI", "POLI ANAK", "POLI PENYAKIT DALAM", "POLI BEDAH", "POLI MATA", "POLI THT", "POLI SYARAF", "POLI JANTUNG", "POLI PARU", "POLI GIGI", "POLI KULIT DAN KELAMIN", "POLI JIWA", "POLI TB", "POLI VCT", "POLI UMUM", "BAGIAN PROGPEL", "BAGIAN KEUANGAN", "BAGIAN ADMINISTRASI DAN UMUM DAN SDM", "BIDANG PELAYANAN MEDIK", "BIDANG KEPERAWATAN", "BIDANG PELAYANAN PENUNJANG", "KOMITE MEDIK", "KOMITE KEPERAWATAN", "KOMITE PPI", "KOMITE KESEHATAN DAN KESELAMATAN KERJA", "SATUAN PEMERIKSAAN INTERNAL", "Lainnya"];
+                const units = ["INSTALASI FARMASI", "INSTALASI RADIOLOGI", "INSTALASI BEDAH SENTRAL", "INSTALASI GAWAT DARURAT", "ICU", "ICCU", "HCU", "INSTALASI LABORATORIUM", "INSTALASI HEMODIALISA", "INSTALASI GIZI", "INSTALASI REKAM MEDIK", "INSTALASI PEMELIHARAAN SARANA", "INSTALASI PENYEHATAN LINGKUNGAN", "INSTALASI FORENSIK DAN MEDIKOLEGAL", "INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER", "INSTALASI MATERNAL DAN PERINATAL", "INSTALASI REHABILITASI MEDIK", "INSTALASI SIM RS", "INSTALASI PKRS", "POLI KIR", "POLI EKSKUTIF", "POLI TMS", "POLI EEG", "POLI ENDOSKOPI", "POLI ESWL", "RUANG MAWAR/ASTER", "RUANG ANYELIR/MELATI", "RUANG ANGGREK/DAHLIA", "RUANG BOUGENVILLE", "RUANG PAVILIUN", "RUANG ISOLASI", "RUANG PERINATOLOGI", "POLI ANAK", "POLI PENYAKIT DALAM", "POLI BEDAH", "POLI MATA", "POLI THT", "POLI SYARAF", "POLI JANTUNG", "POLI PARU", "POLI GIGI", "POLI KULIT DAN KELAMIN", "POLI JIWA", "POLI TB", "POLI VCT", "POLI UMUM", "BAGIAN PROGPEL", "BAGIAN KEUANGAN", "BAGIAN ADMINISTRASI DAN UMUM DAN SDM", "BIDANG PELAYANAN MEDIK", "BIDANG KEPERAWatan", "BIDANG PELAYANAN PENUNJANG", "KOMITE MEDIK", "KOMITE KEPERAWATAN", "KOMITE PPI", "KOMITE KESEHATAN DAN KESELAMATAN KERJA", "SATUAN PEMERIKSAAN INTERNAL", "Lainnya"];
                 units.forEach(u => { const o = document.createElement('option'); o.value = o.textContent = u; unitKerjaSelect.appendChild(o); });
             }
 
@@ -348,12 +348,13 @@
                     if (fileInput) { dataToSubmit.fileKtp = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve({ base64: reader.result.split(',')[1], type: fileInput.type, name: fileInput.name }); reader.onerror = reject; reader.readAsDataURL(fileInput); }); }
                     
                     const response = await fetch(webAppUrl, { method: 'POST', body: JSON.stringify(dataToSubmit) });
+                    if (!response.ok) throw new Error("Gagal mengirim, respons server tidak valid.");
                     const result = await response.json();
 
                     if (result.status === 'sukses') {
                         showNotification(true, `Pengajuan Anda telah berhasil dikirim.`);
                     } else {
-                        throw new Error(result.message || 'Unknown error');
+                        throw new Error(result.message || 'Terjadi kesalahan yang tidak diketahui.');
                     }
                 } catch (error) {
                     showNotification(false, `Gagal mengirim data: ${error.message}`);
