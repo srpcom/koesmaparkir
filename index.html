@@ -17,8 +17,8 @@
             color: var(--text-color); margin: 0; padding: 10px;
         }
         .container { max-width: 800px; width: 100%; margin: 20px auto; background-color: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); }
-        header { background-color: var(--primary-color); color: white; padding: 20px; text-align: center; border-bottom: 5px solid #00487a; position: sticky; top: 0; z-index: 100; transition: all 0.3s ease-in-out; }
-        header .logo-image { width: 70px; height: auto; margin: 0 auto 15px auto; display: block; transition: all 0.3s ease-in-out; }
+        header { background-color: var(--primary-color); color: white; padding: 20px; text-align: center; border-bottom: 5px solid #00487a; position: sticky; top: 0; z-index: 100; }
+        header .logo-image { width: 70px; height: auto; margin: 0 auto 15px auto; display: block; }
         header h1 { margin: 0; font-size: 1.5em; font-weight: 700; }
         header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9em; }
         form { padding: 20px; }
@@ -26,19 +26,18 @@
         legend { font-weight: bold; font-size: 1.2em; color: #fff; padding: 8px 16px; border-radius: 20px; background-color: rgba(0, 90, 156, 0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-        input[type="text"], input[type="tel"], input[type="password"], select, textarea, input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 16px; transition: border-color 0.3s, box-shadow 0.3s; background-color: rgba(255, 255, 255, 0.8); }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.2); background-color: #fff; }
-        button { width: 100%; padding: 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
-        button:hover:not(:disabled) { background-color: #00487a; transform: translateY(-2px); }
+        input[type="text"], input[type="tel"], input[type="password"], select, textarea, input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: rgba(255, 255, 255, 0.8); }
+        button { width: 100%; padding: 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.3s; }
+        button:hover:not(:disabled) { background-color: #00487a; }
         button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
-        .hidden, .hidden-section { display: none; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; color: white; flex-direction: column; padding: 15px; box-sizing: border-box; -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px); }
+        .hidden { display: none; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .modal-container { background-color: white; color: var(--text-color); padding: 25px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
+        .modal-container { background-color: white; color: var(--text-color); padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
         .modal-buttons { display: flex; gap: 15px; margin-top: 25px; }
 
-        #admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); justify-content: center; align-items: center; z-index: 2000; }
         .admin-box { background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .admin-box h2 { text-align: center; color: var(--primary-color); margin-top: 0; }
         #admin-error { color: var(--error-color); text-align: center; margin-bottom: 15px; font-size: 0.9em; }
@@ -53,12 +52,9 @@
         #maintenance-status span.inactive { color: var(--error-color); }
 
         #maintenance-content {
-            font-family: var(--font-family); background-color: #f8f9fa; color: #343a40;
-            display: flex; justify-content: center; align-items: center; height: 100vh;
-            text-align: center; padding: 20px; box-sizing: border-box;
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 3000;
+            display: none; flex-direction: column; justify-content: center; align-items: center; height: 100vh;
+            text-align: center; padding: 20px; box-sizing: border-box; background-color: #f8f9fa;
         }
-        #maintenance-content .container { background: transparent; backdrop-filter: none; border: none; box-shadow: none; }
         #maintenance-content .logo { width: 100px; margin-bottom: 30px; }
         #maintenance-content h1 { font-size: 2.5em; margin: 0; color: #005A9C; }
         #maintenance-content p { font-size: 1.2em; color: #6c757d; line-height: 1.6; }
@@ -66,45 +62,37 @@
     </style>
 </head>
 <body>
-    <!-- BAGIAN UNTUK MAINTENANCE -->
-    <div id="maintenance-content" class="hidden">
-        <div class="container">
-            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD" class="logo">
-            <div class="maintenance-icon">&#9881;</div>
-            <h1>Sedang dalam Perbaikan</h1>
-            <p>
-                Mohon maaf, halaman ini sedang dalam pemeliharaan untuk meningkatkan kualitas layanan.
-                Kami akan segera kembali. Terima kasih atas pengertian Anda.
-            </p>
-        </div>
+    <div id="maintenance-content">
+        <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD" class="logo">
+        <div class="maintenance-icon">&#9881;</div>
+        <h1>Sedang dalam Perbaikan</h1>
+        <p>Mohon maaf, halaman ini sedang dalam pemeliharaan. Kami akan segera kembali.</p>
     </div>
     
-    <!-- BAGIAN UNTUK FORMULIR UTAMA -->
     <div id="main-content" class="hidden">
-        <div id="loading-overlay" class="overlay"> <div class="spinner"></div> <p>Mengirim data, mohon tunggu...</p> </div>
-        <div id="confirmation-overlay" class="overlay"> <div class="modal-container"> <h2>Konfirmasi Data Anda</h2> <p>Mohon periksa kembali data yang telah Anda isikan. screenshot jika perlu .</p> <div id="summary-content"></div> <div class="modal-buttons"> <button type="button" id="edit-button">Perbaiki Data</button> <button type="button" id="final-submit-button">Ya, Kirim & Selesaikan</button> </div> </div> </div>
-        <div id="notification-modal" class="overlay"> <div class="modal-container"> <p id="notification-icon"></p> <h2 id="notification-title"></h2> <p id="notification-message"></p> <div class="modal-buttons"> <button type="button" id="notification-close-button">Tutup</button> </div> </div> </div>
+        <div id="loading-overlay" class="overlay" style="color:white; flex-direction:column;"> <div class="spinner"></div> <p>Mengirim data, mohon tunggu...</p> </div>
+        <div id="confirmation-overlay" class="overlay"> <div class="modal-container"> <h2>Konfirmasi Data Anda</h2> <p>Mohon periksa kembali data Anda.</p> <div id="summary-content"></div> <div class="modal-buttons"> <button type="button" id="edit-button">Perbaiki</button> <button type="button" id="final-submit-button">Ya, Kirim</button> </div> </div> </div>
+        <div id="notification-modal" class="overlay"> <div class="modal-container" style="text-align:center;"> <p id="notification-icon" style="font-size:50px; line-height:1;"></p> <h2 id="notification-title"></h2> <p id="notification-message"></p> <div class="modal-buttons"> <button type="button" id="notification-close-button">Tutup</button> </div> </div> </div>
         <div class="container">
              <header id="main-header">
-                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD dr. R. Koesma" class="logo-image">
+                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD" class="logo-image">
                 <h1>FORMULIR LAYANAN PARKIR</h1>
                 <p>RSUD dr. R. KOESMA TUBAN</p>
             </header>
             <form id="parkingForm">
                  <fieldset> <legend>Tujuan Pengisian</legend> <div class="form-group"> <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label> <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label> <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label> <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label> <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label> <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label> </div> </fieldset>
-                 <fieldset> <legend>Informasi Karyawan</legend> <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div> <div class="form-group"><label for="unitKerja">Unit / Bagian Kerja</label><select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)"><option value="">-- Pilih Unit --</option></select></div> <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Silakan Tulis Nama Unit / Bagian Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div> <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div> <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div> </fieldset>
-                 <fieldset id="update-section" class="hidden-section"><legend>Data Kendaraan Lama</legend><div class="form-group"><label>Jenis Kendaraan Lama</label><br><label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label><label><input type="radio" name="jenisKendaraanLama" value="Sepeda Motor"> Sepeda Motor</label></div><div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')"></div></fieldset>
-                 <fieldset id="card-replacement-section" class="hidden-section"><legend>Informasi Penggantian Kartu</legend><div class="form-group"><label for="alasanPenggantian">Alasan Penggantian (Contoh: Hilang, Rusak)</label><textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea></div></fieldset>
-                 <fieldset id="new-vehicle-section" class="hidden-section"><legend>Detail Kendaraan Baru</legend><div class="form-group"><label><input type="radio" name="jenisKendaraan" value="Mobil"> Mobil</label><label><input type="radio" name="jenisKendaraan" value="Sepeda Motor"> Sepeda Motor</label></div><div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')"><p>Gunakan huruf Besar, tanpa spasi. Misal: S4966EP</p></div></fieldset>
-                 <fieldset id="lainnya-section" class="hidden-section"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Silakan tulis tujuan/keterangan lengkap Anda di sini</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
-                 <fieldset id="agreement-section" class="hidden-section"><legend>Persetujuan</legend><div class="form-group" style="display: flex; align-items: flex-start;"><input type="checkbox" id="agreement" name="agreement" required style="margin-top:5px; margin-right:10px;"><label for="agreement">Saya menyatakan bahwa seluruh data yang saya isikan adalah benar dan saya bersedia mematuhi semua peraturan parkir yang berlaku di lingkungan RSUD.</label></div></fieldset>
+                 <fieldset> <legend>Informasi Karyawan</legend> <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div> <div class="form-group"><label for="unitKerja">Unit / Bagian Kerja</label><select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)"><option value="">-- Pilih Unit --</option></select></div> <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div> <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div> <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div> </fieldset>
+                 <fieldset id="update-section" class="hidden"><legend>Data Kendaraan Lama</legend><div class="form-group"><label>Jenis Kendaraan Lama</label><br><label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label><label><input type="radio" name="jenisKendaraanLama" value="Sepeda Motor"> Motor</label></div><div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')"></div></fieldset>
+                 <fieldset id="card-replacement-section" class="hidden"><legend>Info Penggantian Kartu</legend><div class="form-group"><label for="alasanPenggantian">Alasan Penggantian</label><textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea></div></fieldset>
+                 <fieldset id="new-vehicle-section" class="hidden"><legend>Detail Kendaraan Baru</legend><div class="form-group"><label><input type="radio" name="jenisKendaraan" value="Mobil"> Mobil</label><label><input type="radio" name="jenisKendaraan" value="Sepeda Motor"> Motor</label></div><div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')"><p style="font-size:0.8em; color:#666;">Gunakan huruf besar, tanpa spasi. Misal: S4966EP</p></div></fieldset>
+                 <fieldset id="lainnya-section" class="hidden"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Tulis keterangan lengkap Anda</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
+                 <fieldset id="agreement-section" class="hidden"><legend>Persetujuan</legend><div class="form-group" style="display: flex; align-items: flex-start;"><input type="checkbox" id="agreement" name="agreement" required style="margin-top:5px; margin-right:10px;"><label for="agreement">Saya menyatakan data yang saya isikan adalah benar dan bersedia mematuhi peraturan parkir yang berlaku.</label></div></fieldset>
                  <button type="submit" id="submit-button">Kirim Formulir</button>
             </form>
         </div>
     </div>
 
-    <!-- BAGIAN UNTUK ADMIN PANEL -->
-    <div id="admin-panel" class="hidden">
+    <div id="admin-panel">
         <div id="admin-login" class="admin-box">
             <h2>Login Administrator</h2>
             <p id="admin-error" class="hidden"></p>
@@ -126,7 +114,7 @@
                     <span class="slider"></span>
                 </label>
             </div>
-             <p style="font-size: 0.8em; color: #666; margin-top: 20px;">Jika diaktifkan ("Aktif"), pengunjung akan melihat halaman perbaikan. Jika tidak ("Nonaktif"), formulir akan tampil.</p>
+             <p style="font-size: 0.8em; color: #666; margin-top: 20px;">Jika diaktifkan, pengunjung akan melihat halaman perbaikan.</p>
              <button id="admin-logout-button" style="background-color: #6c757d; margin-top: 15px;">Logout</button>
         </div>
     </div>
@@ -140,28 +128,26 @@
         const adminPanel = document.getElementById('admin-panel');
 
         function showContent(mode) {
-             mainContent.classList.add('hidden');
-             maintenanceContent.classList.add('hidden');
-             adminPanel.classList.add('hidden');
-             if(adminPanel.style.display === 'flex') adminPanel.style.display = 'none';
+             mainContent.style.display = 'none';
+             maintenanceContent.style.display = 'none';
+             adminPanel.style.display = 'none';
 
              switch(mode) {
                 case 'admin':
-                    adminPanel.classList.remove('hidden');
                     adminPanel.style.display = 'flex';
                     initializeAdminPanel();
                     break;
                 case 'maintenance':
-                    maintenanceContent.classList.remove('hidden');
+                    maintenanceContent.style.display = 'flex';
                     break;
                 case 'form':
-                    mainContent.classList.remove('hidden');
+                    mainContent.style.display = 'block';
                     initializeForm();
                     break;
                 case 'error':
-                    maintenanceContent.classList.remove('hidden');
+                    maintenanceContent.style.display = 'flex';
                     document.querySelector('#maintenance-content h1').textContent = 'Gagal Memuat';
-                    document.querySelector('#maintenance-content p').textContent = 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda dan coba lagi nanti.';
+                    document.querySelector('#maintenance-content p').textContent = 'Tidak dapat terhubung ke server. Coba lagi nanti.';
                     break;
              }
         }
@@ -171,15 +157,13 @@
                 showContent('admin');
                 return;
             }
-
             if (typeof isMaintenanceOnFromTemplate !== 'undefined') {
                  showContent(isMaintenanceOnFromTemplate ? 'maintenance' : 'form');
                  return;
             }
-            
             try {
                 const response = await fetch(webAppUrl + '?action=getStatus');
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) throw new Error('Network response error');
                 const data = await response.json();
                 if (data.status === 'success') {
                     showContent(data.maintenanceMode ? 'maintenance' : 'form');
@@ -187,94 +171,96 @@
                     showContent('error');
                 }
             } catch (error) {
-                console.error('Failed to fetch maintenance status:', error);
+                console.error('Fetch status failed:', error);
                 showContent('error');
             }
         });
         
         function initializeAdminPanel() {
-            if (document.getElementById('admin-panel')._initialized) return;
-            document.getElementById('admin-panel')._initialized = true;
+            if (adminPanel._initialized) return;
+            adminPanel._initialized = true;
 
-            const adminLogin = document.getElementById('admin-login');
-            const adminDashboard = document.getElementById('admin-dashboard');
-            const adminPasswordInput = document.getElementById('admin-password');
-            const adminLoginButton = document.getElementById('admin-login-button');
-            const adminError = document.getElementById('admin-error');
-            const maintenanceToggle = document.getElementById('maintenance-toggle');
-            const maintenanceStatus = document.getElementById('maintenance-status');
-            const adminLogoutButton = document.getElementById('admin-logout-button');
-            let adminPassword = null;
+            const loginView = document.getElementById('admin-login');
+            const dashboardView = document.getElementById('admin-dashboard');
+            const passwordInput = document.getElementById('admin-password');
+            const loginButton = document.getElementById('admin-login-button');
+            const errorMsg = document.getElementById('admin-error');
+            const toggle = document.getElementById('maintenance-toggle');
+            const statusText = document.getElementById('maintenance-status');
+            const logoutButton = document.getElementById('admin-logout-button');
+            let sessionPassword = null;
 
-            async function callAdminBackend(action, data = {}) {
+            async function callApi(action, data = {}) {
+                loginButton.disabled = true;
                 try {
                     const response = await fetch(webAppUrl, {
                         method: 'POST', mode: 'cors', cache: 'no-cache',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ action, ...data }),
-                        redirect: 'follow'
                     });
                     if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
                     return await response.json();
-                } catch (error) {
-                    console.error('Admin backend call failed:', error);
+                } catch (err) {
+                    console.error('API call failed:', err);
                     return { status: 'error', message: 'Tidak dapat terhubung ke server.' };
+                } finally {
+                    loginButton.disabled = false;
                 }
             }
 
-            async function handleAdminLogin() {
-                const password = adminPasswordInput.value;
-                if (!password) { showAdminError('Password tidak boleh kosong.'); return; }
-                adminLoginButton.disabled = true; adminLoginButton.textContent = 'Mengecek...';
-                adminError.classList.add('hidden');
+            async function login() {
+                const password = passwordInput.value;
+                if (!password) { showError('Password tidak boleh kosong.'); return; }
+                loginButton.textContent = 'Mengecek...';
+                errorMsg.classList.add('hidden');
                 
-                const result = await callAdminBackend('getMaintenanceStatus', { password });
+                const result = await callApi('getMaintenanceStatus', { password });
                 
                 if (result.status === 'success') {
-                    adminPassword = password;
-                    adminLogin.classList.add('hidden');
-                    adminDashboard.classList.remove('hidden');
-                    updateDashboardUI(result.data.isEnabled);
+                    sessionPassword = password;
+                    loginView.classList.add('hidden');
+                    dashboardView.classList.remove('hidden');
+                    updateDashboard(result.data.isEnabled);
                 } else {
-                    showAdminError(result.message || 'Password salah.');
+                    showError(result.message || 'Password salah.');
                 }
-                adminLoginButton.disabled = false; adminLoginButton.textContent = 'Login';
+                loginButton.textContent = 'Login';
             }
 
-            function handleAdminLogout() {
-                adminPassword = null; adminPasswordInput.value = '';
-                adminDashboard.classList.add('hidden'); adminLogin.classList.remove('hidden');
+            function logout() {
+                sessionPassword = null; passwordInput.value = '';
+                dashboardView.classList.add('hidden'); loginView.classList.remove('hidden');
             }
 
-            async function setMaintenanceMode(isEnabled) {
-                const result = await callAdminBackend('setMaintenanceMode', { password: adminPassword, enabled: isEnabled });
+            async function setMode(isEnabled) {
+                const result = await callApi('setMaintenanceMode', { password: sessionPassword, enabled: isEnabled });
                 if (result.status === 'success') {
-                    updateDashboardUI(isEnabled);
+                    updateDashboard(isEnabled);
                 } else {
                     alert('Gagal mengubah status: ' + (result.message || 'Error'));
-                    maintenanceToggle.checked = !isEnabled;
+                    toggle.checked = !isEnabled; // Revert on failure
                 }
             }
             
-            function showAdminError(message) {
-                adminError.textContent = message;
-                adminError.classList.remove('hidden');
+            function showError(message) {
+                errorMsg.textContent = message;
+                errorMsg.classList.remove('hidden');
             }
 
-            function updateDashboardUI(isEnabled) {
-                maintenanceToggle.checked = isEnabled;
-                maintenanceStatus.innerHTML = `Status: ${isEnabled ? '<span class="active">AKTIF</span>' : '<span class="inactive">NONAKTIF</span>'}`;
+            function updateDashboard(isEnabled) {
+                toggle.checked = isEnabled;
+                statusText.innerHTML = `Status: ${isEnabled ? '<span class="active">AKTIF</span>' : '<span class="inactive">NONAKTIF</span>'}`;
             }
 
-            adminLoginButton.addEventListener('click', handleAdminLogin);
-            adminPasswordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAdminLogin(); });
-            maintenanceToggle.addEventListener('change', (e) => setMaintenanceMode(e.target.checked));
-            adminLogoutButton.addEventListener('click', handleAdminLogout);
+            loginButton.addEventListener('click', login);
+            passwordInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') login(); });
+            toggle.addEventListener('change', (e) => setMode(e.target.checked));
+            logoutButton.addEventListener('click', logout);
         }
 
         function initializeForm() {
-            if (document.getElementById('parkingForm')._initialized) return;
-            document.getElementById('parkingForm')._initialized = true;
+            if (mainContent._initialized) return;
+            mainContent._initialized = true;
 
             let formDataObject = {};
             const allSections = {
@@ -285,19 +271,19 @@
                 agreement: document.getElementById('agreement-section')
             };
             const loadingOverlay = document.getElementById('loading-overlay');
-            const confirmationOverlay = document.getElementById('confirmation-overlay');
-            const notificationModal = document.getElementById('notification-modal');
+            const confirmOverlay = document.getElementById('confirmation-overlay');
+            const notifModal = document.getElementById('notification-modal');
             
             const unitKerjaSelect = document.getElementById('unitKerja');
-            if(unitKerjaSelect.options.length <= 1) {
-                const unitKerjaOptions = ["INSTALASI FARMASI", "INSTALASI RADIOLOGI", "INSTALASI BEDAH SENTRAL", "INSTALASI GAWAT DARURAT", "ICU", "ICCU", "HCU", "INSTALASI LABORATORIUM", "INSTALASI HEMODIALISA", "INSTALASI GIZI", "INSTALASI REKAM MEDIK", "INSTALASI PEMELIHARAAN SARANA", "INSTALASI PENYEHATAN LINGKUNGAN", "INSTALASI FORENSIK DAN MEDIKOLEGAL", "INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER", "INSTALASI MATERNAL DAN PERINATAL", "INSTALASI REHABILITASI MEDIK", "INSTALASI SIM RS", "INSTALASI PKRS", "POLI KIR", "POLI EKSKUTIF", "POLI TMS", "POLI EEG", "POLI ENDOSKOPI", "POLI ESWL", "RUANG MAWAR/ASTER", "RUANG ANYELIR/MELATI", "RUANG ANGGREK/DAHLIA", "RUANG BOUGENVILLE", "RUANG PAVILIUN", "RUANG ISOLASI", "RUANG PERINATOLOGI", "POLI ANAK", "POLI PENYAKIT DALAM", "POLI BEDAH", "POLI MATA", "POLI THT", "POLI SYARAF", "POLI JANTUNG", "POLI PARU", "POLI GIGI", "POLI KULIT DAN KELAMIN", "POLI JIWA", "POLI TB", "POLI VCT", "POLI UMUM", "BAGIAN PROGPEL", "BAGIAN KEUANGAN", "BAGIAN ADMINISTRASI DAN UMUM DAN SDM", "BIDANG PELAYANAN MEDIK", "BIDANG KEPERAWATAN", "BIDANG PELAYANAN PENUNJANG", "KOMITE MEDIK", "KOMITE KEPERAWATAN", "KOMITE PPI", "KOMITE KESEHATAN DAN KESELAMATAN KERJA", "SATUAN PEMERIKSAAN INTERNAL", "Lainnya..."];
-                unitKerjaOptions.forEach(opt => { const option = document.createElement('option'); option.value = (opt === 'Lainnya...') ? 'Lainnya' : opt; option.textContent = opt; unitKerjaSelect.appendChild(option); });
+            if (unitKerjaSelect.options.length <= 1) {
+                const units = ["INSTALASI FARMASI", "INSTALASI RADIOLOGI", "INSTALASI BEDAH SENTRAL", "INSTALASI GAWAT DARURAT", "ICU", "ICCU", "HCU", "INSTALASI LABORATORIUM", "INSTALASI HEMODIALISA", "INSTALASI GIZI", "INSTALASI REKAM MEDIK", "INSTALASI PEMELIHARAAN SARANA", "INSTALASI PENYEHATAN LINGKUNGAN", "INSTALASI FORENSIK DAN MEDIKOLEGAL", "INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER", "INSTALASI MATERNAL DAN PERINATAL", "INSTALASI REHABILITASI MEDIK", "INSTALASI SIM RS", "INSTALASI PKRS", "POLI KIR", "POLI EKSKUTIF", "POLI TMS", "POLI EEG", "POLI ENDOSKOPI", "POLI ESWL", "RUANG MAWAR/ASTER", "RUANG ANYELIR/MELATI", "RUANG ANGGREK/DAHLIA", "RUANG BOUGENVILLE", "RUANG PAVILIUN", "RUANG ISOLASI", "RUANG PERINATOLOGI", "POLI ANAK", "POLI PENYAKIT DALAM", "POLI BEDAH", "POLI MATA", "POLI THT", "POLI SYARAF", "POLI JANTUNG", "POLI PARU", "POLI GIGI", "POLI KULIT DAN KELAMIN", "POLI JIWA", "POLI TB", "POLI VCT", "POLI UMUM", "BAGIAN PROGPEL", "BAGIAN KEUANGAN", "BAGIAN ADMINISTRASI DAN UMUM DAN SDM", "BIDANG PELAYANAN MEDIK", "BIDANG KEPERAWATAN", "BIDANG PELAYANAN PENUNJANG", "KOMITE MEDIK", "KOMITE KEPERAWATAN", "KOMITE PPI", "KOMITE KESEHATAN DAN KESELAMATAN KERJA", "SATUAN PEMERIKSAAN INTERNAL", "Lainnya"];
+                units.forEach(u => { const o = document.createElement('option'); o.value = o.textContent = u; unitKerjaSelect.appendChild(o); });
             }
 
             window.toggleSections = function() {
                 const choice = document.querySelector('input[name="jenisPengajuan"]:checked').value;
-                Object.values(allSections).forEach(sec => { sec.style.display = 'none'; setRequired(sec, false); });
-                const show = (sec) => { sec.style.display = 'block'; setRequired(sec, true); };
+                Object.values(allSections).forEach(sec => sec.classList.add('hidden'));
+                const show = (sec) => sec.classList.remove('hidden');
                 switch(choice) {
                     case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(allSections.newVehicle); show(allSections.agreement); break;
                     case 'Rubah Nomor Kendaraan': show(allSections.update); show(allSections.newVehicle); show(allSections.agreement); break;
@@ -306,29 +292,75 @@
                     case 'Lainnya': show(allSections.lainnya); show(allSections.agreement); break;
                 }
             };
+
+            window.handleUnitKerjaChange = function(select) {
+                const lainnya = document.getElementById('unitKerjaLainnya-group');
+                lainnya.classList.toggle('hidden', select.value !== 'Lainnya');
+                document.getElementById('unitKerjaLainnya').required = (select.value === 'Lainnya');
+            };
+
+            function populateSummary(data) {
+                const content = document.getElementById('summary-content');
+                content.innerHTML = '';
+                const add = (label, value) => { if (value) content.innerHTML += `<p><strong>${label}:</strong> ${value}</p>`; };
+                add('Tujuan', data.jenisPengajuan);
+                add('Nama Lengkap', data.namaLengkap);
+                add('Unit Kerja', data.unitKerja === 'Lainnya' ? data.unitKerjaLainnya : data.unitKerja);
+                add('No. Telepon', data.telepon);
+                add('File Identitas', document.getElementById('fileKtp').files[0]?.name);
+                add('Jenis Kend. Lama', data.jenisKendaraanLama);
+                add('Nopol Lama', data.noPolisiLama);
+                add('Jenis Kend. Baru', data.jenisKendaraan);
+                add('Nopol Baru', data.noPolisiBaru);
+                add('Alasan Ganti Kartu', data.alasanPenggantian);
+                add('Keterangan Lainnya', data.keteranganLainnya);
+            }
             
-            function setRequired(element, isRequired) {
-                element.querySelectorAll('input, select, textarea').forEach(input => {
-                    if(!['radio', 'checkbox', 'file'].includes(input.type)) { input.required = (element.style.display !== 'none') ? isRequired : false; }
-                });
+            function showNotification(isSuccess, message) {
+                notifModal.querySelector('#notification-icon').textContent = isSuccess ? '✓' : '✗';
+                notifModal.querySelector('#notification-icon').style.color = isSuccess ? 'var(--success-color)' : 'var(--error-color)';
+                notifModal.querySelector('#notification-title').textContent = isSuccess ? 'Berhasil' : 'Gagal';
+                notifModal.querySelector('#notification-message').textContent = message;
+                notifModal.style.display = 'flex';
+                notifModal.classList.toggle('success', isSuccess);
             }
 
-            window.handleUnitKerjaChange = function(selectElement) {
-                const lainnyaGroup = document.getElementById('unitKerjaLainnya-group');
-                const lainnyaInput = document.getElementById('unitKerjaLainnya');
-                lainnyaInput.required = (selectElement.value === 'Lainnya');
-                lainnyaGroup.classList.toggle('hidden', selectElement.value !== 'Lainnya');
-                if (selectElement.value !== 'Lainnya') lainnyaInput.value = '';
-            };
+            document.getElementById('parkingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                formDataObject = Object.fromEntries(formData.entries());
+                populateSummary(formDataObject);
+                confirmOverlay.style.display = 'flex';
+            });
             
-            function compressAndReadFile(file) { /* ... fungsi kompresi file ... */ }
-            function populateSummary(data) { /* ... fungsi ringkasan ... */ }
-            function showNotification(isSuccess, message) { /* ... fungsi notifikasi ... */ }
+            document.getElementById('edit-button').addEventListener('click', () => confirmOverlay.style.display = 'none');
+            document.getElementById('notification-close-button').addEventListener('click', () => { if (notifModal.classList.contains('success')) window.location.reload(); else notifModal.style.display = 'none'; });
+            
+            document.getElementById('final-submit-button').addEventListener('click', async function() {
+                confirmOverlay.style.display = 'none';
+                loadingOverlay.style.display = 'flex';
+                let dataToSubmit = { ...formDataObject };
+                if (dataToSubmit.unitKerja === 'Lainnya') { dataToSubmit.unitKerja = dataToSubmit.unitKerjaLainnya; }
+                delete dataToSubmit.unitKerjaLainnya;
+                
+                try {
+                    const fileInput = document.getElementById('fileKtp').files[0];
+                    if (fileInput) { dataToSubmit.fileKtp = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onloadend = () => resolve({ base64: reader.result.split(',')[1], type: fileInput.type, name: fileInput.name }); reader.onerror = reject; reader.readAsDataURL(fileInput); }); }
+                    
+                    const response = await fetch(webAppUrl, { method: 'POST', body: JSON.stringify(dataToSubmit) });
+                    const result = await response.json();
 
-            document.getElementById('parkingForm').addEventListener('submit', function(e) { e.preventDefault(); /* ... logika submit awal ... */ });
-            document.getElementById('edit-button').addEventListener('click', () => confirmationOverlay.style.display = 'none');
-            document.getElementById('notification-close-button').addEventListener('click', () => { if (notificationModal.classList.contains('success')) { window.location.reload(); } else { notificationModal.style.display = 'none'; } });
-            document.getElementById('final-submit-button').addEventListener('click', async function() { /* ... logika submit akhir ... */ });
+                    if (result.status === 'sukses') {
+                        showNotification(true, `Pengajuan Anda telah berhasil dikirim.`);
+                    } else {
+                        throw new Error(result.message || 'Unknown error');
+                    }
+                } catch (error) {
+                    showNotification(false, `Gagal mengirim data: ${error.message}`);
+                } finally {
+                    loadingOverlay.style.display = 'none';
+                }
+            });
         }
     </script>
 </body>
