@@ -152,6 +152,19 @@
 </head>
 <body>
     <div id="loading-overlay" class="overlay"><div class="spinner"></div><p>Mohon tunggu...</p></div>
+    
+    <!-- Modal Konfirmasi Hapus -->
+    <div id="delete-confirm-modal" class="overlay">
+        <div style="background: white; padding: 20px 30px; border-radius: 8px; text-align: center; max-width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <h3 style="margin-top:0; color: var(--error-color);">Konfirmasi Hapus</h3>
+            <p id="delete-confirm-text">Apakah Anda yakin ingin menghapus data ini secara permanen? Tindakan ini tidak dapat dibatalkan.</p>
+            <div style="display: flex; justify-content: space-around; margin-top: 25px;">
+                <button id="confirm-delete-btn" style="background-color: var(--error-color); width: 130px; padding: 10px;">Ya, Hapus</button>
+                <button id="cancel-delete-btn" style="background-color: #6c757d; width: 130px; padding: 10px;">Batal</button>
+            </div>
+        </div>
+    </div>
+
     <div id="main-form-container">
          <div class="container">
             <header>
@@ -171,7 +184,6 @@
                         <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
                         <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
                         <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
-                        <!-- --- PERBAIKAN: Mengubah teks dan value --- -->
                         <label><input type="radio" name="jenisPengajuan" value="Buat/Ganti Kartu Parkir" onchange="toggleSections()" required> Buat/Ganti Kartu Parkir</label>
                         <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
                     </div>
@@ -180,7 +192,6 @@
                         <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK) namun kendaraannya masih sama. Anda perlu mengisi Nopol lama dan baru.</p>
                         <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar. Anda akan diminta mengisi Nopol kendaraan yang akan dihapus.</p>
                         <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil). Anda akan mengisi detail kendaraan baru.</p>
-                        <!-- --- PERBAIKAN: Menyesuaikan ID dan teks deskripsi --- -->
                         <p id="desc-buat/ganti-kartu-parkir" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang, rusak, atau jika Anda belum pernah menerima kartu sebelumnya.</p>
                         <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci pada kolom keterangan yang disediakan.</p>
                     </div>
@@ -288,7 +299,6 @@
                     </div>
                 </fieldset>
                 <fieldset id="card-replacement-section" class="hidden">
-                    <!-- --- PERBAIKAN: Mengubah legend --- -->
                     <legend>Alasan Pembuatan/Penggantian Kartu Parkir</legend>
                     <div class="form-group">
                         <label>Pilih Alasan</label>
@@ -370,12 +380,14 @@
             </div>
         </div>
     </div>
-    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">ver 1.1</footer>
+    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">ver 1.2</footer>
     <script>
         const webAppUrl = 'https://script.google.com/macros/s/AKfycbz4BFMq1gjZhyzKZx5qzqPEcoNxzrQZG0NHAX_g8ym4xFU6fBFpWmONkpxgjAXxxqNY/exec';
         
         let submissionHeaders = [];
         let currentPage = 1;
+        let rowToDelete = null;
+        let selectToRevert = null;
 
         const mainFormContainer = document.getElementById('main-form-container');
         const adminLoginPage = document.getElementById('admin-login-page');
@@ -404,6 +416,25 @@
         searchInput.addEventListener('keyup', () => fetchPage(1));
         statusFilter.addEventListener('change', () => fetchPage(1));
         downloadButton.addEventListener('click', downloadXLSX);
+
+        // --- Event Listener untuk Modal Konfirmasi Hapus ---
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+            if (rowToDelete) {
+                updateStatus('Hapus', rowToDelete);
+                document.getElementById('delete-confirm-modal').style.display = 'none';
+                if(selectToRevert) selectToRevert.closest('tr').style.display = 'none'; 
+            }
+        });
+
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            if (selectToRevert) {
+                selectToRevert.value = selectToRevert.getAttribute('data-previous-value');
+            }
+            document.getElementById('delete-confirm-modal').style.display = 'none';
+            rowToDelete = null;
+            selectToRevert = null;
+        });
+
 
         async function adminLogin() {
             const password = document.getElementById('admin-password').value;
@@ -509,7 +540,11 @@
 
                     if (header === 'Status') {
                         const select = document.createElement('select');
-                        select.innerHTML = `<option value="Belum diproses" ${cell === 'Belum diproses' ? 'selected' : ''}>Belum diproses</option><option value="Selesai" ${cell === 'Selesai' ? 'selected' : ''}>Selesai</option><option value="Ditolak" ${cell === 'Ditolak' ? 'selected' : ''}>Ditolak</option>`;
+                        select.innerHTML = `<option value="Belum diproses" ${cell === 'Belum diproses' ? 'selected' : ''}>Belum diproses</option>
+                                            <option value="Selesai" ${cell === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                                            <option value="Ditolak" ${cell === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+                                            <option value="Hapus" style="color:red; font-weight:bold;">Hapus</option>`;
+                        select.setAttribute('data-previous-value', cell);
                         select.onchange = (event) => handleStatusChange(event.target, originalIndex);
                         td.appendChild(select);
                         updateSelectColor(select);
@@ -542,8 +577,15 @@
         }
         
         function handleStatusChange(selectElement, rowIndex) {
-            updateSelectColor(selectElement);
-            updateStatus(selectElement.value, rowIndex);
+            if (selectElement.value === 'Hapus') {
+                rowToDelete = rowIndex;
+                selectToRevert = selectElement;
+                document.getElementById('delete-confirm-modal').style.display = 'flex';
+            } else {
+                updateSelectColor(selectElement);
+                selectElement.setAttribute('data-previous-value', selectElement.value);
+                updateStatus(selectElement.value, rowIndex);
+            }
         }
 
         function updateSelectColor(selectElement) {
@@ -558,7 +600,7 @@
             showLoading(true, 'Menyimpan...');
             try {
                 await fetch(`${webAppUrl}?action=updateStatus&rowIndex=${rowIndex}&status=${encodeURIComponent(newStatus)}`);
-            } catch (e) { console.error("Gagal update status:", e); alert("Gagal menyimpan status."); }
+            } catch (e) { console.error("Gagal update status:", e); }
             finally { showLoading(false); }
         }
 
@@ -580,10 +622,10 @@
                     XLSX.utils.book_append_sheet(workbook, worksheet, "Submisi");
                     XLSX.writeFile(workbook, "Data_Parkir_Karyawan.xlsx");
                 } else {
-                    alert("Tidak ada data untuk diunduh sesuai filter yang dipilih.");
+                   //
                 }
             } catch(e) {
-                alert("Gagal mengunduh data. Periksa koneksi internet Anda.");
+               //
             } finally {
                 showLoading(false);
             }
@@ -611,7 +653,7 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    alert('Pengajuan Anda telah berhasil dikirim!');
+                    //
                     this.reset(); 
                     toggleSections(); 
                     handleStatusKepegawaianChange();
@@ -621,7 +663,6 @@
                 }
             } catch(error) { 
                 console.error('Submit Error:', error);
-                alert('Terjadi kesalahan koneksi. Pastikan internet Anda stabil. Pesan: ' + error.message); 
             } finally { 
                 showLoading(false); 
             } 
@@ -702,7 +743,6 @@
             }
         }
         
-        // --- PERBAIKAN: Fungsi generik untuk gaya radio button ---
         function handleRadioStyle(radioElement) {
             if (!radioElement) return;
             const radioName = radioElement.name;
@@ -719,4 +759,3 @@
     </script>
 </body>
 </html>
-
