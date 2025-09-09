@@ -76,6 +76,8 @@
             #submissions-table td:last-child { border-bottom: none; }
             #submissions-table td::before { content: attr(data-label); font-weight: bold; text-align: left; margin-right: 15px; color: var(--primary-color); flex-shrink: 0; }
             .admin-controls { flex-direction: column; align-items: stretch; }
+            /* PERUBAIKAN: Sembunyikan sel kosong di tampilan HP */
+            #submissions-table td.empty-cell { display: none; }
         }
     </style>
 </head>
@@ -304,17 +306,26 @@
                     const td = document.createElement('td');
                     const header = submissionHeaders[cellIndex];
                     td.setAttribute('data-label', header);
-                     if (header === 'Status') {
+                    
+                    const isEmpty = !cell || cell.toString().trim() === '';
+
+                    if (header === 'Status') {
                         const select = document.createElement('select');
                         select.innerHTML = `<option value="Belum diproses" ${cell === 'Belum diproses' ? 'selected' : ''}>Belum diproses</option><option value="Selesai" ${cell === 'Selesai' ? 'selected' : ''}>Selesai</option><option value="Ditolak" ${cell === 'Ditolak' ? 'selected' : ''}>Ditolak</option>`;
                         select.onchange = (event) => handleStatusChange(event.target, originalIndex);
                         td.appendChild(select);
                         updateSelectColor(select);
-                    } else if (header === 'Link File Identitas' && cell && cell.startsWith('http')) {
+                    } else if (header === 'Link File Identitas' && !isEmpty && cell.startsWith('http')) {
                         td.innerHTML = `<a href="${cell}" target="_blank" rel="noopener noreferrer">Lihat File</a>`;
                     } else {
                         td.textContent = cell;
                     }
+
+                    // PERUBAIKAN: Tambahkan kelas 'empty-cell' jika data kosong, kecuali untuk kolom Status
+                    if (header !== 'Status' && isEmpty) {
+                        td.classList.add('empty-cell');
+                    }
+
                     tr.appendChild(td);
                 });
                 tableBody.appendChild(tr);
