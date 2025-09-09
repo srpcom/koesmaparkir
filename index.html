@@ -316,7 +316,11 @@
                         updateSelectColor(select);
                     } else if (header === 'Link File Identitas' && !isEmpty && cell.startsWith('http')) {
                         td.innerHTML = `<a href="${cell}" target="_blank" rel="noopener noreferrer">Lihat File</a>`;
-                    } else {
+                    } else if (header === 'Timestamp') {
+                        // **PERBAIKAN: Menambahkan "WIB" pada tampilan timestamp**
+                        td.textContent = cell ? `${cell} WIB` : '';
+                    }
+                    else {
                         td.textContent = cell;
                     }
 
@@ -389,7 +393,6 @@
 
         async function checkFormStatusForUser() { try { const response = await fetch(`${webAppUrl}?action=getSettings`); const result = await response.json(); const isOff = result.status === 'success' && result.data.formStatus === 'OFF'; document.getElementById('parkingForm').classList.toggle('hidden', isOff); document.getElementById('form-closed-message').classList.toggle('hidden', !isOff); } catch(e) { console.error("Gagal memeriksa status form.", e); } }
         
-        // --- PERBAIKAN PADA FUNGSI PENGIRIMAN FORM ---
         document.getElementById('parkingForm').addEventListener('submit', async function(e) { 
             e.preventDefault(); 
             showLoading(true, "Mengirim data..."); 
@@ -401,17 +404,14 @@
                     formDataObject.fileKtp = await compressAndReadFile(fileInput);
                 }
                 
-                // Menghapus 'mode: no-cors' dan menambahkan penanganan respons yang benar
                 const response = await fetch(webAppUrl, { 
                     method: 'POST', 
-                    // Menggunakan header text/plain untuk kompatibilitas terbaik dengan Google Apps Script
                     headers: {
                         'Content-Type': 'text/plain;charset=utf-8',
                     },
                     body: JSON.stringify(formDataObject)
                 });
                 
-                // Sekarang kita bisa membaca respons dari server
                 const result = await response.json();
 
                 if (result.status === 'success') {
@@ -419,7 +419,6 @@
                     this.reset(); 
                     toggleSections(); 
                 } else {
-                    // Jika server mengirim pesan error, kita menampilkannya
                     throw new Error(result.message || 'Terjadi kesalahan di server.');
                 }
             } catch(error) { 
