@@ -78,27 +78,28 @@
         #form-status-toggle.on span { background-color: var(--success-color); }
         #form-status-toggle.on span:before { transform: translateX(24px); }
         
-        /* --- PERBAIKAN: Gaya tabel admin yang lebih hemat ruang --- */
         #submissions-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             table-layout: fixed;
-            font-family: 'Arial Narrow', Arial, sans-serif; /* Menggunakan font yang lebih ramping */
+            font-family: 'Arial Narrow', Arial, sans-serif;
         }
         #submissions-table th, #submissions-table td {
             border: 1px solid #ddd;
-            padding: 6px 8px; /* Mengurangi padding vertikal */
+            padding: 6px 8px;
             text-align: left;
-            font-size: 0.85em; /* Sedikit memperkecil font */
+            font-size: 0.85em;
             word-break: break-word;
         }
         #submissions-table th {
             background-color: #f2f2f2;
-            white-space: nowrap; /* Mencegah header terpotong */
+            /* --- PERBAIKAN: Mengubah white-space agar teks header bisa wrap --- */
+            white-space: normal;
+            vertical-align: middle; /* Memastikan teks tetap di tengah jika ada 2 baris */
         }
         #submissions-table td {
-            white-space: normal; /* Memungkinkan isi sel untuk wrap jika perlu */
+            white-space: normal;
         }
 
         .table-container { max-height: 500px; overflow-x: auto; }
