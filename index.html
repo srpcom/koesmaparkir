@@ -4,509 +4,398 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Layanan Parkir</title>
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png">
     <style>
-        /* CSS untuk tampilan profesional dan modern */
         :root {
-            --primary-color: #005A9C;
-            --secondary-color: #F0F8FF;
-            --border-color: #DCDCDC;
-            --text-color: #333;
-            --success-color: #28a745;
-            --error-color: #dc3545;
+            --primary-color: #005A9C; --secondary-color: #F0F8FF; --border-color: #DCDCDC;
+            --text-color: #333; --success-color: #28a745; --error-color: #dc3545;
             --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
-
-        body {
-            font-family: var(--font-family);
-            background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: var(--text-color);
-            margin: 0;
-            padding: 10px;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            margin: 20px auto;
-            background-color: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 12px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-bottom: 5px solid #00487a;
-            border-radius: 12px 12px 0 0;
-        }
-
-        header .logo-image {
-            width: 70px;
-            height: auto;
-            margin: 0 auto 15px auto;
-            display: block;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.5em;
-            font-weight: 700;
-        }
-        
-        header p {
-            margin: 5px 0 0;
-            opacity: 0.9;
-            font-size: 0.9em;
-        }
-
-        form {
-            padding: 20px;
-        }
-
-        fieldset {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px 15px;
-            margin-bottom: 25px;
-            background-color: rgba(255, 255, 255, 0.5);
-        }
-
-        legend {
-            font-weight: bold;
-            font-size: 1.2em;
-            color: var(--primary-color);
-            padding: 5px 15px;
-            border-radius: 20px;
-            background-color: #fff;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        input[type="text"],
-        input[type="tel"],
-        select,
-        textarea,
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-        
-        textarea {
-            resize: vertical;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.2);
-            background-color: #fff;
-        }
-
-        .radio-group label, .checkbox-group label {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            font-weight: normal;
-            cursor: pointer;
-        }
-        
-        .radio-group input, .checkbox-group input {
-           margin-right: 10px;
-           flex-shrink: 0;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        button:hover:not(:disabled) {
-            background-color: #00487a;
-            transform: translateY(-2px);
-        }
-        
-        button:disabled {
-            background-color: #a0a0a0;
-            cursor: not-allowed;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .keterangan-box {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: rgba(240, 248, 255, 0.8);
-            border-radius: 6px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        /* Overlay and Modal styles */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 15px;
-            box-sizing: border-box;
-            backdrop-filter: blur(5px);
-        }
-        
-        .spinner {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid var(--primary-color);
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        #loading-overlay p {
-            color: white;
-            margin-top: 20px;
-            font-size: 1.2em;
-        }
-
-        .modal-container {
-            background-color: white;
-            padding: 25px;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 100%;
-            text-align: left;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-        }
-        .modal-container h2 {
-            margin-top: 0;
-            color: var(--primary-color);
-            text-align: center;
-        }
-        .summary-content p {
-            margin: 10px 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            line-height: 1.6;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 25px;
-        }
-        
-        /* Notification styles */
-        #notification-modal .modal-container { text-align: center; }
-        #notification-modal .icon { font-size: 50px; line-height: 1; }
+        body { font-family: var(--font-family); background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: var(--text-color); margin: 0; padding: 10px; }
+        .container { max-width: 800px; width: 100%; margin: 20px auto; background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 12px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); }
+        header { background-color: var(--primary-color); color: white; padding: 20px; text-align: center; border-bottom: 5px solid #00487a; border-radius: 12px 12px 0 0; }
+        header .logo-image { width: 70px; margin: 0 auto 15px auto; display: block; }
+        header h1 { margin: 0; font-size: 1.5em; }
+        header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9em; }
+        form, .admin-container { padding: 20px; }
+        fieldset { border: 1px solid var(--border-color); border-radius: 8px; padding: 20px 15px; margin-bottom: 25px; background-color: rgba(255, 255, 255, 0.5); }
+        legend { font-weight: bold; font-size: 1.2em; color: var(--primary-color); padding: 5px 15px; border-radius: 20px; background-color: #fff; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input[type="text"], input[type="tel"], input[type="password"], select, textarea, input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: rgba(255, 255, 255, 0.9); }
+        .radio-group label, .checkbox-group label { display: flex; align-items: center; margin-bottom: 10px; font-weight: normal; cursor: pointer; }
+        .radio-group input, .checkbox-group input { margin-right: 10px; flex-shrink: 0; }
+        button { width: 100%; padding: 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
+        button:hover:not(:disabled) { background-color: #00487a; transform: translateY(-2px); }
+        button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
+        .hidden { display: none; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; backdrop-filter: blur(5px); }
+        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #loading-overlay p { color: white; margin-top: 20px; font-size: 1.2em; }
+        .modal-container { background-color: white; padding: 25px; border-radius: 12px; max-width: 500px; width: 100%; text-align: left; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
+        .modal-buttons { display: flex; gap: 15px; margin-top: 25px; }
+        #notification-modal .icon { font-size: 50px; line-height: 1; text-align: center; }
         #notification-modal.success .icon { color: var(--success-color); }
         #notification-modal.error .icon { color: var(--error-color); }
-
-        @media (min-width: 600px) {
-            form { padding: 30px; }
-        }
+        /* Admin Styles */
+        #admin-dashboard { background-color: #f9f9f9; border-radius: 8px; }
+        .admin-section { padding: 20px; border-bottom: 1px solid #eee; }
+        .admin-section:last-child { border-bottom: none; }
+        .admin-section h2 { margin-top: 0; color: var(--primary-color); }
+        .toggle-switch { display: flex; align-items: center; gap: 10px; }
+        .toggle-switch label { font-size: 1.1em; }
+        #form-status-toggle { width: 50px; height: 26px; position: relative; cursor: pointer; }
+        #form-status-toggle span { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
+        #form-status-toggle span:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        #form-status-toggle.on span { background-color: var(--success-color); }
+        #form-status-toggle.on span:before { transform: translateX(24px); }
+        #submissions-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        #submissions-table th, #submissions-table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
+        #submissions-table th { background-color: #f2f2f2; }
+        #submissions-table select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+        .table-container { max-height: 500px; overflow-y: auto; }
+        #logout-button { background-color: var(--error-color); margin-top: 20px; }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="overlay">
-        <div class="spinner"></div>
-        <p>Mengirim data, mohon tunggu...</p>
-    </div>
+    <!-- Overlays (Loading, Confirmation, Notification) -->
+    <div id="loading-overlay" class="overlay"><div class="spinner"></div><p>Mohon tunggu...</p></div>
+    <div id="confirmation-overlay" class="overlay">...</div>
+    <div id="notification-modal" class="overlay">...</div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirmation-overlay" class="overlay">
-        <div class="modal-container">
-            <h2>Konfirmasi Data Anda</h2>
-            <p>Mohon periksa kembali data Anda. Pastikan semua informasi sudah benar sebelum melanjutkan.</p>
-            <div id="summary-content" class="summary-content"></div>
-            <div class="modal-buttons">
-                <button type="button" id="edit-button" style="background-color: #6c757d;">Perbaiki</button>
-                <button type="button" id="final-submit-button">Ya, Kirim</button>
+    <!-- MAIN FORM CONTAINER -->
+    <div id="main-form-container">
+        <div class="container">
+            <header>
+                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo" class="logo-image">
+                <h1>FORMULIR LAYANAN PARKIR</h1>
+                <p>RSUD dr. R. KOESMA TUBAN</p>
+            </header>
+            <div id="form-closed-message" class="admin-container hidden" style="text-align: center; padding: 40px;">
+                <h2>Formulir Ditutup</h2>
+                <p>Mohon maaf, saat ini formulir sedang ditutup sementara oleh administrator.</p>
             </div>
+            <form id="parkingForm">
+                 <!-- Fieldsets from original form -->
+                 <fieldset>
+                    <legend>Tujuan Pengisian</legend>
+                    <div class="form-group radio-group">
+                        <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Informasi Karyawan</legend>
+                    <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div>
+                    <div class="form-group"><label for="unitKerja">Unit / Bagian Kerja</label><select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)"><option value="">-- Pilih Unit --</option><option value="INSTALASI FARMASI">INSTALASI FARMASI</option><option value="LAINNYA">Lainnya...</option></select></div>
+                    <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
+                    <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div>
+                    <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
+                </fieldset>
+                <fieldset id="update-section" class="hidden"><legend>Data Kendaraan Lama</legend><div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama"></div></fieldset>
+                <fieldset id="card-replacement-section" class="hidden"><legend>Informasi Penggantian Kartu</legend><div class="form-group"><label for="alasanPenggantian">Alasan Penggantian</label><textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea></div></fieldset>
+                <fieldset id="new-vehicle-section" class="hidden"><legend>Detail Kendaraan Baru</legend><div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru"></div></fieldset>
+                <fieldset id="lainnya-section" class="hidden"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Tulis keterangan lengkap Anda</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
+                <fieldset id="agreement-section" class="hidden"><legend>Persetujuan</legend><div class="form-group checkbox-group"><input type="checkbox" id="agreement" name="agreement" required><label for="agreement">Saya menyatakan data yang diisikan benar.</label></div></fieldset>
+                <button type="submit" id="submit-button">Kirim Formulir</button>
+            </form>
         </div>
     </div>
 
-    <!-- Notification Modal -->
-    <div id="notification-modal" class="overlay">
-        <div class="modal-container">
-            <p id="notification-icon" class="icon"></p>
-            <h2 id="notification-title"></h2>
-            <p id="notification-message"></p>
-            <div class="modal-buttons">
-                 <button type="button" id="notification-close-button">Tutup</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <header>
-            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD" class="logo-image">
-            <h1>FORMULIR LAYANAN PARKIR</h1>
-            <p>RSUD dr. R. KOESMA TUBAN</p>
-        </header>
-
-        <form id="parkingForm">
-            <fieldset>
-                <legend>Tujuan Pengisian</legend>
-                <div class="form-group radio-group">
-                    <!-- Opsi radio button untuk tujuan pengisian -->
-                    <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
-                    <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
+    <!-- ADMIN LOGIN PAGE -->
+    <div id="admin-login-page" class="hidden">
+        <div class="container">
+            <header><h1>Login Admin</h1></header>
+            <div class="admin-container">
+                <div class="form-group">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" required>
                 </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Informasi Karyawan</legend>
-                <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div>
-                <div class="form-group"><label for="unitKerja">Unit / Bagian Kerja</label><select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)"><option value="">-- Pilih Unit --</option><option value="INSTALASI FARMASI">INSTALASI FARMASI</option><option value="LAINNYA">Lainnya...</option></select></div>
-                <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
-                <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div>
-                <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
-            </fieldset>
-
-            <fieldset id="update-section" class="hidden"><legend>Data Kendaraan Lama</legend><div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama"></div></fieldset>
-            <fieldset id="card-replacement-section" class="hidden"><legend>Informasi Penggantian Kartu</legend><div class="form-group"><label for="alasanPenggantian">Alasan Penggantian</label><textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea></div></fieldset>
-            <fieldset id="new-vehicle-section" class="hidden"><legend>Detail Kendaraan Baru</legend><div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru"></div></fieldset>
-            <fieldset id="lainnya-section" class="hidden"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Tulis keterangan lengkap Anda</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
-            
-            <fieldset id="agreement-section" class="hidden"><legend>Persetujuan</legend><div class="form-group checkbox-group"><input type="checkbox" id="agreement" name="agreement" required><label for="agreement">Saya menyatakan data yang diisikan benar dan bersedia mematuhi peraturan yang berlaku.</label></div></fieldset>
-
-            <button type="submit" id="submit-button">Kirim Formulir</button>
-        </form>
+                <button id="admin-login-button">Login</button>
+                 <p id="login-error" class="hidden" style="color:red; text-align:center; margin-top:10px;"></p>
+            </div>
+        </div>
     </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="admin-dashboard" class="hidden">
+        <div class="container">
+            <header><h1>Dashboard Admin</h1></header>
+            <div class="admin-container">
+                <!-- Settings Section -->
+                <div class="admin-section">
+                    <h2>Pengaturan Formulir</h2>
+                    <div class="toggle-switch">
+                        <label for="form-status-toggle">Formulir:</label>
+                        <div id="form-status-toggle" onclick="toggleFormStatus()"><span></span></div>
+                        <strong id="form-status-text"></strong>
+                    </div>
+                </div>
+                <!-- Submissions Section -->
+                <div class="admin-section">
+                    <h2>Data Submisi <button id="refresh-data" style="width:auto; padding: 5px 10px; font-size: 0.8em; float: right;">Refresh</button></h2>
+                    <div class="table-container">
+                        <table id="submissions-table">
+                            <thead></thead>
+                            <tbody>
+                                <tr><td colspan="11" style="text-align:center;">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <button id="logout-button">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+        ver 1.1
+    </footer>
 
     <script>
-        // =========================================================================
-        // PENTING: Ganti URL di bawah ini dengan URL Web App Anda dari Google Apps Script
-        // =========================================================================
+        // URL Web App telah diperbarui sesuai permintaan Anda
         const webAppUrl = 'https://script.google.com/macros/s/AKfycbz4BFMq1gjZhyzKZx5qzqPEcoNxzrQZG0NHAX_g8ym4xFU6fBFpWmONkpxgjAXxxqNY/exec';
-        // =========================================================================
-
-        // DOM elements
-        const form = document.getElementById('parkingForm');
-        const sections = {
-            update: document.getElementById('update-section'),
-            cardReplacement: document.getElementById('card-replacement-section'),
-            newVehicle: document.getElementById('new-vehicle-section'),
-            lainnya: document.getElementById('lainnya-section'),
-            agreement: document.getElementById('agreement-section')
-        };
-        const overlays = {
-            loading: document.getElementById('loading-overlay'),
-            confirmation: document.getElementById('confirmation-overlay'),
-            notification: document.getElementById('notification-modal')
-        };
-        let formDataObject = {};
-
-        function setRequired(element, isRequired) {
-            element.querySelectorAll('input, select, textarea').forEach(input => {
-                if (input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
-                    input.required = isRequired;
-                }
-            });
-        }
-
-        function toggleSections() {
-            const choice = document.querySelector('input[name="jenisPengajuan"]:checked').value;
-            Object.values(sections).forEach(sec => {
-                sec.style.display = 'none';
-                setRequired(sec, false);
-            });
-
-            const show = (keys) => {
-                keys.forEach(key => {
-                    sections[key].style.display = 'block';
-                    setRequired(sections[key], true);
-                });
-            };
-
-            switch(choice) {
-                case 'Pendaftaran Baru':
-                case 'Tambah Kendaraan Baru': show(['newVehicle', 'agreement']); break;
-                case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle', 'agreement']); break;
-                case 'Hapus Nomor Kendaraan': show(['update', 'agreement']); break;
-                case 'Penggantian Kartu': show(['update', 'cardReplacement', 'agreement']); break;
-                case 'Lainnya': show(['lainnya', 'agreement']); break;
-            }
-        }
-
-        function handleUnitKerjaChange(select) {
-            const lainnyaGroup = document.getElementById('unitKerjaLainnya-group');
-            const lainnyaInput = document.getElementById('unitKerjaLainnya');
-            const isLainnya = select.value === 'LAINNYA';
-            lainnyaGroup.classList.toggle('hidden', !isLainnya);
-            lainnyaInput.required = isLainnya;
-            if (!isLainnya) lainnyaInput.value = '';
-        }
-
-        function compressAndReadFile(file) {
-            return new Promise((resolve, reject) => {
-                // If it's not an image, just read it as base64
-                if (!file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name });
-                    reader.onerror = error => reject(error);
-                    reader.readAsDataURL(file);
-                    return;
-                }
-                
-                // If it is an image, compress it
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const MAX_WIDTH = 1024;
-                        const scaleSize = MAX_WIDTH / img.width;
-                        canvas.width = MAX_WIDTH;
-                        canvas.height = img.height * scaleSize;
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // 80% quality
-                        resolve({ base64: dataUrl.split(',')[1], type: 'image/jpeg', name: 'compressed_id.jpg' });
-                    };
-                    img.src = e.target.result;
-                };
-                reader.onerror = error => reject(error);
-                reader.readAsDataURL(file);
-            });
-        }
         
-        function populateSummary(data) {
-            const summaryContent = document.getElementById('summary-content');
-            summaryContent.innerHTML = ''; // Clear previous
-            const addRow = (label, value) => {
-                if (value) summaryContent.innerHTML += `<p><strong>${label}:</strong> ${value}</p>`;
-            };
-            addRow('Tujuan Pengisian', data.jenisPengajuan);
-            addRow('Nama Lengkap', data.namaLengkap);
-            addRow('Unit Kerja', data.unitKerja === 'LAINNYA' ? data.unitKerjaLainnya : data.unitKerja);
-            addRow('No. Telepon', data.telepon);
-            addRow('File Identitas', document.getElementById('fileKtp').files[0]?.name);
-            addRow('No. Polisi Lama', data.noPolisiLama);
-            addRow('No. Polisi Baru', data.noPolisiBaru);
-            addRow('Alasan Ganti Kartu', data.alasanPenggantian);
-            addRow('Keterangan Lainnya', data.keteranganLainnya);
-        }
+        // --- ADMIN PANEL LOGIC ---
+        const mainFormContainer = document.getElementById('main-form-container');
+        const adminLoginPage = document.getElementById('admin-login-page');
+        const adminDashboard = document.getElementById('admin-dashboard');
 
-        function showNotification(isSuccess, message) {
-            const modal = overlays.notification;
-            modal.className = 'overlay ' + (isSuccess ? 'success' : 'error');
-            document.getElementById('notification-title').textContent = isSuccess ? 'Berhasil' : 'Gagal';
-            document.getElementById('notification-icon').textContent = isSuccess ? '✓' : '✗';
-            document.getElementById('notification-message').textContent = message;
-            modal.style.display = 'flex';
-        }
+        // Simple Router
+        window.addEventListener('hashchange', handleRouteChange);
+        window.addEventListener('load', handleRouteChange);
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (webAppUrl.includes('GANTI_DENGAN_URL')) {
-                alert('Konfigurasi Error: URL Web App belum diatur di file HTML.');
-                return;
-            }
-            formDataObject = Object.fromEntries(new FormData(this).entries());
-            populateSummary(formDataObject);
-            overlays.confirmation.style.display = 'flex';
-        });
-
-        document.getElementById('edit-button').addEventListener('click', () => overlays.confirmation.style.display = 'none');
-        document.getElementById('notification-close-button').addEventListener('click', () => {
-            overlays.notification.style.display = 'none';
-            if (overlays.notification.classList.contains('success')) {
-                 window.location.reload();
-            }
-        });
-
-        document.getElementById('final-submit-button').addEventListener('click', async function() {
-            overlays.confirmation.style.display = 'none';
-            overlays.loading.style.display = 'flex';
-            document.getElementById('submit-button').disabled = true;
-
-            let dataToSubmit = { ...formDataObject };
-            if (dataToSubmit.unitKerja === 'LAINNYA') {
-                dataToSubmit.unitKerja = dataToSubmit.unitKerjaLainnya;
-            }
-            delete dataToSubmit.unitKerjaLainnya;
-
-            try {
-                const fileInput = document.getElementById('fileKtp').files[0];
-                if (fileInput) { 
-                    dataToSubmit.fileKtp = await compressAndReadFile(fileInput); 
-                }
-            
-                const response = await fetch(webAppUrl, {
-                    method: 'POST',
-                    body: JSON.stringify(dataToSubmit),
-                });
-
-                // Since we can't read response from `no-cors`, we assume success if fetch doesn't throw.
-                // A better approach is to use JSONP or have the GAS return a redirect, but for simplicity:
-                const result = await response.json(); // Wait for the response from the server
-                if (result.status === "success") {
-                    showNotification(true, 'Data Anda telah berhasil dikirim dan akan segera diproses.');
-                    form.reset();
-                    Object.values(sections).forEach(sec => sec.style.display = 'none');
+        function handleRouteChange() {
+            const hash = window.location.hash;
+            if (hash === '#admin') {
+                if (sessionStorage.getItem('isAdminAuthenticated') === 'true') {
+                    showDashboard();
                 } else {
-                    throw new Error(result.message || 'Terjadi kesalahan di server.');
+                    showAdminLogin();
+                }
+            } else {
+                showMainForm();
+            }
+        }
+
+        function showMainForm() {
+            mainFormContainer.classList.remove('hidden');
+            adminLoginPage.classList.add('hidden');
+            adminDashboard.classList.add('hidden');
+            checkFormStatusForUser();
+        }
+
+        function showAdminLogin() {
+            mainFormContainer.classList.add('hidden');
+            adminLoginPage.classList.remove('hidden');
+            adminDashboard.classList.add('hidden');
+        }
+
+        function showDashboard() {
+            mainFormContainer.classList.add('hidden');
+            adminLoginPage.classList.add('hidden');
+            adminDashboard.classList.remove('hidden');
+            loadAdminData();
+        }
+
+        // Admin Login
+        document.getElementById('admin-login-button').addEventListener('click', async () => {
+            const password = document.getElementById('admin-password').value;
+            const loginError = document.getElementById('login-error');
+            showLoading(true, "Memverifikasi...");
+            try {
+                const response = await fetch(`${webAppUrl}?action=adminLogin&password=${encodeURIComponent(password)}`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    sessionStorage.setItem('isAdminAuthenticated', 'true');
+                    showDashboard();
+                } else {
+                    loginError.textContent = result.message || "Password salah.";
+                    loginError.classList.remove('hidden');
                 }
             } catch (error) {
-                showNotification(false, `Gagal mengirim data. Periksa koneksi internet Anda. Error: ${error.message}`);
+                loginError.textContent = "Gagal terhubung ke server.";
+                loginError.classList.remove('hidden');
             } finally {
-                document.getElementById('submit-button').disabled = false;
-                overlays.loading.style.display = 'none';
+                showLoading(false);
             }
         });
+        
+        // Logout
+        document.getElementById('logout-button').addEventListener('click', () => {
+            sessionStorage.removeItem('isAdminAuthenticated');
+            window.location.hash = '';
+            // window.location.reload(); // Uncomment if you prefer a full page reload on logout
+        });
+
+        // Load Admin Data
+        async function loadAdminData() {
+            showLoading(true, 'Memuat data admin...');
+            await loadSettings();
+            await loadSubmissions();
+            showLoading(false);
+        }
+
+        // Load Settings
+        async function loadSettings() {
+            try {
+                const response = await fetch(`${webAppUrl}?action=getSettings`);
+                const result = await response.json();
+                if (result.status === 'success') {
+                    const status = result.data.formStatus;
+                    const toggle = document.getElementById('form-status-toggle');
+                    const text = document.getElementById('form-status-text');
+                    if (status === 'ON') {
+                        toggle.classList.add('on');
+                        text.textContent = 'ON';
+                    } else {
+                        toggle.classList.remove('on');
+                        text.textContent = 'OFF';
+                    }
+                }
+            } catch (e) { console.error("Gagal memuat pengaturan:", e); }
+        }
+
+        // Toggle Form Status
+        async function toggleFormStatus() {
+            const toggle = document.getElementById('form-status-toggle');
+            const newStatus = toggle.classList.contains('on') ? 'OFF' : 'ON';
+            showLoading(true, 'Memperbarui...');
+            try {
+                const response = await fetch(`${webAppUrl}?action=updateSettings&formStatus=${newStatus}`);
+                const result = await response.json();
+                 if (result.status === 'success') {
+                    await loadSettings();
+                } else {
+                    alert('Gagal memperbarui status.');
+                }
+            } catch (e) { 
+                console.error("Gagal mengubah status:", e); 
+                alert('Terjadi kesalahan saat mengubah status.');
+            }
+            finally { showLoading(false); }
+        }
+
+        // Load Submissions
+        document.getElementById('refresh-data').addEventListener('click', loadSubmissions);
+        async function loadSubmissions() {
+            const tableBody = document.querySelector('#submissions-table tbody');
+            const tableHead = document.querySelector('#submissions-table thead');
+            tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;">Memuat data...</td></tr>';
+            try {
+                const response = await fetch(`${webAppUrl}?action=getSubmissions`);
+                const result = await response.json();
+                if (result.status === 'success' && result.data.length > 1) {
+                    const headers = result.data[0];
+                    const submissions = result.data.slice(1);
+                    tableHead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+                    tableBody.innerHTML = '';
+                    submissions.reverse().forEach((row, index) => {
+                        const originalIndex = result.data.length - index;
+                        const tr = document.createElement('tr');
+                        row.forEach((cell, cellIndex) => {
+                            const td = document.createElement('td');
+                            if (headers[cellIndex] === 'Status') {
+                                td.innerHTML = `<select onchange="updateStatus(this, ${originalIndex})">
+                                    <option value="Belum diproses" ${cell === 'Belum diproses' ? 'selected' : ''}>Belum diproses</option>
+                                    <option value="Selesai" ${cell === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                                    <option value="Ditolak" ${cell === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+                                </select>`;
+                            } else if (headers[cellIndex] === 'Link File Identitas' && cell && cell.startsWith('http')) {
+                                td.innerHTML = `<a href="${cell}" target="_blank" rel="noopener noreferrer">Lihat File</a>`;
+                            } else {
+                                td.textContent = cell;
+                            }
+                            tr.appendChild(td);
+                        });
+                        tableBody.appendChild(tr);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;">Belum ada data.</td></tr>';
+                }
+            } catch (e) { 
+                console.error("Gagal memuat submisi:", e); 
+                tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center; color:red;">Gagal memuat data.</td></tr>';
+            }
+        }
+
+        // Update Status
+        async function updateStatus(selectElement, rowIndex) {
+            const newStatus = selectElement.value;
+            showLoading(true, 'Menyimpan...');
+            try {
+                const response = await fetch(`${webAppUrl}?action=updateStatus&rowIndex=${rowIndex}&status=${encodeURIComponent(newStatus)}`);
+                const result = await response.json();
+                if (result.status !== 'success') {
+                    alert('Gagal menyimpan status.');
+                }
+            } catch (e) { console.error("Gagal update status:", e); }
+            finally { showLoading(false); }
+        }
+        
+        // --- USER FORM LOGIC ---
+        function showLoading(show, message = "Mengirim data...") {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.querySelector('p').textContent = message;
+            overlay.style.display = show ? 'flex' : 'none';
+        }
+
+        async function checkFormStatusForUser() {
+            try {
+                const response = await fetch(`${webAppUrl}?action=getSettings`);
+                const result = await response.json();
+                if (result.status === 'success' && result.data.formStatus === 'OFF') {
+                    document.getElementById('parkingForm').classList.add('hidden');
+                    document.getElementById('form-closed-message').classList.remove('hidden');
+                } else {
+                    document.getElementById('parkingForm').classList.remove('hidden');
+                    document.getElementById('form-closed-message').classList.add('hidden');
+                }
+            } catch(e) {
+                console.error("Could not check form status for user.", e);
+                 document.getElementById('parkingForm').classList.add('hidden');
+                 document.getElementById('form-closed-message').textContent = "Gagal memuat formulir. Periksa koneksi Anda.";
+                 document.getElementById('form-closed-message').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('parkingForm').addEventListener('submit', async function(e) {
+             e.preventDefault();
+             showLoading(true);
+             const formDataObject = Object.fromEntries(new FormData(this).entries());
+             try {
+                const fileInput = document.getElementById('fileKtp').files[0];
+                if(fileInput) formDataObject.fileKtp = await compressAndReadFile(fileInput);
+
+                const response = await fetch(webAppUrl, { method: 'POST', body: JSON.stringify(formDataObject) });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('Pengajuan Anda telah berhasil dikirim!');
+                    this.reset();
+                    toggleSections();
+                } else {
+                    alert('Gagal mengirim: ' + result.message);
+                }
+             } catch(error) {
+                alert('Terjadi kesalahan: ' + error.message);
+             } finally {
+                showLoading(false);
+             }
+        });
+
+        // Dummy/Helper functions from original form
+        const formSections = { update: document.getElementById('update-section'), cardReplacement: document.getElementById('card-replacement-section'), newVehicle: document.getElementById('new-vehicle-section'), lainnya: document.getElementById('lainnya-section'), agreement: document.getElementById('agreement-section') };
+        function setRequired(element, isRequired) { element.querySelectorAll('input, select, textarea').forEach(input => { if (input.type.match(/text|tel|file/) || input.tagName === 'SELECT' || input.tagName === 'TEXTAREA') { input.required = isRequired; } }); }
+        function toggleSections(){ const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value; Object.values(formSections).forEach(s => { s.style.display = 'none'; setRequired(s, false); }); if (!choice) return; const show = (keys) => keys.forEach(k => { formSections[k].style.display = 'block'; setRequired(formSections[k], true); }); switch(choice){ case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(['newVehicle', 'agreement']); break; case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle', 'agreement']); break; case 'Hapus Nomor Kendaraan': show(['update', 'agreement']); break; case 'Penggantian Kartu': show(['update', 'cardReplacement', 'agreement']); break; case 'Lainnya': show(['lainnya', 'agreement']); break; } }
+        function handleUnitKerjaChange(select){ const lainnyaGroup = document.getElementById('unitKerjaLainnya-group'); const lainnyaInput = document.getElementById('unitKerjaLainnya'); const isLainnya = select.value === 'LAINNYA'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
+        function compressAndReadFile(file){ return new Promise((resolve, reject) => { if (!file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name }); reader.onerror = reject; reader.readAsDataURL(file); return; } const reader = new FileReader(); reader.onload = e => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const MAX_WIDTH = 1024; const scaleSize = MAX_WIDTH / img.width; canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; ctx.drawImage(img, 0, 0, canvas.width, canvas.height); const dataUrl = canvas.toDataURL('image/jpeg', 0.8); resolve({ base64: dataUrl.split(',')[1], type: 'image/jpeg', name: 'compressed_id.jpg' }); }; img.src = e.target.result; }; reader.onerror = reject; reader.readAsDataURL(file); }); }
     </script>
 </body>
 </html>
+
