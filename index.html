@@ -278,7 +278,9 @@
     </div>
 
     <script>
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbyyGFR-VxH8DWoTu7PlPjDCkp7d-QkmrC6vzxlU36WfWOxZgOKUItV0SppH0OcoCB4/exec';
+        // PERHATIAN: Ganti URL ini dengan URL Web App dari Google Apps Script Anda setelah di-deploy.
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbzjIBxRRzxvUXVyykkmkUEtOpthJQp8w4AM2g-8qwSx2rWrUD3OmxxUReFFaVxYlgY7/exec';
+        
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingText = document.getElementById('loading-text');
 
@@ -290,9 +292,9 @@
         function hideLoading() {
             loadingOverlay.style.display = 'none';
         }
-        function showNotification(isSuccess, message) {
+        function showNotification(isSuccess, title, message) {
             const modal = document.getElementById('notification-modal');
-            modal.querySelector('#notification-title').textContent = isSuccess ? 'Berhasil' : 'Gagal';
+            modal.querySelector('#notification-title').textContent = title;
             modal.querySelector('#notification-icon').textContent = isSuccess ? '✓' : '✗';
             modal.querySelector('#notification-icon').style.color = isSuccess ? 'var(--success-color)' : 'var(--error-color)';
             modal.querySelector('#notification-message').textContent = message;
@@ -300,35 +302,39 @@
         }
         
         async function fetchFromGAS(action, payload = {}) {
+            // Cek apakah URL sudah diganti
+            if (webAppUrl === 'PASTIKAN_URL_WEB_APP_ANDA_DARI_GOOGLE_SCRIPT_DI_SINI') {
+                 showNotification(false, 'Kesalahan Konfigurasi', 'URL Web App belum diatur di file index.html. Silakan ikuti panduan di file README.md.');
+                 throw new Error("URL Web App belum dikonfigurasi.");
+            }
             try {
+                // Metode pengiriman data ini dirancang untuk menghindari masalah CORS
+                // dengan tidak mengirim header 'Content-Type' secara eksplisit.
                 const response = await fetch(webAppUrl, {
                     method: 'POST',
                     mode: 'cors',
                     cache: 'no-cache',
-                    // The 'headers' property is removed. This is the key change.
-                    // The browser will now send a Content-Type of 'text/plain', which
-                    // avoids the CORS preflight (OPTIONS) request that is failing.
-                    // The Google Apps Script backend will still receive the JSON string
-                    // in e.postData.contents and can parse it normally.
+                    redirect: 'follow',
                     body: JSON.stringify({ action, payload })
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`Respon server tidak valid: ${response.status} ${response.statusText}`);
                 }
                 
-                // Added safer JSON parsing
                 const resultText = await response.text();
                 try {
                     return JSON.parse(resultText);
                 } catch (e) {
-                    console.error("Failed to parse response as JSON:", resultText);
-                    throw new Error("Server returned an invalid response.");
+                    console.error("Gagal mem-parsing JSON dari server:", resultText);
+                    throw new Error("Server memberikan respon yang tidak bisa dibaca.");
                 }
 
             } catch (error) {
                 console.error('Fetch error:', error);
-                showNotification(false, `Gagal terhubung ke server. Periksa koneksi internet Anda. Error: ${error.message}`);
+                // Menampilkan pesan error yang lebih informatif kepada pengguna
+                const friendlyMessage = `Gagal terhubung ke server. Ini bisa terjadi karena:\n1. Koneksi internet Anda bermasalah.\n2. Server sedang sibuk atau offline.\n3. Ada kesalahan konfigurasi (CORS). Pastikan Google Script sudah di-deploy dengan benar.\n\nError: ${error.message}`;
+                showNotification(false, 'Gagal Terhubung', friendlyMessage);
                 throw error;
             }
         }
@@ -420,14 +426,14 @@
             try {
                 const result = await fetchFromGAS('submitForm', dataToSubmit);
                 if (result.status === 'sukses') {
-                    showNotification(true, `Pengajuan berhasil dikirim dengan Nomor Registrasi: ${result.registrationNumber}. Silakan screenshot halaman ini.`);
+                    showNotification(true, 'Berhasil', `Pengajuan berhasil dikirim dengan Nomor Registrasi: ${result.registrationNumber}. Silakan screenshot halaman ini.`);
                     form.reset();
                     toggleSections();
                 } else {
                     throw new Error(result.message || 'Terjadi kesalahan yang tidak diketahui.');
                 }
             } catch (error) {
-                 showNotification(false, `Gagal mengirim data: ${error.message}`);
+                 // Pesan error sudah ditampilkan oleh fetchFromGAS, jadi tidak perlu ditampilkan lagi
             } finally {
                 hideLoading();
             }
@@ -453,8 +459,10 @@
                     document.getElementById('admin-dashboard-container').classList.remove('hidden');
                     loadAdminDashboard(true); // Initial load
                 } else {
-                    showNotification(false, result.message);
+                    showNotification(false, 'Login Gagal', result.message);
                 }
+            } catch (error) {
+                // Error already handled by fetchFromGAS
             } finally {
                 hideLoading();
             }
@@ -545,11 +553,11 @@
             try {
                 const result = await fetchFromGAS('setFormStatus', { password, status: newStatus });
                 if (result.status === 'sukses') {
-                    showNotification(true, 'Status formulir berhasil diperbarui.');
+                    showNotification(true, 'Berhasil', 'Status formulir berhasil diperbarui.');
                     document.getElementById('form-status-text').textContent = newStatus === 'ON' ? 'Aktif' : 'Nonaktif';
                 } else { throw new Error(result.message); }
             } catch (error) {
-                showNotification(false, `Gagal memperbarui status: ${error.message}`);
+                showNotification(false, 'Gagal', `Gagal memperbarui status: ${error.message}`);
                 document.getElementById('form-status-toggle').checked = newStatus !== 'ON';
             } finally {
                 hideLoading();
@@ -561,11 +569,11 @@
             try {
                 const result = await fetchFromGAS('updateStatus', { password, rowIndex, newStatus });
                 if (result.status === 'sukses') {
-                    showNotification(true, `Status untuk baris ${rowIndex} berhasil diperbarui.`);
+                    showNotification(true, 'Berhasil', `Status untuk baris ${rowIndex} berhasil diperbarui.`);
                     loadAdminDashboard();
                 } else { throw new Error(result.message); }
             } catch (error) {
-                showNotification(false, `Gagal memperbarui status: ${error.message}`);
+                showNotification(false, 'Gagal', `Gagal memperbarui status: ${error.message}`);
             } finally {
                 hideLoading();
             }
@@ -599,7 +607,9 @@
                         showPage('maintenance-container');
                     }
                 } catch(e) {
-                    showPage('maintenance-container');
+                    // Jika gagal memeriksa status (misal karena URL belum di set),
+                    // tampilkan halaman formulir agar tidak buntu di halaman maintenance
+                    showPage('user-form-container');
                 } finally {
                     hideLoading();
                 }
