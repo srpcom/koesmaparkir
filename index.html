@@ -135,7 +135,6 @@
             <p>RSUD dr. R. KOESMA TUBAN</p>
         </header>
         <form id="parkingForm">
-            <!-- Existing form fields... -->
             <fieldset>
                 <legend>Tujuan Pengisian</legend>
                  <div class="form-group radio-group">
@@ -154,7 +153,6 @@
                     <label for="namaLengkap">Nama Lengkap</label>
                     <input type="text" id="namaLengkap" name="namaLengkap" required>
                 </div>
-                 <!-- NEW FIELD: Status Kepegawaian -->
                 <div class="form-group">
                     <label for="statusKepegawaian">Status Kepegawaian</label>
                     <select id="statusKepegawaian" name="statusKepegawaian" required onchange="handleStatusKepegawaianChange(this)">
@@ -307,8 +305,8 @@
                     mode: 'cors',
                     cache: 'no-cache',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, payload }),
-                    redirect: 'follow'
+                    body: JSON.stringify({ action, payload })
+                    // PERBAIKAN: Menghapus 'redirect: follow' yang bisa menyebabkan masalah CORS
                 });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return await response.json();
@@ -461,12 +459,11 @@
                 const dataResult = await fetchFromGAS('getAllData', { 
                     password,
                     page: adminState.currentPage,
-                    rowsPerPage: 20, // Tampilkan 20 data per halaman
+                    rowsPerPage: 20,
                     startDate: adminState.startDate,
                     endDate: adminState.endDate
                 });
 
-                // Populate Table
                 const tableBody = document.querySelector('#admin-data-table tbody');
                 const tableHead = document.querySelector('#admin-data-table thead');
                 tableBody.innerHTML = '';
@@ -484,7 +481,7 @@
 
                     dataResult.data.forEach(rowData => {
                         const row = document.createElement('tr');
-                        row.dataset.rowIndex = rowData.rowIndex; // Use rowIndex from backend
+                        row.dataset.rowIndex = rowData.rowIndex;
                         
                         const status = rowData['Status'];
                         if (status === 'Belum Diproses') row.className = 'status-belum-diproses';
@@ -495,11 +492,7 @@
                             const cell = document.createElement('td');
                             if (header === 'Status') {
                                 const select = document.createElement('select');
-                                select.innerHTML = `
-                                    <option value="Belum Diproses">Belum Diproses</option>
-                                    <option value="Selesai">Selesai</option>
-                                    <option value="Ditolak">Ditolak</option>
-                                `;
+                                select.innerHTML = `<option value="Belum Diproses">Belum Diproses</option><option value="Selesai">Selesai</option><option value="Ditolak">Ditolak</option>`;
                                 select.value = rowData[header];
                                 select.addEventListener('change', (e) => updateSubmissionStatus(row.dataset.rowIndex, e.target.value));
                                 cell.appendChild(select);
@@ -515,7 +508,6 @@
                      tableBody.innerHTML = '<tr><td>Tidak ada data yang cocok dengan filter Anda.</td></tr>';
                 }
 
-                // Update Pagination
                 adminState.currentPage = dataResult.currentPage;
                 adminState.totalPages = dataResult.totalPages;
                 document.getElementById('page-info').textContent = `Halaman ${adminState.currentPage} dari ${adminState.totalPages} (${dataResult.totalRows} data)`;
@@ -524,7 +516,7 @@
 
             } catch (error) {
                 console.error("Gagal memuat dashboard:", error);
-                sessionStorage.removeItem(ADMIN_TOKEN_KEY); // Clear token on error
+                sessionStorage.removeItem(ADMIN_TOKEN_KEY);
                 route();
             } finally {
                 hideLoading();
@@ -538,9 +530,7 @@
                 if (result.status === 'sukses') {
                     showNotification(true, 'Status formulir berhasil diperbarui.');
                     document.getElementById('form-status-text').textContent = newStatus === 'ON' ? 'Aktif' : 'Nonaktif';
-                } else {
-                    throw new Error(result.message);
-                }
+                } else { throw new Error(result.message); }
             } catch (error) {
                 showNotification(false, `Gagal memperbarui status: ${error.message}`);
                 document.getElementById('form-status-toggle').checked = newStatus !== 'ON';
@@ -556,9 +546,7 @@
                 if (result.status === 'sukses') {
                     showNotification(true, `Status untuk baris ${rowIndex} berhasil diperbarui.`);
                     loadAdminDashboard();
-                } else {
-                     throw new Error(result.message);
-                }
+                } else { throw new Error(result.message); }
             } catch (error) {
                 showNotification(false, `Gagal memperbarui status: ${error.message}`);
             } finally {
@@ -602,17 +590,9 @@
         }
         
         // Event Listeners
-        document.getElementById('admin-login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const password = document.getElementById('admin-password').value;
-            adminLogin(password);
-        });
-        document.getElementById('form-status-toggle').addEventListener('change', function() {
-            const newStatus = this.checked ? 'ON' : 'OFF';
-            updateFormStatus(newStatus);
-        });
+        document.getElementById('admin-login-form').addEventListener('submit', (e) => { e.preventDefault(); adminLogin(document.getElementById('admin-password').value); });
+        document.getElementById('form-status-toggle').addEventListener('change', function() { updateFormStatus(this.checked ? 'ON' : 'OFF'); });
         document.getElementById('refresh-data-btn').addEventListener('click', () => {
-             // Reset filter and page, then load
             document.getElementById('start-date').value = '';
             document.getElementById('end-date').value = '';
             adminState.startDate = '';
@@ -623,30 +603,16 @@
         document.getElementById('filter-btn').addEventListener('click', () => {
             adminState.startDate = document.getElementById('start-date').value;
             adminState.endDate = document.getElementById('end-date').value;
-            adminState.currentPage = 1; // Reset to first page on new filter
+            adminState.currentPage = 1;
             loadAdminDashboard();
         });
-        document.getElementById('prev-page-btn').addEventListener('click', () => {
-            if (adminState.currentPage > 1) {
-                adminState.currentPage--;
-                loadAdminDashboard();
-            }
-        });
-        document.getElementById('next-page-btn').addEventListener('click', () => {
-            if (adminState.currentPage < adminState.totalPages) {
-                adminState.currentPage++;
-                loadAdminDashboard();
-            }
-        });
+        document.getElementById('prev-page-btn').addEventListener('click', () => { if (adminState.currentPage > 1) { adminState.currentPage--; loadAdminDashboard(); } });
+        document.getElementById('next-page-btn').addEventListener('click', () => { if (adminState.currentPage < adminState.totalPages) { adminState.currentPage++; loadAdminDashboard(); } });
         document.getElementById('notification-close-button').addEventListener('click', (e) => {
              e.target.closest('.overlay').style.display = 'none';
-             if (e.target.closest('.overlay').querySelector('#notification-title').textContent === 'Berhasil') {
-                 if(!window.location.hash.includes('admin')) { window.location.reload(); }
-             }
+             if (e.target.closest('.overlay').querySelector('#notification-title').textContent === 'Berhasil' && !window.location.hash.includes('admin')) { window.location.reload(); }
         });
-        document.getElementById('edit-button').addEventListener('click', () => {
-             document.getElementById('confirmation-overlay').style.display = 'none';
-        });
+        document.getElementById('edit-button').addEventListener('click', () => { document.getElementById('confirmation-overlay').style.display = 'none'; });
         window.addEventListener('hashchange', route);
 
         // Initial load
