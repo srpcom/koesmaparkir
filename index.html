@@ -298,24 +298,41 @@
             modal.querySelector('#notification-message').textContent = message;
             modal.style.display = 'flex';
         }
+        
         async function fetchFromGAS(action, payload = {}) {
             try {
                 const response = await fetch(webAppUrl, {
                     method: 'POST',
                     mode: 'cors',
                     cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
+                    // The 'headers' property is removed. This is the key change.
+                    // The browser will now send a Content-Type of 'text/plain', which
+                    // avoids the CORS preflight (OPTIONS) request that is failing.
+                    // The Google Apps Script backend will still receive the JSON string
+                    // in e.postData.contents and can parse it normally.
                     body: JSON.stringify({ action, payload })
-                    // PERBAIKAN: Menghapus 'redirect: follow' yang bisa menyebabkan masalah CORS
                 });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return await response.json();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Added safer JSON parsing
+                const resultText = await response.text();
+                try {
+                    return JSON.parse(resultText);
+                } catch (e) {
+                    console.error("Failed to parse response as JSON:", resultText);
+                    throw new Error("Server returned an invalid response.");
+                }
+
             } catch (error) {
                 console.error('Fetch error:', error);
-                showNotification(false, `Gagal terhubung ke server. Periksa koneksi internet Anda. ${error.message}`);
+                showNotification(false, `Gagal terhubung ke server. Periksa koneksi internet Anda. Error: ${error.message}`);
                 throw error;
             }
         }
+
 
         // --- FORM LOGIC ---
         function toggleSections() {
