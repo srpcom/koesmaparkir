@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Layanan Parkir</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png">
-    <!-- Library untuk fungsionalitas Download XLSX -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%2c kecil.png">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary-color: #005A9C; --secondary-color: #F0F8FF; --border-color: #DCDCDC;
             --text-color: #333; --success-color: #28a745; --error-color: #dc3545;
-            /* Warna status baru */
             --pending-bg: #fffbe6; --pending-color: #9c6f00; --pending-border: #ffe58f;
             --completed-bg: #f6ffed; --completed-color: #389e0d; --completed-border: #b7eb8f;
             --rejected-bg: #fff1f0; --rejected-color: #cf1322; --rejected-border: #ffa39e;
@@ -39,7 +37,6 @@
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-overlay p { color: white; margin-top: 20px; font-size: 1.2em; }
-        /* Admin Styles */
         #admin-dashboard { background-color: #f9f9f9; border-radius: 8px; }
         .admin-section { padding: 20px; border-bottom: 1px solid #eee; }
         .admin-section h2 { margin-top: 0; color: var(--primary-color); }
@@ -61,13 +58,10 @@
         .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 15px; }
         .pagination-controls button { width: auto; padding: 5px 10px; font-size: 0.9em; }
         .pagination-controls .page-info { font-size: 0.9em; }
-        
-        /* Style untuk pewarnaan status */
         #submissions-table td select { padding: 8px; border-radius: 5px; width:100%; font-weight: bold; border-width: 1px; transition: background-color 0.3s, border-color 0.3s; }
         .status-pending { background-color: var(--pending-bg); color: var(--pending-color); border-color: var(--pending-border); }
         .status-selesai { background-color: var(--completed-bg); color: var(--completed-color); border-color: var(--completed-border); }
         .status-ditolak { background-color: var(--rejected-bg); color: var(--rejected-color); border-color: var(--rejected-border); }
-
         @media (max-width: 768px) {
             body { padding: 5px; }
             .container { margin: 10px auto; padding: 0; }
@@ -86,14 +80,11 @@
     </style>
 </head>
 <body>
-    <!-- Overlays -->
     <div id="loading-overlay" class="overlay"><div class="spinner"></div><p>Mohon tunggu...</p></div>
-
-    <!-- MAIN FORM CONTAINER -->
     <div id="main-form-container">
          <div class="container">
             <header>
-                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo" class="logo-image">
+                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%2c kecil.png" alt="Logo" class="logo-image">
                 <h1>FORMULIR LAYANAN PARKIR</h1>
                 <p>RSUD dr. R. KOESMA TUBAN</p>
             </header>
@@ -130,23 +121,16 @@
             </form>
         </div>
     </div>
-
-    <!-- ADMIN LOGIN PAGE -->
     <div id="admin-login-page" class="hidden">
         <div class="container">
             <header><h1>Login Admin</h1></header>
             <div class="admin-container">
-                <div class="form-group">
-                    <label for="admin-password">Password</label>
-                    <input type="password" id="admin-password" required>
-                </div>
+                <div class="form-group"><label for="admin-password">Password</label><input type="password" id="admin-password" required></div>
                 <button id="admin-login-button">Login</button>
-                 <p id="login-error" class="hidden" style="color:red; text-align:center; margin-top:10px;"></p>
+                <p id="login-error" class="hidden" style="color:red; text-align:center; margin-top:10px;"></p>
             </div>
         </div>
     </div>
-
-    <!-- ADMIN DASHBOARD -->
     <div id="admin-dashboard" class="hidden">
         <div class="container">
             <header><h1>Dashboard Admin</h1></header>
@@ -162,11 +146,10 @@
                 <div class="admin-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <h2>Data Submisi</h2>
-                        <button id="refresh-data" style="width:auto; padding: 5px 10px; font-size: 0.8em;">Refresh</button>
+                        <button id="refresh-data" style="width:auto; padding: 5px 10px; font-size: 0.8em;" onclick="fetchPage(1)">Refresh</button>
                     </div>
                     <div class="admin-controls">
                         <input type="text" id="search-input" placeholder="Cari data...">
-                        <!-- PERUBAIKAN: Tombol filter status ditambahkan -->
                         <select id="status-filter">
                             <option value="Semua">Semua Status</option>
                             <option value="Belum diproses">Belum diproses</option>
@@ -187,42 +170,26 @@
             </div>
         </div>
     </div>
-
-    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
-        ver 1.1
-    </footer>
-
+    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">ver 1.1</footer>
     <script>
         const webAppUrl = 'https://script.google.com/macros/s/AKfycbz4BFMq1gjZhyzKZx5qzqPEcoNxzrQZG0NHAX_g8ym4xFU6fBFpWmONkpxgjAXxxqNY/exec';
         
-        // --- GLOBAL & ADMIN STATE ---
-        let allSubmissions = [];
-        let filteredSubmissions = [];
-        let currentPage = 1;
-        const rowsPerPage = 30;
         let submissionHeaders = [];
+        let currentPage = 1;
 
-        // --- ELEMENT SELECTORS ---
         const mainFormContainer = document.getElementById('main-form-container');
         const adminLoginPage = document.getElementById('admin-login-page');
         const adminDashboard = document.getElementById('admin-dashboard');
         const searchInput = document.getElementById('search-input');
-        const downloadButton = document.getElementById('download-xlsx');
-        // PERUBAIKAN: Selector untuk filter status ditambahkan
         const statusFilter = document.getElementById('status-filter');
+        const downloadButton = document.getElementById('download-xlsx');
         
-        // --- ROUTING ---
         window.addEventListener('hashchange', handleRouteChange);
         window.addEventListener('load', handleRouteChange);
 
         function handleRouteChange() {
-            const hash = window.location.hash;
-            if (hash === '#admin') {
-                if (sessionStorage.getItem('isAdminAuthenticated') === 'true') {
-                    showDashboard();
-                } else {
-                    showAdminLogin();
-                }
+            if (window.location.hash === '#admin') {
+                sessionStorage.getItem('isAdminAuthenticated') === 'true' ? showDashboard() : showAdminLogin();
             } else {
                 showMainForm();
             }
@@ -232,17 +199,12 @@
         function showAdminLogin() { mainFormContainer.classList.add('hidden'); adminLoginPage.classList.remove('hidden'); adminDashboard.classList.add('hidden'); }
         function showDashboard() { mainFormContainer.classList.add('hidden'); adminLoginPage.classList.add('hidden'); adminDashboard.classList.remove('hidden'); loadAdminData(); }
 
-        // --- ADMIN EVENT LISTENERS ---
         document.getElementById('admin-login-button').addEventListener('click', adminLogin);
         document.getElementById('logout-button').addEventListener('click', adminLogout);
-        // PERUBAIKAN: Event listener untuk search dan filter digabung
-        searchInput.addEventListener('keyup', applyFilters);
-        statusFilter.addEventListener('change', applyFilters);
+        searchInput.addEventListener('keyup', () => fetchPage(1));
+        statusFilter.addEventListener('change', () => fetchPage(1));
         downloadButton.addEventListener('click', downloadXLSX);
-        document.getElementById('refresh-data').addEventListener('click', loadSubmissions);
 
-
-        // --- ADMIN CORE FUNCTIONS ---
         async function adminLogin() {
             const password = document.getElementById('admin-password').value;
             const loginError = document.getElementById('login-error');
@@ -264,13 +226,7 @@
         }
 
         function adminLogout() { sessionStorage.removeItem('isAdminAuthenticated'); window.location.hash = ''; }
-
-        async function loadAdminData() {
-            showLoading(true, 'Memuat data admin...');
-            await loadSettings();
-            await loadSubmissions();
-            showLoading(false);
-        }
+        async function loadAdminData() { await loadSettings(); await fetchPage(1); }
 
         async function loadSettings() {
             try {
@@ -279,16 +235,14 @@
                 if (result.status === 'success') {
                     const status = result.data.formStatus;
                     const toggle = document.getElementById('form-status-toggle');
-                    const text = document.getElementById('form-status-text');
                     toggle.classList.toggle('on', status === 'ON');
-                    text.textContent = status;
+                    document.getElementById('form-status-text').textContent = status;
                 }
             } catch (e) { console.error("Gagal memuat pengaturan:", e); }
         }
         
         async function toggleFormStatus() {
-            const toggle = document.getElementById('form-status-toggle');
-            const newStatus = toggle.classList.contains('on') ? 'OFF' : 'ON';
+            const newStatus = document.getElementById('form-status-toggle').classList.contains('on') ? 'OFF' : 'ON';
             showLoading(true, 'Memperbarui...');
             try {
                 await fetch(`${webAppUrl}?action=updateSettings&formStatus=${newStatus}`);
@@ -297,82 +251,63 @@
             finally { showLoading(false); }
         }
 
-        async function loadSubmissions() {
+        async function fetchPage(page) {
+            currentPage = page;
+            const searchTerm = searchInput.value;
+            const status = statusFilter.value;
+            showLoading(true, "Memuat data...");
+
             const tableBody = document.querySelector('#submissions-table tbody');
-            tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center;">Memuat data...</td></tr>';
-            try {
-                const response = await fetch(`${webAppUrl}?action=getSubmissions`);
-                const result = await response.json();
-                if (result.status === 'success' && result.data.length > 1) {
-                    submissionHeaders = result.data[0];
-                    allSubmissions = result.data.slice(1).reverse();
-                    applyFilters();
-                } else {
-                    submissionHeaders = result.data.length > 0 ? result.data[0] : [];
-                    allSubmissions = [];
-                    applyFilters();
-                }
-            } catch (e) { 
-                console.error("Gagal memuat submisi:", e); 
-                tableBody.innerHTML = '<tr><td colspan="11" style="text-align:center; color:red;">Gagal memuat data.</td></tr>';
-            }
-        }
-
-        // PERUBAIKAN: Fungsi handleSearch diubah menjadi applyFilters
-        function applyFilters() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const selectedStatus = statusFilter.value;
-            const statusIndex = submissionHeaders.indexOf('Status');
-
-            let tempFiltered = [...allSubmissions];
-
-            // Filter by status first
-            if (selectedStatus !== 'Semua' && statusIndex !== -1) {
-                tempFiltered = tempFiltered.filter(row => row[statusIndex] === selectedStatus);
-            }
+            tableBody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Memuat data...</td></tr>`;
             
-            // Then filter by search term
-            if (searchTerm) {
-                tempFiltered = tempFiltered.filter(row => 
-                    row.some(cell => String(cell).toLowerCase().includes(searchTerm))
-                );
+            try {
+                const url = new URL(webAppUrl);
+                url.searchParams.append('action', 'getSubmissions');
+                url.searchParams.append('page', page);
+                url.searchParams.append('searchTerm', searchTerm);
+                url.searchParams.append('statusFilter', status);
+
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const { headers, pageData, currentPage, totalPages } = result.data;
+                    submissionHeaders = headers;
+                    displayData(pageData);
+                    setupPagination(currentPage, totalPages);
+                } else {
+                     tableBody.innerHTML = `<tr><td colspan="11" style="text-align:center; color:red;">Gagal memuat data: ${result.message}</td></tr>`;
+                }
+            } catch (e) {
+                console.error("Gagal fetchPage:", e);
+                tableBody.innerHTML = `<tr><td colspan="11" style="text-align:center; color:red;">Gagal terhubung ke server.</td></tr>`;
+            } finally {
+                showLoading(false);
             }
-
-            filteredSubmissions = tempFiltered;
-            currentPage = 1;
-            displayCurrentPage();
         }
-
-        function displayCurrentPage() {
+        
+        function displayData(pageData) {
             const tableBody = document.querySelector('#submissions-table tbody');
             const tableHead = document.querySelector('#submissions-table thead');
             tableBody.innerHTML = '';
             tableHead.innerHTML = `<tr>${submissionHeaders.map(h => `<th>${h}</th>`).join('')}</tr>`;
 
-            if (filteredSubmissions.length === 0) {
+            if (!pageData || pageData.length === 0) {
                 tableBody.innerHTML = `<tr><td data-label="Info" colspan="${submissionHeaders.length || 1}" style="text-align:center;">Data tidak ditemukan.</td></tr>`;
-                setupPagination(0);
                 return;
             }
 
-            const pageData = filteredSubmissions.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-
-            pageData.forEach(row => {
-                const originalRowIndexInAll = allSubmissions.findIndex(r => r === row);
-                const originalSheetIndex = allSubmissions.length - originalRowIndexInAll + 1;
-                
+            pageData.forEach(item => {
+                const { rowData, originalIndex } = item;
                 const tr = document.createElement('tr');
-                row.forEach((cell, cellIndex) => {
+                rowData.forEach((cell, cellIndex) => {
                     const td = document.createElement('td');
                     const header = submissionHeaders[cellIndex];
                     td.setAttribute('data-label', header);
                      if (header === 'Status') {
                         const select = document.createElement('select');
-                        select.innerHTML = `
-                            <option value="Belum diproses" ${cell === 'Belum diproses' ? 'selected' : ''}>Belum diproses</option>
-                            <option value="Selesai" ${cell === 'Selesai' ? 'selected' : ''}>Selesai</option>
-                            <option value="Ditolak" ${cell === 'Ditolak' ? 'selected' : ''}>Ditolak</option>`;
-                        select.onchange = (event) => handleStatusChange(event.target, originalSheetIndex);
+                        select.innerHTML = `<option value="Belum diproses" ${cell === 'Belum diproses' ? 'selected' : ''}>Belum diproses</option><option value="Selesai" ${cell === 'Selesai' ? 'selected' : ''}>Selesai</option><option value="Ditolak" ${cell === 'Ditolak' ? 'selected' : ''}>Ditolak</option>`;
+                        select.onchange = (event) => handleStatusChange(event.target, originalIndex);
                         td.appendChild(select);
                         updateSelectColor(select);
                     } else if (header === 'Link File Identitas' && cell && cell.startsWith('http')) {
@@ -384,13 +319,20 @@
                 });
                 tableBody.appendChild(tr);
             });
-            
-            setupPagination(filteredSubmissions.length);
+        }
+        
+        function setupPagination(currentPage, totalPages) {
+            const paginationControls = document.getElementById('pagination-controls');
+            if (totalPages <= 1) {
+                paginationControls.innerHTML = '';
+                return;
+            }
+            paginationControls.innerHTML = `<button onclick="fetchPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>«</button><span class="page-info">Hal ${currentPage} dari ${totalPages}</span><button onclick="fetchPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
         }
         
         function handleStatusChange(selectElement, rowIndex) {
             updateSelectColor(selectElement);
-            updateStatus(selectElement, rowIndex);
+            updateStatus(selectElement.value, rowIndex);
         }
 
         function updateSelectColor(selectElement) {
@@ -400,42 +342,42 @@
             else if (value === 'Selesai') selectElement.classList.add('status-selesai');
             else if (value === 'Ditolak') selectElement.classList.add('status-ditolak');
         }
-
-        function setupPagination(totalRows) {
-            const paginationControls = document.getElementById('pagination-controls');
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-            paginationControls.innerHTML = totalPages <= 1 ? '' : `
-                <button id="prev-page" ${currentPage === 1 ? 'disabled' : ''}>«</button>
-                <span class="page-info">Hal ${currentPage} dari ${totalPages}</span>
-                <button id="next-page" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
-            if (totalPages > 1) {
-                document.getElementById('prev-page').onclick = () => { currentPage--; displayCurrentPage(); };
-                document.getElementById('next-page').onclick = () => { currentPage++; displayCurrentPage(); };
-            }
-        }
         
-        async function updateStatus(selectElement, rowIndex) {
-            const newStatus = selectElement.value;
+        async function updateStatus(newStatus, rowIndex) {
             showLoading(true, 'Menyimpan...');
             try {
                 await fetch(`${webAppUrl}?action=updateStatus&rowIndex=${rowIndex}&status=${encodeURIComponent(newStatus)}`);
-                const originalRowIndexInAll = allSubmissions.findIndex(row => (allSubmissions.length - allSubmissions.indexOf(row) + 1) === rowIndex);
-                if(allSubmissions[originalRowIndexInAll]){
-                    allSubmissions[originalRowIndexInAll][submissionHeaders.indexOf('Status')] = newStatus;
-                }
-            } catch (e) { console.error("Gagal update status:", e); }
+            } catch (e) { console.error("Gagal update status:", e); alert("Gagal menyimpan status."); }
             finally { showLoading(false); }
         }
 
-        function downloadXLSX() {
-            if (filteredSubmissions.length === 0) { return alert("Tidak ada data untuk diunduh."); }
-            const worksheet = XLSX.utils.aoa_to_sheet([submissionHeaders, ...filteredSubmissions]);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Submisi");
-            XLSX.writeFile(workbook, "Data_Parkir_Karyawan.xlsx");
+        async function downloadXLSX() {
+            showLoading(true, "Mempersiapkan unduhan...");
+            try {
+                const url = new URL(webAppUrl);
+                url.searchParams.append('action', 'downloadData');
+                url.searchParams.append('searchTerm', searchInput.value);
+                url.searchParams.append('statusFilter', statusFilter.value);
+                
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data.rows.length > 0) {
+                    const { headers, rows } = result.data;
+                    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Submisi");
+                    XLSX.writeFile(workbook, "Data_Parkir_Karyawan.xlsx");
+                } else {
+                    alert("Tidak ada data untuk diunduh sesuai filter yang dipilih.");
+                }
+            } catch(e) {
+                alert("Gagal mengunduh data. Periksa koneksi internet Anda.");
+            } finally {
+                showLoading(false);
+            }
         }
 
-        // --- USER FORM LOGIC (No changes) ---
         async function checkFormStatusForUser() { try { const response = await fetch(`${webAppUrl}?action=getSettings`); const result = await response.json(); const isOff = result.status === 'success' && result.data.formStatus === 'OFF'; document.getElementById('parkingForm').classList.toggle('hidden', isOff); document.getElementById('form-closed-message').classList.toggle('hidden', !isOff); } catch(e) { console.error("Gagal memeriksa status form.", e); } }
         document.getElementById('parkingForm').addEventListener('submit', async function(e) { e.preventDefault(); showLoading(true, "Mengirim data..."); const formDataObject = Object.fromEntries(new FormData(this).entries()); try { const fileInput = document.getElementById('fileKtp').files[0]; if(fileInput) formDataObject.fileKtp = await compressAndReadFile(fileInput); await fetch(webAppUrl, { method: 'POST', body: JSON.stringify(formDataObject), mode: 'no-cors' }); alert('Pengajuan Anda telah berhasil dikirim!'); this.reset(); toggleSections(); } catch(error) { alert('Terjadi kesalahan koneksi. Pastikan internet Anda stabil.'); } finally { showLoading(false); } });
         const formSections = { update: document.getElementById('update-section'), cardReplacement: document.getElementById('card-replacement-section'), newVehicle: document.getElementById('new-vehicle-section'), lainnya: document.getElementById('lainnya-section'), agreement: document.getElementById('agreement-section') };
