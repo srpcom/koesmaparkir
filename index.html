@@ -165,72 +165,93 @@
                 <fieldset>
                     <legend>Informasi Karyawan</legend>
                     <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div>
+                    
+                    <!-- --- PERBAIKAN: Menambahkan Status Kepegawaian --- -->
                     <div class="form-group">
-                        <label for="unitKerja">Unit / Bagian Kerja</label>
-                        <!-- --- PERBAIKAN: Daftar Unit Kerja diperbarui --- -->
-                        <select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)">
-                            <option value="">-- Pilih Unit --</option>
-                            <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
-                            <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
-                            <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
-                            <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
-                            <option value="ICU">ICU</option>
-                            <option value="ICCU">ICCU</option>
-                            <option value="HCU">HCU</option>
-                            <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
-                            <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
-                            <option value="INSTALASI GIZI">INSTALASI GIZI</option>
-                            <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
-                            <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
-                            <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
-                            <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
-                            <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
-                            <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
-                            <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
-                            <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
-                            <option value="INSTALASI PKRS">INSTALASI PKRS</option>
-                            <option value="POLI KIR">POLI KIR</option>
-                            <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
-                            <option value="POLI TMS">POLI TMS</option>
-                            <option value="POLI EEG">POLI EEG</option>
-                            <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
-                            <option value="POLI ESWL">POLI ESWL</option>
-                            <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
-                            <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
-                            <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
-                            <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
-                            <option value="RUANG PAVILIUN">RUANG PAVILIUN</option>
-                            <option value="RUANG ISOLASI">RUANG ISOLASI</option>
-                            <option value="RUANG PERINATOLOGI">RUANG PERINATOLOGI</option>
-                            <option value="POLI ANAK">POLI ANAK</option>
-                            <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
-                            <option value="POLI BEDAH">POLI BEDAH</option>
-                            <option value="POLI MATA">POLI MATA</option>
-                            <option value="POLI THT">POLI THT</option>
-                            <option value="POLI SYARAF">POLI SYARAF</option>
-                            <option value="POLI JANTUNG">POLI JANTUNG</option>
-                            <option value="POLI PARU">POLI PARU</option>
-                            <option value="POLI GIGI">POLI GIGI</option>
-                            <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
-                            <option value="POLI JIWA">POLI JIWA</option>
-                            <option value="POLI TB">POLI TB</option>
-                            <option value="POLI VCT">POLI VCT</option>
-                            <option value="POLI UMUM">POLI UMUM</option>
-                            <option value="BAGIAN PROGPEL">BAGIAN PROGPEL</option>
-                            <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
-                            <option value="BAGIAN ADMINISTRASI DAN UMUM DAN SDM">BAGIAN ADMINISTRASI DAN UMUM</option>
-                            <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
-                            <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
-                            <option value="BIDANG PELAYANAN PENUNJANG">BIDANG PENUNJANG</option>
-                            <option value="KOMITE MEDIK">KOMITE MEDIK</option>
-                            <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
-                            <option value="KOMITE PPI">KOMITE PPI</option>
-                            <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
-                            <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
-                            <option value="LAINNYA">Lainnya...</option>
-                        </select>
+                        <label>Status Kepegawaian</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="statusKepegawaian" value="Karyawan RSUD" onchange="handleStatusKepegawaianChange()" required> Karyawan RSUD dr. R Koesma</label>
+                            <label><input type="radio" name="statusKepegawaian" value="Pihak Ketiga" onchange="handleStatusKepegawaianChange()" required> Lainnya / Pihak Ketiga</label>
+                        </div>
                     </div>
-                    <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
+
+                    <!-- Muncul jika "Karyawan RSUD" dipilih -->
+                    <div id="rsud-employee-section" class="hidden">
+                        <div class="form-group">
+                            <label for="unitKerja">Unit / Bagian Kerja</label>
+                            <select id="unitKerja" name="unitKerja" onchange="handleUnitKerjaChange(this)">
+                                <option value="">-- Pilih Unit --</option>
+                                <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
+                                <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
+                                <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
+                                <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
+                                <option value="ICU">ICU</option>
+                                <option value="ICCU">ICCU</option>
+                                <option value="HCU">HCU</option>
+                                <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
+                                <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
+                                <option value="INSTALASI GIZI">INSTALASI GIZI</option>
+                                <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
+                                <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
+                                <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
+                                <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
+                                <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
+                                <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
+                                <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
+                                <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
+                                <option value="INSTALASI PKRS">INSTALASI PKRS</option>
+                                <option value="POLI KIR">POLI KIR</option>
+                                <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
+                                <option value="POLI TMS">POLI TMS</option>
+                                <option value="POLI EEG">POLI EEG</option>
+                                <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
+                                <option value="POLI ESWL">POLI ESWL</option>
+                                <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
+                                <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
+                                <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
+                                <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
+                                <option value="RUANG PAVILIUN">RUANG PAVILIUN</option>
+                                <option value="RUANG ISOLASI">RUANG ISOLASI</option>
+                                <option value="RUANG PERINATOLOGI">RUANG PERINATOLOGI</option>
+                                <option value="POLI ANAK">POLI ANAK</option>
+                                <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
+                                <option value="POLI BEDAH">POLI BEDAH</option>
+                                <option value="POLI MATA">POLI MATA</option>
+                                <option value="POLI THT">POLI THT</option>
+                                <option value="POLI SYARAF">POLI SYARAF</option>
+                                <option value="POLI JANTUNG">POLI JANTUNG</option>
+                                <option value="POLI PARU">POLI PARU</option>
+                                <option value="POLI GIGI">POLI GIGI</option>
+                                <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
+                                <option value="POLI JIWA">POLI JIWA</option>
+                                <option value="POLI TB">POLI TB</option>
+                                <option value="POLI VCT">POLI VCT</option>
+                                <option value="POLI UMUM">POLI UMUM</option>
+                                <option value="BAGIAN PROGPEL">BAGIAN PROGPEL</option>
+                                <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
+                                <option value="BAGIAN ADMINISTRASI DAN UMUM">BAGIAN ADMINISTRASI DAN UMUM</option>
+                                <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
+                                <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
+                                <option value="BIDANG PELAYANAN PENUNJANG">BIDANG PENUNJANG</option>
+                                <option value="KOMITE MEDIK">KOMITE MEDIK</option>
+                                <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
+                                <option value="KOMITE PPI">KOMITE PPI</option>
+                                <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
+                                <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
+                                <option value="LAINNYA">Lainnya...</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
+                    </div>
+
+                    <!-- Muncul jika "Pihak Ketiga" dipilih -->
+                    <div id="other-employee-section" class="hidden">
+                        <div class="form-group">
+                            <label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label>
+                            <input type="text" id="afiliasiLainnya" name="afiliasiLainnya">
+                        </div>
+                    </div>
+                    
                     <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div>
                     <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
                 </fieldset>
@@ -555,6 +576,7 @@
                     alert('Pengajuan Anda telah berhasil dikirim!');
                     this.reset(); 
                     toggleSections(); 
+                    handleStatusKepegawaianChange(); // Reset dynamic fields
                 } else {
                     throw new Error(result.message || 'Terjadi kesalahan di server.');
                 }
@@ -570,16 +592,16 @@
         
         function toggleSections(){
             const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value;
-            const allLabels = document.querySelectorAll('.radio-group label');
+            const allLabels = document.querySelectorAll('#parkingForm .radio-group label');
             const allDescriptions = document.querySelectorAll('.keterangan-text');
             const keteranganBox = document.getElementById('keterangan-tujuan-box');
 
-            allLabels.forEach(label => label.classList.remove('selected-label'));
+            allLabels.forEach(label => { if(label.parentElement.parentElement.id !== 'karyawan-status-group') label.classList.remove('selected-label')});
             allDescriptions.forEach(desc => desc.classList.add('hidden'));
             keteranganBox.classList.add('hidden');
 
             if (choice) {
-                const selectedRadio = document.querySelector(`input[value="${choice}"]`);
+                const selectedRadio = document.querySelector(`input[name="jenisPengajuan"][value="${choice}"]`);
                 if (selectedRadio) {
                     selectedRadio.parentElement.classList.add('selected-label');
                 }
@@ -597,22 +619,40 @@
             if (!choice) return;
             const show = (keys) => keys.forEach(k => formSections[k].style.display = 'block');
             switch(choice){
-                case 'Pendaftaran Baru':
-                case 'Tambah Kendaraan Baru':
-                    show(['newVehicle', 'agreement']);
-                    break;
-                case 'Rubah Nomor Kendaraan':
-                    show(['update', 'newVehicle', 'agreement']);
-                    break;
-                case 'Hapus Nomor Kendaraan':
-                    show(['update', 'agreement']);
-                    break;
-                case 'Penggantian Kartu':
-                    show(['update', 'cardReplacement', 'agreement']);
-                    break;
-                case 'Lainnya':
-                    show(['lainnya', 'agreement']);
-                    break;
+                case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(['newVehicle', 'agreement']); break;
+                case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle', 'agreement']); break;
+                case 'Hapus Nomor Kendaraan': show(['update', 'agreement']); break;
+                case 'Penggantian Kartu': show(['update', 'cardReplacement', 'agreement']); break;
+                case 'Lainnya': show(['lainnya', 'agreement']); break;
+            }
+        }
+        
+        // --- PERBAIKAN: Fungsi baru untuk menangani Status Kepegawaian ---
+        function handleStatusKepegawaianChange() {
+            const choice = document.querySelector('input[name="statusKepegawaian"]:checked')?.value;
+            const rsudSection = document.getElementById('rsud-employee-section');
+            const otherSection = document.getElementById('other-employee-section');
+            const unitKerjaSelect = document.getElementById('unitKerja');
+            const afiliasiInput = document.getElementById('afiliasiLainnya');
+
+            if (choice === 'Karyawan RSUD') {
+                rsudSection.classList.remove('hidden');
+                otherSection.classList.add('hidden');
+                unitKerjaSelect.required = true;
+                afiliasiInput.required = false;
+                afiliasiInput.value = ''; 
+            } else if (choice === 'Pihak Ketiga') {
+                rsudSection.classList.add('hidden');
+                otherSection.classList.remove('hidden');
+                unitKerjaSelect.required = false;
+                afiliasiInput.required = true;
+                unitKerjaSelect.value = ''; 
+                handleUnitKerjaChange(unitKerjaSelect); 
+            } else {
+                rsudSection.classList.add('hidden');
+                otherSection.classList.add('hidden');
+                unitKerjaSelect.required = false;
+                afiliasiInput.required = false;
             }
         }
 
