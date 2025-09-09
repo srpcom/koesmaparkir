@@ -56,6 +56,76 @@
         .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 15px; }
         .pagination-controls button { width: auto; padding: 5px 10px; font-size: 0.9em; }
         .pagination-controls .page-info { font-size: 0.9em; }
+
+        /* PERUBAIKAN: Style responsif untuk dashboard admin */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            .container {
+                margin: 10px auto;
+                padding: 0;
+            }
+            #admin-dashboard .container, #admin-login-page .container {
+                width: 100%;
+                margin: 5px 0;
+                padding: 0;
+                border: none;
+                border-radius: 0;
+                background-color: transparent;
+                backdrop-filter: none;
+                box-shadow: none;
+            }
+            #admin-dashboard .admin-container, #admin-login-page .admin-container {
+                padding: 10px;
+                background-color: #f9f9f9;
+                border-radius: 8px;
+            }
+            #admin-dashboard header {
+                border-radius: 8px 8px 0 0;
+            }
+            .table-container {
+                overflow-x: hidden; /* Tidak perlu scroll horizontal lagi */
+                max-height: none;
+            }
+            #submissions-table, #submissions-table thead, #submissions-table tbody, #submissions-table th, #submissions-table td, #submissions-table tr {
+                display: block;
+            }
+            #submissions-table thead {
+                display: none; /* Sembunyikan header tabel */
+            }
+            #submissions-table tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                background-color: #fff;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            #submissions-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px;
+                text-align: right;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+            #submissions-table td:last-child {
+                border-bottom: none;
+            }
+            #submissions-table td::before {
+                content: attr(data-label); /* Tampilkan header sebagai label */
+                font-weight: bold;
+                text-align: left;
+                margin-right: 15px;
+                color: var(--primary-color);
+                flex-shrink: 0;
+            }
+            .admin-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
     </style>
 </head>
 <body>
@@ -323,7 +393,7 @@
             tableHead.innerHTML = `<tr>${submissionHeaders.map(h => `<th>${h}</th>`).join('')}</tr>`;
 
             if (filteredSubmissions.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="${submissionHeaders.length || 1}" style="text-align:center;">Data tidak ditemukan.</td></tr>`;
+                tableBody.innerHTML = `<tr><td data-label="Info" colspan="${submissionHeaders.length || 1}" style="text-align:center;">Data tidak ditemukan.</td></tr>`;
                 setupPagination(0);
                 return;
             }
@@ -340,6 +410,8 @@
                 row.forEach((cell, cellIndex) => {
                     const td = document.createElement('td');
                     const header = submissionHeaders[cellIndex];
+                    // PERUBAIKAN: Tambahkan atribut data-label untuk CSS mobile
+                    td.setAttribute('data-label', header);
                      if (header === 'Status') {
                         td.innerHTML = `<select onchange="updateStatus(this, ${originalSheetIndex})">
                             <option value="Belum diproses" ${cell === 'Belum diproses' ? 'selected' : ''}>Belum diproses</option>
