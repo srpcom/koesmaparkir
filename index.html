@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Layanan Parkir</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%2c kecil.png">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -17,6 +17,14 @@
         }
         body { font-family: var(--font-family); background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: var(--text-color); margin: 0; padding: 10px; transition: background-color 0.3s; }
         .container { max-width: 800px; width: 100%; margin: 20px auto; background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 12px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); }
+        
+        /* --- PERBAIKAN: Gaya khusus untuk kontainer formulir utama agar lebih transparan --- */
+        #main-form-container .container {
+            background-color: rgba(255, 255, 255, 0.5); /* Transparansi 50% */
+            backdrop-filter: blur(12px); /* Blur sedikit lebih kuat untuk menjaga estetika */
+            -webkit-backdrop-filter: blur(12px);
+        }
+
         header { background-color: var(--primary-color); color: white; padding: 20px; text-align: center; border-bottom: 5px solid #00487a; border-radius: 12px 12px 0 0; }
         header .logo-image { width: 70px; margin: 0 auto 15px auto; display: block; }
         header h1 { margin: 0; font-size: 1.5em; }
@@ -62,7 +70,6 @@
         .status-selesai { background-color: var(--completed-bg); color: var(--completed-color); border-color: var(--completed-border); }
         .status-ditolak { background-color: var(--rejected-bg); color: var(--rejected-color); border-color: var(--rejected-border); }
         
-        /* --- PERBAIKAN: Gaya khusus untuk tampilan admin --- */
         body.admin-view {
             padding: 0;
             background-image: none;
@@ -103,7 +110,7 @@
     <div id="main-form-container">
          <div class="container">
             <header>
-                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%2c kecil.png" alt="Logo" class="logo-image">
+                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo" class="logo-image">
                 <h1>FORMULIR LAYANAN PARKIR</h1>
                 <p>RSUD dr. R. KOESMA TUBAN</p>
             </header>
