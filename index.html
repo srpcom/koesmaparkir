@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulir Layanan Parkir</title>
-    <!-- Favicon Baru -->
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png">
     <style>
         /* CSS untuk tampilan profesional dan modern */
         :root {
-            --primary-color: #005A9C; /* Warna biru khas instansi kesehatan/pemerintah */
-            --secondary-color: #F0F8FF; /* Warna latar belakang lembut */
-            --border-color: #DCDCDC; /* Warna border abu-abu terang */
+            --primary-color: #005A9C;
+            --secondary-color: #F0F8FF;
+            --border-color: #DCDCDC;
             --text-color: #333;
             --success-color: #28a745;
             --error-color: #dc3545;
@@ -26,20 +26,19 @@
             background-attachment: fixed;
             color: var(--text-color);
             margin: 0;
-            padding: 10px; /* Padding dikurangi untuk mobile */
+            padding: 10px;
         }
 
         .container {
             max-width: 800px;
             width: 100%;
             margin: 20px auto;
-            background-color: rgba(255, 255, 255, 0.4); /* Lebih transparan lagi */
-            backdrop-filter: blur(12px); /* Efek blur lebih kuat */
-            -webkit-backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 12px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            /* overflow: hidden; Dihapus agar sticky header berfungsi */
         }
 
         header {
@@ -48,45 +47,19 @@
             padding: 20px;
             text-align: center;
             border-bottom: 5px solid #00487a;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            transition: all 0.3s ease-in-out;
+            border-radius: 12px 12px 0 0;
         }
 
-        /* Style untuk header saat di-scroll */
-        header.scrolled {
-            background-color: rgba(0, 90, 156, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 10px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-        }
-
-        header.scrolled .logo-image {
-            width: 50px; /* Logo mengecil */
-            margin-bottom: 0;
-        }
-
-        header.scrolled h1,
-        header.scrolled p {
-            display: none; /* Sembunyikan judul dan deskripsi saat di-scroll */
-        }
-
-
-        /* Style untuk logo baru */
         header .logo-image {
             width: 70px;
             height: auto;
             margin: 0 auto 15px auto;
             display: block;
-            transition: all 0.3s ease-in-out;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.5em; /* Ukuran font disesuaikan */
+            font-size: 1.5em;
             font-weight: 700;
         }
         
@@ -101,24 +74,22 @@
         }
 
         fieldset {
-            border: 1px solid transparent;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 20px 15px; /* Padding disesuaikan */
+            padding: 20px 15px;
             margin-bottom: 25px;
-            transition: all 0.3s ease-in-out;
+            background-color: rgba(255, 255, 255, 0.5);
         }
 
         legend {
             font-weight: bold;
             font-size: 1.2em;
-            color: #fff;
-            padding: 8px 16px;
+            color: var(--primary-color);
+            padding: 5px 15px;
             border-radius: 20px;
-            background-color: rgba(0, 90, 156, 0.7); /* Latar belakang transparan */
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .form-group {
@@ -142,17 +113,13 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             box-sizing: border-box;
-            font-size: 16px; /* Mencegah zoom otomatis di iOS */
+            font-size: 16px;
             transition: border-color 0.3s, box-shadow 0.3s;
-            background-color: rgba(255, 255, 255, 0.8);
+            background-color: rgba(255, 255, 255, 0.9);
         }
         
         textarea {
             resize: vertical;
-        }
-
-        input[type="file"] {
-            padding: 8px;
         }
 
         input:focus,
@@ -164,28 +131,17 @@
             background-color: #fff;
         }
 
-        .radio-group label {
-            display: flex; /* Menggunakan flexbox */
+        .radio-group label, .checkbox-group label {
+            display: flex;
             align-items: center;
-            margin-bottom: 10px; /* Memberi jarak antar pilihan */
+            margin-bottom: 10px;
             font-weight: normal;
             cursor: pointer;
         }
         
-        .radio-group input {
+        .radio-group input, .checkbox-group input {
            margin-right: 10px;
            flex-shrink: 0;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .checkbox-group input {
-            margin-top: 5px;
-            margin-right: 10px;
-            flex-shrink: 0;
         }
 
         button {
@@ -211,7 +167,7 @@
             cursor: not-allowed;
         }
 
-        .hidden-section, .hidden {
+        .hidden {
             display: none;
         }
 
@@ -222,21 +178,8 @@
             border-radius: 6px;
             border-left: 4px solid var(--primary-color);
         }
-
-        .keterangan-text {
-            margin: 0;
-            font-size: 0.9em;
-            color: #555;
-            line-height: 1.5;
-        }
         
-        .input-description {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        /* Overlay */
+        /* Overlay and Modal styles */
         .overlay {
             position: fixed;
             top: 0;
@@ -248,11 +191,8 @@
             display: none;
             justify-content: center;
             align-items: center;
-            color: white;
-            flex-direction: column;
             padding: 15px;
             box-sizing: border-box;
-            -webkit-backdrop-filter: blur(5px);
             backdrop-filter: blur(5px);
         }
         
@@ -271,20 +211,17 @@
         }
         
         #loading-overlay p {
+            color: white;
             margin-top: 20px;
             font-size: 1.2em;
         }
 
-        /* --- Style untuk Modal --- */
         .modal-container {
             background-color: white;
-            color: var(--text-color);
             padding: 25px;
             border-radius: 12px;
             max-width: 500px;
             width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
             text-align: left;
             box-shadow: 0 5px 25px rgba(0,0,0,0.2);
         }
@@ -299,84 +236,44 @@
             padding-bottom: 10px;
             line-height: 1.6;
         }
-        .summary-content p strong {
-            display: block;
-            color: #555;
-            font-size: 0.9em;
-        }
         .modal-buttons {
             display: flex;
             gap: 15px;
             margin-top: 25px;
         }
-        .modal-buttons button {
-            width: 100%; /* Default width */
-        }
-        .modal-buttons .edit-button {
-            background-color: #6c757d;
-            width: 50%;
-        }
-        .modal-buttons .edit-button:hover {
-            background-color: #5a6268;
-        }
-        .modal-buttons .confirm-button {
-             width: 50%;
-        }
         
-        /* --- Style Notifikasi --- */
-        #notification-modal .modal-container {
-            text-align: center;
-        }
-        #notification-modal h2 {
-            font-size: 1.8em;
-        }
-        #notification-message {
-            white-space: pre-line; /* Agar karakter newline (\n) di JavaScript berfungsi */
-            line-height: 1.6;
-        }
-        #notification-modal .icon {
-            font-size: 50px;
-            line-height: 1;
-        }
+        /* Notification styles */
+        #notification-modal .modal-container { text-align: center; }
+        #notification-modal .icon { font-size: 50px; line-height: 1; }
         #notification-modal.success .icon { color: var(--success-color); }
         #notification-modal.error .icon { color: var(--error-color); }
 
-        /* Responsif untuk layar lebar */
-         @media (min-width: 600px) {
-            .radio-group label {
-                display: inline-flex;
-                margin-bottom: 0;
-                margin-right: 15px;
-            }
-            body {
-                padding: 20px 20px 80px 20px; /* Beri ruang di bawah */
-            }
-            form {
-                padding: 30px;
-            }
+        @media (min-width: 600px) {
+            form { padding: 30px; }
         }
     </style>
 </head>
 <body>
+    <!-- Loading Overlay -->
     <div id="loading-overlay" class="overlay">
         <div class="spinner"></div>
         <p>Mengirim data, mohon tunggu...</p>
     </div>
 
+    <!-- Confirmation Modal -->
     <div id="confirmation-overlay" class="overlay">
         <div class="modal-container">
             <h2>Konfirmasi Data Anda</h2>
-            <p>Mohon periksa kembali data yang telah Anda isikan. screenshot jika perlu .</p>
-            <div id="summary-content" class="summary-content">
-                <!-- Konten ringkasan akan diisi oleh JavaScript -->
-            </div>
+            <p>Mohon periksa kembali data Anda. Pastikan semua informasi sudah benar sebelum melanjutkan.</p>
+            <div id="summary-content" class="summary-content"></div>
             <div class="modal-buttons">
-                <button type="button" id="edit-button" class="edit-button">Perbaiki Data</button>
-                <button type="button" id="final-submit-button" class="confirm-button">Ya, Kirim & Selesaikan</button>
+                <button type="button" id="edit-button" style="background-color: #6c757d;">Perbaiki</button>
+                <button type="button" id="final-submit-button">Ya, Kirim</button>
             </div>
         </div>
     </div>
 
+    <!-- Notification Modal -->
     <div id="notification-modal" class="overlay">
         <div class="modal-container">
             <p id="notification-icon" class="icon"></p>
@@ -388,11 +285,9 @@
         </div>
     </div>
 
-
     <div class="container">
-        <header id="main-header">
-            <!-- Logo RSUD Baru -->
-            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD dr. R. Koesma" class="logo-image">
+        <header>
+            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD" class="logo-image">
             <h1>FORMULIR LAYANAN PARKIR</h1>
             <p>RSUD dr. R. KOESMA TUBAN</p>
         </header>
@@ -401,6 +296,7 @@
             <fieldset>
                 <legend>Tujuan Pengisian</legend>
                 <div class="form-group radio-group">
+                    <!-- Opsi radio button untuk tujuan pengisian -->
                     <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
                     <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
                     <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
@@ -408,389 +304,209 @@
                     <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
                     <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
                 </div>
-                <div id="keterangan-tujuan" class="keterangan-box hidden">
-                    <p id="desc-pendaftaran-baru" class="keterangan-text hidden">Untuk mendaftarkan kendaraan pertama Anda pada sistem parkir.</p>
-                    <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK 5 tahunan) namun kendaraannya masih sama.</p>
-                    <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar untuk parkir di RSUD.</p>
-                    <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil).</p>
-                    <p id="desc-penggantian-kartu" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang atau rusak.</p>
-                    <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci.</p>
-                </div>
             </fieldset>
 
             <fieldset>
                 <legend>Informasi Karyawan</legend>
-                <div class="form-group">
-                    <label for="namaLengkap">Nama Lengkap</label>
-                    <input type="text" id="namaLengkap" name="namaLengkap" required>
-                </div>
-                <div class="form-group">
-                    <label for="unitKerja">Unit / Bagian Kerja</label>
-                    <select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)">
-                        <option value="">-- Pilih Unit --</option>
-                        <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
-                        <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
-                        <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
-                        <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
-                        <option value="ICU">ICU</option>
-                        <option value="ICCU">ICCU</option>
-                        <option value="HCU">HCU</option>
-                        <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
-                        <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
-                        <option value="INSTALASI GIZI">INSTALASI GIZI</option>
-                        <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
-                        <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
-                        <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
-                        <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
-                        <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
-                        <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
-                        <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
-                        <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
-                        <option value="INSTALASI PKRS">INSTALASI PKRS</option>
-                        <option value="POLI KIR">POLI KIR</option>
-                        <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
-                        <option value="POLI TMS">POLI TMS</option>
-                        <option value="POLI EEG">POLI EEG</option>
-                        <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
-                        <option value="POLI ESWL">POLI ESWL</option>
-                        <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
-                        <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
-                        <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
-                        <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
-                        <option value="RUANG PAVILIUN">RUANG PAVILIUN</option>
-                        <option value="RUANG ISOLASI">RUANG ISOLASI</option>
-                        <option value="RUANG PERINATOLOGI">RUANG PERINATOLOGI</option>
-                        <option value="POLI ANAK">POLI ANAK</option>
-                        <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
-                        <option value="POLI BEDAH">POLI BEDAH</option>
-                        <option value="POLI MATA">POLI MATA</option>
-                        <option value="POLI THT">POLI THT</option>
-                        <option value="POLI SYARAF">POLI SYARAF</option>
-                        <option value="POLI JANTUNG">POLI JANTUNG</option>
-                        <option value="POLI PARU">POLI PARU</option>
-                        <option value="POLI GIGI">POLI GIGI</option>
-                        <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
-                        <option value="POLI JIWA">POLI JIWA</option>
-                        <option value="POLI TB">POLI TB</option>
-                        <option value="POLI VCT">POLI VCT</option>
-                        <option value="POLI UMUM">POLI UMUM</option>
-                        <option value="BAGIAN PROGPEL">BAGIAN PROGPEL</option>
-                        <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
-                        <option value="BAGIAN ADMINISTRASI DAN UMUM DAN SDM">BAGIAN ADMINISTRASI DAN UMUM</option>
-                        <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
-                        <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
-                        <option value="BIDANG PELAYANAN PENUNJANG">BIDANG PENUNJANG</option>
-                        <option value="KOMITE MEDIK">KOMITE MEDIK</option>
-                        <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
-                        <option value="KOMITE PPI">KOMITE PPI</option>
-                        <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
-                        <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
-                        <option value="Lainnya">Lainnya...</option>
-                    </select>
-                </div>
-                <div class="form-group hidden" id="unitKerjaLainnya-group">
-                    <label for="unitKerjaLainnya">Silakan Tulis Nama Unit / Bagian Anda</label>
-                    <input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya">
-                </div>
-                <div class="form-group">
-                    <label for="telepon">Nomor Telepon / WA (Aktif)</label>
-                    <input type="tel" id="telepon" name="telepon" required>
-                </div>
-                 <div class="form-group">
-                    <label for="fileKtp">Upload Identitas (KTP/SIM)</label>
-                    <input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required>
-                </div>
+                <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div>
+                <div class="form-group"><label for="unitKerja">Unit / Bagian Kerja</label><select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)"><option value="">-- Pilih Unit --</option><option value="INSTALASI FARMASI">INSTALASI FARMASI</option><option value="LAINNYA">Lainnya...</option></select></div>
+                <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
+                <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div>
+                <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
             </fieldset>
 
-            <fieldset id="update-section" class="hidden-section">
-                <legend>Data Kendaraan Lama</legend>
-                <div class="form-group radio-group">
-                    <label>Jenis Kendaraan Lama</label><br>
-                    <label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label>
-                    <label><input type="radio" name="jenisKendaraanLama" value="Sepeda Motor"> Sepeda Motor</label>
-                </div>
-                <div class="form-group">
-                    <label for="noPolisiLama">Nomor Polisi Lama</label>
-                    <input type="text" id="noPolisiLama" name="noPolisiLama" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
-                </div>
-            </fieldset>
-
-            <fieldset id="card-replacement-section" class="hidden-section">
-                <legend>Informasi Penggantian Kartu</legend>
-                 <div class="form-group">
-                    <label for="alasanPenggantian">Alasan Penggantian (Contoh: Hilang, Rusak)</label>
-                    <textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea>
-                </div>
-            </fieldset>
+            <fieldset id="update-section" class="hidden"><legend>Data Kendaraan Lama</legend><div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama"></div></fieldset>
+            <fieldset id="card-replacement-section" class="hidden"><legend>Informasi Penggantian Kartu</legend><div class="form-group"><label for="alasanPenggantian">Alasan Penggantian</label><textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea></div></fieldset>
+            <fieldset id="new-vehicle-section" class="hidden"><legend>Detail Kendaraan Baru</legend><div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru"></div></fieldset>
+            <fieldset id="lainnya-section" class="hidden"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Tulis keterangan lengkap Anda</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
             
-            <fieldset id="new-vehicle-section" class="hidden-section">
-                <legend>Detail Kendaraan Baru</legend>
-                <div class="form-group radio-group">
-                    <label><input type="radio" name="jenisKendaraan" value="Mobil"> Mobil</label>
-                    <label><input type="radio" name="jenisKendaraan" value="Sepeda Motor"> Sepeda Motor</label>
-                </div>
-                <div class="form-group">
-                    <label for="noPolisiBarU">Nomor Polisi Baru</label>
-                    <input type="text" id="noPolisiBaru" name="noPolisiBaru" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" pattern="^\S+$" title="Harap isi tanpa menggunakan spasi.">
-                    <p class="input-description">Gunakan huruf Besar, tanpa spasi. Misal: S4966EP</p>
-                </div>
-            </fieldset>
-
-             <fieldset id="lainnya-section" class="hidden-section">
-                <legend>Keterangan Lainnya</legend>
-                <div class="form-group">
-                    <label for="keteranganLainnya">Silakan tulis tujuan/keterangan lengkap Anda di sini</label>
-                    <textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea>
-                </div>
-            </fieldset>
-            
-            <fieldset id="agreement-section" class="hidden-section">
-                <legend>Persetujuan</legend>
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="agreement" name="agreement" required>
-                    <label for="agreement">Saya menyatakan bahwa seluruh data yang saya isikan adalah benar dan saya bersedia mematuhi semua peraturan parkir yang berlaku di lingkungan RSUD.</label>
-                </div>
-            </fieldset>
+            <fieldset id="agreement-section" class="hidden"><legend>Persetujuan</legend><div class="form-group checkbox-group"><input type="checkbox" id="agreement" name="agreement" required><label for="agreement">Saya menyatakan data yang diisikan benar dan bersedia mematuhi peraturan yang berlaku.</label></div></fieldset>
 
             <button type="submit" id="submit-button">Kirim Formulir</button>
         </form>
     </div>
 
     <script>
-        // --- Bagian Logika Formulir ---
+        // =========================================================================
+        // PENTING: Ganti URL di bawah ini dengan URL Web App Anda dari Google Apps Script
+        // =========================================================================
+        const webAppUrl = 'GANTI_DENGAN_URL_WEB_APP_ANDA';
+        // =========================================================================
 
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbwMeXBhRq3JRwVV4A4jHPvdOjm2-b9wJ4A5lnxZW7PrS7OdS-xHszZxD54a8KDvC-S5/exec';
-
-        const allSections = {
+        // DOM elements
+        const form = document.getElementById('parkingForm');
+        const sections = {
             update: document.getElementById('update-section'),
             cardReplacement: document.getElementById('card-replacement-section'),
             newVehicle: document.getElementById('new-vehicle-section'),
             lainnya: document.getElementById('lainnya-section'),
             agreement: document.getElementById('agreement-section')
         };
-
-        const allDescriptions = {
-            box: document.getElementById('keterangan-tujuan'),
-            'Pendaftaran Baru': document.getElementById('desc-pendaftaran-baru'),
-            'Rubah Nomor Kendaraan': document.getElementById('desc-rubah-nomor-kendaraan'),
-            'Hapus Nomor Kendaraan': document.getElementById('desc-hapus-nomor-kendaraan'),
-            'Tambah Kendaraan Baru': document.getElementById('desc-tambah-kendaraan-baru'),
-            'Penggantian Kartu': document.getElementById('desc-penggantian-kartu'),
-            'Lainnya': document.getElementById('desc-lainnya')
+        const overlays = {
+            loading: document.getElementById('loading-overlay'),
+            confirmation: document.getElementById('confirmation-overlay'),
+            notification: document.getElementById('notification-modal')
         };
-        
         let formDataObject = {};
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const confirmationOverlay = document.getElementById('confirmation-overlay');
-        const notificationModal = document.getElementById('notification-modal');
 
         function setRequired(element, isRequired) {
-            const inputs = element.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                if(input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
-                    input.required = (element.style.display !== 'none') ? isRequired : false;
+            element.querySelectorAll('input, select, textarea').forEach(input => {
+                if (input.type !== 'radio' && input.type !== 'checkbox' && input.type !== 'file') {
+                    input.required = isRequired;
                 }
             });
         }
 
         function toggleSections() {
             const choice = document.querySelector('input[name="jenisPengajuan"]:checked').value;
-            for (const key in allSections) { allSections[key].style.display = 'none'; setRequired(allSections[key], false); }
-            for (const key in allDescriptions) { if(key !== 'box') allDescriptions[key].style.display = 'none'; }
-            allDescriptions.box.style.display = 'block';
-            if (allDescriptions[choice]) { allDescriptions[choice].style.display = 'block'; }
+            Object.values(sections).forEach(sec => {
+                sec.style.display = 'none';
+                setRequired(sec, false);
+            });
+
+            const show = (keys) => {
+                keys.forEach(key => {
+                    sections[key].style.display = 'block';
+                    setRequired(sections[key], true);
+                });
+            };
+
             switch(choice) {
                 case 'Pendaftaran Baru':
-                case 'Tambah Kendaraan Baru':
-                    allSections.newVehicle.style.display = 'block';
-                    allSections.agreement.style.display = 'block';
-                    setRequired(allSections.newVehicle, true);
-                    break;
-                case 'Rubah Nomor Kendaraan':
-                    allSections.update.style.display = 'block';
-                    allSections.newVehicle.style.display = 'block';
-                    allSections.agreement.style.display = 'block';
-                    setRequired(allSections.update, true);
-                    setRequired(allSections.newVehicle, true);
-                    break;
-                case 'Hapus Nomor Kendaraan':
-                    allSections.update.style.display = 'block';
-                    allSections.agreement.style.display = 'block';
-                    setRequired(allSections.update, true);
-                    break;
-                case 'Penggantian Kartu':
-                    allSections.update.style.display = 'block';
-                    allSections.cardReplacement.style.display = 'block';
-                    allSections.agreement.style.display = 'block';
-                    setRequired(allSections.update, true);
-                    setRequired(allSections.cardReplacement, true);
-                    break;
-                case 'Lainnya':
-                    allSections.lainnya.style.display = 'block';
-                    allSections.agreement.style.display = 'block';
-                    setRequired(allSections.lainnya, true);
-                    break;
+                case 'Tambah Kendaraan Baru': show(['newVehicle', 'agreement']); break;
+                case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle', 'agreement']); break;
+                case 'Hapus Nomor Kendaraan': show(['update', 'agreement']); break;
+                case 'Penggantian Kartu': show(['update', 'cardReplacement', 'agreement']); break;
+                case 'Lainnya': show(['lainnya', 'agreement']); break;
             }
         }
 
-        function handleUnitKerjaChange(selectElement) {
+        function handleUnitKerjaChange(select) {
             const lainnyaGroup = document.getElementById('unitKerjaLainnya-group');
             const lainnyaInput = document.getElementById('unitKerjaLainnya');
-            lainnyaInput.required = (selectElement.value === 'Lainnya');
-            lainnyaGroup.classList.toggle('hidden', selectElement.value !== 'Lainnya');
-            if(selectElement.value !== 'Lainnya') lainnyaInput.value = '';
+            const isLainnya = select.value === 'LAINNYA';
+            lainnyaGroup.classList.toggle('hidden', !isLainnya);
+            lainnyaInput.required = isLainnya;
+            if (!isLainnya) lainnyaInput.value = '';
         }
 
-        function compressAndReadFile(file, maxSizeInBytes = 512000) { // Target size ~500KB
+        function compressAndReadFile(file) {
             return new Promise((resolve, reject) => {
+                // If it's not an image, just read it as base64
                 if (!file.type.startsWith('image/')) {
                     const reader = new FileReader();
-                    reader.onload = () => {
-                        const base64String = reader.result.split(',')[1];
-                        resolve({ base64: base64String, type: file.type, name: file.name });
-                    };
-                    reader.onerror = (error) => reject(error);
+                    reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name });
+                    reader.onerror = error => reject(error);
                     reader.readAsDataURL(file);
                     return;
                 }
-
+                
+                // If it is an image, compress it
                 const reader = new FileReader();
-                reader.onload = (e) => {
+                reader.onload = e => {
                     const img = new Image();
                     img.onload = () => {
-                        const MAX_WIDTH = 1280;
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-
                         const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
                         const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        let dataUrl = canvas.toDataURL('image/jpeg', 0.9); // Start with 90% quality
-                        
-                        // Iteratively reduce quality if file is too large
-                        let quality = 0.9;
-                        while (dataUrl.length > maxSizeInBytes * 4/3 && quality > 0.1) {
-                            quality -= 0.1;
-                            dataUrl = canvas.toDataURL('image/jpeg', quality);
-                        }
-
-                        const base64String = dataUrl.split(',')[1];
-                        let newName = file.name.split('.').slice(0, -1).join('.') + '.jpg';
-                        
-                        resolve({ base64: base64String, type: 'image/jpeg', name: newName });
+                        const MAX_WIDTH = 1024;
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.8); // 80% quality
+                        resolve({ base64: dataUrl.split(',')[1], type: 'image/jpeg', name: 'compressed_id.jpg' });
                     };
-                    img.onerror = (error) => reject(error);
                     img.src = e.target.result;
                 };
-                reader.onerror = (error) => reject(error);
+                reader.onerror = error => reject(error);
                 reader.readAsDataURL(file);
             });
         }
         
         function populateSummary(data) {
             const summaryContent = document.getElementById('summary-content');
-            summaryContent.innerHTML = `<p><strong>Tujuan Pengisian:</strong> <span>${data.jenisPengajuan || '-'}</span></p><p><strong>Nama Lengkap:</strong> <span>${data.namaLengkap || '-'}</span></p><p><strong>Unit / Bagian Kerja:</strong> <span>${(data.unitKerja === 'Lainnya' ? data.unitKerjaLainnya : data.unitKerja) || '-'}</span></p><p><strong>Nomor Telepon / WA:</strong> <span>${data.telepon || '-'}</span></p><p><strong>File Identitas (KTP/SIM):</strong> <span>${document.getElementById('fileKtp').files[0]?.name || 'Tidak ada file'}</span></p>`;
-            const addSummaryRow = (label, value) => { if (value) { const p = document.createElement('p'); p.innerHTML = `<strong>${label}:</strong> ${value}`; summaryContent.appendChild(p); } };
-            addSummaryRow('Jenis Kendaraan Lama', data.jenisKendaraanLama);
-            addSummaryRow('Nomor Polisi Lama', data.noPolisiLama);
-            addSummaryRow('Jenis Kendaraan Baru', data.jenisKendaraan);
-            addSummaryRow('Nomor Polisi Baru', data.noPolisiBaru);
-            addSummaryRow('Alasan Penggantian Kartu', data.alasanPenggantian);
-            addSummaryRow('Keterangan Lainnya', data.keteranganLainnya);
+            summaryContent.innerHTML = ''; // Clear previous
+            const addRow = (label, value) => {
+                if (value) summaryContent.innerHTML += `<p><strong>${label}:</strong> ${value}</p>`;
+            };
+            addRow('Tujuan Pengisian', data.jenisPengajuan);
+            addRow('Nama Lengkap', data.namaLengkap);
+            addRow('Unit Kerja', data.unitKerja === 'LAINNYA' ? data.unitKerjaLainnya : data.unitKerja);
+            addRow('No. Telepon', data.telepon);
+            addRow('File Identitas', document.getElementById('fileKtp').files[0]?.name);
+            addRow('No. Polisi Lama', data.noPolisiLama);
+            addRow('No. Polisi Baru', data.noPolisiBaru);
+            addRow('Alasan Ganti Kartu', data.alasanPenggantian);
+            addRow('Keterangan Lainnya', data.keteranganLainnya);
         }
 
         function showNotification(isSuccess, message) {
-            const title = document.getElementById('notification-title');
-            const icon = document.getElementById('notification-icon');
-            const msg = document.getElementById('notification-message');
-            
-            notificationModal.className = 'overlay ' + (isSuccess ? 'success' : 'error');
-            title.textContent = isSuccess ? 'Berhasil Terkirim' : 'Terjadi Kesalahan';
-            icon.textContent = isSuccess ? '✓' : '✗';
-            msg.textContent = message;
-            notificationModal.style.display = 'flex';
+            const modal = overlays.notification;
+            modal.className = 'overlay ' + (isSuccess ? 'success' : 'error');
+            document.getElementById('notification-title').textContent = isSuccess ? 'Berhasil' : 'Gagal';
+            document.getElementById('notification-icon').textContent = isSuccess ? '✓' : '✗';
+            document.getElementById('notification-message').textContent = message;
+            modal.style.display = 'flex';
         }
 
-        document.getElementById('parkingForm').addEventListener('submit', function(e) {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
             if (webAppUrl.includes('GANTI_DENGAN_URL')) {
-                alert('Kesalahan Konfigurasi: URL Web App belum diatur di dalam file HTML.');
+                alert('Konfigurasi Error: URL Web App belum diatur di file HTML.');
                 return;
             }
-            const formData = new FormData(this);
-            formDataObject = Object.fromEntries(formData.entries());
+            formDataObject = Object.fromEntries(new FormData(this).entries());
             populateSummary(formDataObject);
-            confirmationOverlay.style.display = 'flex';
+            overlays.confirmation.style.display = 'flex';
         });
 
-        document.getElementById('edit-button').addEventListener('click', () => confirmationOverlay.style.display = 'none');
+        document.getElementById('edit-button').addEventListener('click', () => overlays.confirmation.style.display = 'none');
         document.getElementById('notification-close-button').addEventListener('click', () => {
-            notificationModal.style.display = 'none';
-            if (notificationModal.classList.contains('success')) {
-                 window.location.reload(); // Reload halaman setelah sukses
+            overlays.notification.style.display = 'none';
+            if (overlays.notification.classList.contains('success')) {
+                 window.location.reload();
             }
-        });
-        
-        window.addEventListener('scroll', function() {
-            const header = document.getElementById('main-header');
-            header.classList.toggle('scrolled', window.scrollY > 10);
         });
 
         document.getElementById('final-submit-button').addEventListener('click', async function() {
-            confirmationOverlay.style.display = 'none';
-            loadingOverlay.style.display = 'flex';
-            const submitButton = document.getElementById('submit-button');
-            submitButton.disabled = true;
-            submitButton.textContent = 'Mengirim...';
+            overlays.confirmation.style.display = 'none';
+            overlays.loading.style.display = 'flex';
+            document.getElementById('submit-button').disabled = true;
 
             let dataToSubmit = { ...formDataObject };
-            if (dataToSubmit.unitKerja === 'Lainnya') { dataToSubmit.unitKerja = dataToSubmit.unitKerjaLainnya; }
+            if (dataToSubmit.unitKerja === 'LAINNYA') {
+                dataToSubmit.unitKerja = dataToSubmit.unitKerjaLainnya;
+            }
             delete dataToSubmit.unitKerjaLainnya;
 
             try {
-                const fileKtpInput = document.getElementById('fileKtp').files[0];
-                if (fileKtpInput) { 
-                    dataToSubmit.fileKtp = await compressAndReadFile(fileKtpInput); 
+                const fileInput = document.getElementById('fileKtp').files[0];
+                if (fileInput) { 
+                    dataToSubmit.fileKtp = await compressAndReadFile(fileInput); 
                 }
             
                 const response = await fetch(webAppUrl, {
                     method: 'POST',
-                    mode: 'no-cors', // Diperlukan untuk beberapa konfigurasi GAS
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dataToSubmit),
-                    redirect: 'follow'
                 });
 
-                // NOTE: Karena menggunakan mode 'no-cors', kita tidak bisa membaca response.ok atau response.json().
-                // Kita anggap pengiriman berhasil jika tidak ada error network.
-                // Notifikasi sukses akan didasarkan pada asumsi ini.
-                const successMessage = `Pengajuan Anda telah berhasil dikirim dan sedang diproses.\n\nData akan diproses dalam waktu maksimal 7 (hari) hari kerja. Untuk informasi lebih lanjut, silakan hubungi Bagian Administrasi.`;
-                showNotification(true, successMessage);
-                
-                document.getElementById('parkingForm').reset();
-                for (const key in allSections) { allSections[key].style.display = 'none'; }
-                allDescriptions.box.style.display = 'none';
-                document.getElementById('unitKerjaLainnya-group').classList.add('hidden');
-
+                // Since we can't read response from `no-cors`, we assume success if fetch doesn't throw.
+                // A better approach is to use JSONP or have the GAS return a redirect, but for simplicity:
+                const result = await response.json(); // Wait for the response from the server
+                if (result.status === "success") {
+                    showNotification(true, 'Data Anda telah berhasil dikirim dan akan segera diproses.');
+                    form.reset();
+                    Object.values(sections).forEach(sec => sec.style.display = 'none');
+                } else {
+                    throw new Error(result.message || 'Terjadi kesalahan di server.');
+                }
             } catch (error) {
-                showNotification(false, `Gagal mengirim data. Periksa koneksi internet Anda atau hubungi administrator. Error: ${error}`);
+                showNotification(false, `Gagal mengirim data. Periksa koneksi internet Anda. Error: ${error.message}`);
             } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = 'Kirim Formulir';
-                loadingOverlay.style.display = 'none';
+                document.getElementById('submit-button').disabled = false;
+                overlays.loading.style.display = 'none';
             }
         });
-        
     </script>
 </body>
 </html>
-
