@@ -18,10 +18,9 @@
         body { font-family: var(--font-family); background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: var(--text-color); margin: 0; padding: 10px; transition: background-color 0.3s; }
         .container { max-width: 800px; width: 100%; margin: 20px auto; background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 12px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); }
         
-        /* --- PERBAIKAN: Gaya khusus untuk kontainer formulir utama agar lebih transparan --- */
         #main-form-container .container {
-            background-color: rgba(255, 255, 255, 0.5); /* Transparansi 50% */
-            backdrop-filter: blur(12px); /* Blur sedikit lebih kuat untuk menjaga estetika */
+            background-color: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
         }
 
@@ -35,12 +34,37 @@
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; }
         input[type="text"], input[type="tel"], input[type="password"], select, textarea, input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: rgba(255, 255, 255, 0.9); }
-        .radio-group label, .checkbox-group label { display: flex; align-items: center; margin-bottom: 10px; font-weight: normal; cursor: pointer; }
-        .radio-group input, .checkbox-group input { margin-right: 10px; flex-shrink: 0; }
+        .radio-group label { display: flex; align-items: center; margin-bottom: 10px; font-weight: normal; cursor: pointer; transition: all 0.2s ease-in-out; }
+        .radio-group input { margin-right: 10px; flex-shrink: 0; }
+        
+        .radio-group label.selected-label {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .checkbox-group label { display: flex; align-items: center; margin-bottom: 10px; font-weight: normal; cursor: pointer; }
+        .checkbox-group input { margin-right: 10px; flex-shrink: 0; }
+
         button { width: 100%; padding: 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
         button:hover:not(:disabled) { background-color: #00487a; transform: translateY(-2px); }
         button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
         .hidden { display: none; }
+
+        .keterangan-box {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(240, 248, 255, 0.85);
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            transition: all 0.3s ease-in-out;
+        }
+        .keterangan-text {
+            margin: 0;
+            font-size: 0.9em;
+            color: #333;
+            line-height: 1.5;
+        }
+
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; backdrop-filter: blur(5px); }
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -129,18 +153,112 @@
                         <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
                         <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
                     </div>
+                    <div id="keterangan-tujuan-box" class="keterangan-box hidden">
+                        <p id="desc-pendaftaran-baru" class="keterangan-text hidden">Untuk mendaftarkan kendaraan pertama Anda. Anda akan diminta mengisi detail kendaraan baru dan mengupload identitas diri.</p>
+                        <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK) namun kendaraannya masih sama. Anda perlu mengisi Nopol lama dan baru.</p>
+                        <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar. Anda akan diminta mengisi Nopol kendaraan yang akan dihapus.</p>
+                        <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil). Anda akan mengisi detail kendaraan baru.</p>
+                        <p id="desc-penggantian-kartu" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang atau rusak. Anda perlu mengisi Nopol kendaraan yang terdaftar dan alasan penggantian.</p>
+                        <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci pada kolom keterangan yang disediakan.</p>
+                    </div>
                 </fieldset>
                 <fieldset>
                     <legend>Informasi Karyawan</legend>
                     <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div>
-                    <div class="form-group"><label for="unitKerja">Unit / Bagian Kerja</label><select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)"><option value="">-- Pilih Unit --</option><option value="INSTALASI FARMASI">INSTALASI FARMASI</option><option value="LAINNYA">Lainnya...</option></select></div>
+                    <div class="form-group">
+                        <label for="unitKerja">Unit / Bagian Kerja</label>
+                        <!-- --- PERBAIKAN: Daftar Unit Kerja diperbarui --- -->
+                        <select id="unitKerja" name="unitKerja" required onchange="handleUnitKerjaChange(this)">
+                            <option value="">-- Pilih Unit --</option>
+                            <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
+                            <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
+                            <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
+                            <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
+                            <option value="ICU">ICU</option>
+                            <option value="ICCU">ICCU</option>
+                            <option value="HCU">HCU</option>
+                            <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
+                            <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
+                            <option value="INSTALASI GIZI">INSTALASI GIZI</option>
+                            <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
+                            <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
+                            <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
+                            <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
+                            <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
+                            <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
+                            <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
+                            <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
+                            <option value="INSTALASI PKRS">INSTALASI PKRS</option>
+                            <option value="POLI KIR">POLI KIR</option>
+                            <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
+                            <option value="POLI TMS">POLI TMS</option>
+                            <option value="POLI EEG">POLI EEG</option>
+                            <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
+                            <option value="POLI ESWL">POLI ESWL</option>
+                            <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
+                            <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
+                            <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
+                            <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
+                            <option value="RUANG PAVILIUN">RUANG PAVILIUN</option>
+                            <option value="RUANG ISOLASI">RUANG ISOLASI</option>
+                            <option value="RUANG PERINATOLOGI">RUANG PERINATOLOGI</option>
+                            <option value="POLI ANAK">POLI ANAK</option>
+                            <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
+                            <option value="POLI BEDAH">POLI BEDAH</option>
+                            <option value="POLI MATA">POLI MATA</option>
+                            <option value="POLI THT">POLI THT</option>
+                            <option value="POLI SYARAF">POLI SYARAF</option>
+                            <option value="POLI JANTUNG">POLI JANTUNG</option>
+                            <option value="POLI PARU">POLI PARU</option>
+                            <option value="POLI GIGI">POLI GIGI</option>
+                            <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
+                            <option value="POLI JIWA">POLI JIWA</option>
+                            <option value="POLI TB">POLI TB</option>
+                            <option value="POLI VCT">POLI VCT</option>
+                            <option value="POLI UMUM">POLI UMUM</option>
+                            <option value="BAGIAN PROGPEL">BAGIAN PROGPEL</option>
+                            <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
+                            <option value="BAGIAN ADMINISTRASI DAN UMUM DAN SDM">BAGIAN ADMINISTRASI DAN UMUM</option>
+                            <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
+                            <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
+                            <option value="BIDANG PELAYANAN PENUNJANG">BIDANG PENUNJANG</option>
+                            <option value="KOMITE MEDIK">KOMITE MEDIK</option>
+                            <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
+                            <option value="KOMITE PPI">KOMITE PPI</option>
+                            <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
+                            <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
+                            <option value="LAINNYA">Lainnya...</option>
+                        </select>
+                    </div>
                     <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
                     <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div>
                     <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
                 </fieldset>
-                <fieldset id="update-section" class="hidden"><legend>Data Kendaraan Lama</legend><div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama"></div></fieldset>
+                <fieldset id="update-section" class="hidden">
+                    <legend>Data Kendaraan Lama</legend>
+                    <div class="form-group radio-group">
+                        <label>Jenis Kendaraan Lama</label>
+                        <label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label>
+                        <label><input type="radio" name="jenisKendaraanLama" value="Motor"> Motor</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="noPolisiLama">Nomor Polisi Lama</label>
+                        <input type="text" id="noPolisiLama" name="noPolisiLama">
+                    </div>
+                </fieldset>
                 <fieldset id="card-replacement-section" class="hidden"><legend>Informasi Penggantian Kartu</legend><div class="form-group"><label for="alasanPenggantian">Alasan Penggantian</label><textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea></div></fieldset>
-                <fieldset id="new-vehicle-section" class="hidden"><legend>Detail Kendaraan Baru</legend><div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru"></div></fieldset>
+                <fieldset id="new-vehicle-section" class="hidden">
+                    <legend>Detail Kendaraan Baru</legend>
+                    <div class="form-group radio-group">
+                        <label>Jenis Kendaraan Baru</label>
+                        <label><input type="radio" name="jenisKendaraanBaru" value="Mobil"> Mobil</label>
+                        <label><input type="radio" name="jenisKendaraanBaru" value="Motor"> Motor</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="noPolisiBaru">Nomor Polisi Baru</label>
+                        <input type="text" id="noPolisiBaru" name="noPolisiBaru">
+                    </div>
+                </fieldset>
                 <fieldset id="lainnya-section" class="hidden"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Tulis keterangan lengkap Anda</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
                 <fieldset id="agreement-section" class="hidden"><legend>Persetujuan</legend><div class="form-group checkbox-group"><input type="checkbox" id="agreement" name="agreement" required><label for="agreement">Saya menyatakan data yang diisikan benar.</label></div></fieldset>
                 <button type="submit" id="submit-button">Kirim Formulir</button>
@@ -449,7 +567,55 @@
         });
 
         const formSections = { update: document.getElementById('update-section'), cardReplacement: document.getElementById('card-replacement-section'), newVehicle: document.getElementById('new-vehicle-section'), lainnya: document.getElementById('lainnya-section'), agreement: document.getElementById('agreement-section') };
-        function toggleSections(){ const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value; Object.values(formSections).forEach(s => s.style.display = 'none'); if (!choice) return; const show = (keys) => keys.forEach(k => formSections[k].style.display = 'block'); switch(choice){ case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(['newVehicle', 'agreement']); break; case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle', 'agreement']); break; case 'Hapus Nomor Kendaraan': show(['update', 'agreement']); break; case 'Penggantian Kartu': show(['update', 'cardReplacement', 'agreement']); break; case 'Lainnya': show(['lainnya', 'agreement']); break; } }
+        
+        function toggleSections(){
+            const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value;
+            const allLabels = document.querySelectorAll('.radio-group label');
+            const allDescriptions = document.querySelectorAll('.keterangan-text');
+            const keteranganBox = document.getElementById('keterangan-tujuan-box');
+
+            allLabels.forEach(label => label.classList.remove('selected-label'));
+            allDescriptions.forEach(desc => desc.classList.add('hidden'));
+            keteranganBox.classList.add('hidden');
+
+            if (choice) {
+                const selectedRadio = document.querySelector(`input[value="${choice}"]`);
+                if (selectedRadio) {
+                    selectedRadio.parentElement.classList.add('selected-label');
+                }
+
+                const descriptionId = `desc-${choice.toLowerCase().replace(/ /g, '-')}`;
+                const descriptionEl = document.getElementById(descriptionId);
+                
+                if (descriptionEl) {
+                    keteranganBox.classList.remove('hidden');
+                    descriptionEl.classList.remove('hidden');
+                }
+            }
+
+            Object.values(formSections).forEach(s => s.style.display = 'none');
+            if (!choice) return;
+            const show = (keys) => keys.forEach(k => formSections[k].style.display = 'block');
+            switch(choice){
+                case 'Pendaftaran Baru':
+                case 'Tambah Kendaraan Baru':
+                    show(['newVehicle', 'agreement']);
+                    break;
+                case 'Rubah Nomor Kendaraan':
+                    show(['update', 'newVehicle', 'agreement']);
+                    break;
+                case 'Hapus Nomor Kendaraan':
+                    show(['update', 'agreement']);
+                    break;
+                case 'Penggantian Kartu':
+                    show(['update', 'cardReplacement', 'agreement']);
+                    break;
+                case 'Lainnya':
+                    show(['lainnya', 'agreement']);
+                    break;
+            }
+        }
+
         function handleUnitKerjaChange(select){ const lainnyaGroup = document.getElementById('unitKerjaLainnya-group'); const lainnyaInput = document.getElementById('unitKerjaLainnya'); const isLainnya = select.value === 'LAINNYA'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
         function compressAndReadFile(file){ return new Promise((resolve, reject) => { if (!file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name }); reader.onerror = reject; reader.readAsDataURL(file); return; } const reader = new FileReader(); reader.onload = e => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const MAX_WIDTH = 1024; const scaleSize = MAX_WIDTH / img.width; canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; ctx.drawImage(img, 0, 0, canvas.width, canvas.height); const dataUrl = canvas.toDataURL('image/jpeg', 0.8); resolve({ base64: dataUrl.split(',')[1], type: 'image/jpeg', name: 'compressed_id.jpg' }); }; img.src = e.target.result; }; reader.onerror = reject; reader.readAsDataURL(file); }); }
         function showLoading(show, message = "Mohon tunggu...") { const overlay = document.getElementById('loading-overlay'); overlay.style.display = show ? 'flex' : 'none'; overlay.querySelector('p').textContent = message; }
