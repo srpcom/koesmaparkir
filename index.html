@@ -55,13 +55,14 @@
         .table-container { max-height: 500px; overflow-x: auto; }
         #logout-button { background-color: var(--error-color); margin-top: 20px; }
         .admin-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; align-items: center; }
-        #search-input { flex-grow: 1; padding: 8px; font-size: 0.9em; border-radius: 5px; border: 1px solid #ccc; }
+        #search-input, #status-filter { padding: 8px; font-size: 0.9em; border-radius: 5px; border: 1px solid #ccc; }
+        #search-input { flex-grow: 1; }
         .download-button { width: auto; padding: 8px 12px; font-size: 0.9em; background-color: var(--success-color); }
         .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 15px; }
         .pagination-controls button { width: auto; padding: 5px 10px; font-size: 0.9em; }
         .pagination-controls .page-info { font-size: 0.9em; }
         
-        /* PERUBAIKAN: Style untuk pewarnaan status */
+        /* Style untuk pewarnaan status */
         #submissions-table td select { padding: 8px; border-radius: 5px; width:100%; font-weight: bold; border-width: 1px; transition: background-color 0.3s, border-color 0.3s; }
         .status-pending { background-color: var(--pending-bg); color: var(--pending-color); border-color: var(--pending-border); }
         .status-selesai { background-color: var(--completed-bg); color: var(--completed-color); border-color: var(--completed-border); }
@@ -165,6 +166,13 @@
                     </div>
                     <div class="admin-controls">
                         <input type="text" id="search-input" placeholder="Cari data...">
+                        <!-- PERUBAIKAN: Tombol filter status ditambahkan -->
+                        <select id="status-filter">
+                            <option value="Semua">Semua Status</option>
+                            <option value="Belum diproses">Belum diproses</option>
+                            <option value="Selesai">Selesai</option>
+                            <option value="Ditolak">Ditolak</option>
+                        </select>
                         <button id="download-xlsx" class="download-button">Unduh .xlsx</button>
                     </div>
                     <div class="table-container">
@@ -200,6 +208,8 @@
         const adminDashboard = document.getElementById('admin-dashboard');
         const searchInput = document.getElementById('search-input');
         const downloadButton = document.getElementById('download-xlsx');
+        // PERUBAIKAN: Selector untuk filter status ditambahkan
+        const statusFilter = document.getElementById('status-filter');
         
         // --- ROUTING ---
         window.addEventListener('hashchange', handleRouteChange);
@@ -225,7 +235,9 @@
         // --- ADMIN EVENT LISTENERS ---
         document.getElementById('admin-login-button').addEventListener('click', adminLogin);
         document.getElementById('logout-button').addEventListener('click', adminLogout);
-        searchInput.addEventListener('keyup', handleSearch);
+        // PERUBAIKAN: Event listener untuk search dan filter digabung
+        searchInput.addEventListener('keyup', applyFilters);
+        statusFilter.addEventListener('change', applyFilters);
         downloadButton.addEventListener('click', downloadXLSX);
         document.getElementById('refresh-data').addEventListener('click', loadSubmissions);
 
@@ -294,11 +306,11 @@
                 if (result.status === 'success' && result.data.length > 1) {
                     submissionHeaders = result.data[0];
                     allSubmissions = result.data.slice(1).reverse();
-                    handleSearch();
+                    applyFilters();
                 } else {
                     submissionHeaders = result.data.length > 0 ? result.data[0] : [];
                     allSubmissions = [];
-                    handleSearch();
+                    applyFilters();
                 }
             } catch (e) { 
                 console.error("Gagal memuat submisi:", e); 
@@ -306,9 +318,27 @@
             }
         }
 
-        function handleSearch() {
+        // PERUBAIKAN: Fungsi handleSearch diubah menjadi applyFilters
+        function applyFilters() {
             const searchTerm = searchInput.value.toLowerCase();
-            filteredSubmissions = !searchTerm ? [...allSubmissions] : allSubmissions.filter(row => row.some(cell => String(cell).toLowerCase().includes(searchTerm)));
+            const selectedStatus = statusFilter.value;
+            const statusIndex = submissionHeaders.indexOf('Status');
+
+            let tempFiltered = [...allSubmissions];
+
+            // Filter by status first
+            if (selectedStatus !== 'Semua' && statusIndex !== -1) {
+                tempFiltered = tempFiltered.filter(row => row[statusIndex] === selectedStatus);
+            }
+            
+            // Then filter by search term
+            if (searchTerm) {
+                tempFiltered = tempFiltered.filter(row => 
+                    row.some(cell => String(cell).toLowerCase().includes(searchTerm))
+                );
+            }
+
+            filteredSubmissions = tempFiltered;
             currentPage = 1;
             displayCurrentPage();
         }
@@ -344,7 +374,7 @@
                             <option value="Ditolak" ${cell === 'Ditolak' ? 'selected' : ''}>Ditolak</option>`;
                         select.onchange = (event) => handleStatusChange(event.target, originalSheetIndex);
                         td.appendChild(select);
-                        updateSelectColor(select); // Set initial color
+                        updateSelectColor(select);
                     } else if (header === 'Link File Identitas' && cell && cell.startsWith('http')) {
                         td.innerHTML = `<a href="${cell}" target="_blank" rel="noopener noreferrer">Lihat File</a>`;
                     } else {
@@ -358,15 +388,13 @@
             setupPagination(filteredSubmissions.length);
         }
         
-        // PERUBAIKAN: Fungsi baru untuk menangani perubahan status dan warna
         function handleStatusChange(selectElement, rowIndex) {
-            updateSelectColor(selectElement); // Perbarui warna langsung
-            updateStatus(selectElement, rowIndex); // Kirim pembaruan ke server
+            updateSelectColor(selectElement);
+            updateStatus(selectElement, rowIndex);
         }
 
-        // PERUBAIKAN: Fungsi baru untuk mengatur kelas warna pada select
         function updateSelectColor(selectElement) {
-            selectElement.className = ''; // Reset kelas
+            selectElement.className = '';
             const value = selectElement.value;
             if (value === 'Belum diproses') selectElement.classList.add('status-pending');
             else if (value === 'Selesai') selectElement.classList.add('status-selesai');
@@ -391,7 +419,7 @@
             showLoading(true, 'Menyimpan...');
             try {
                 await fetch(`${webAppUrl}?action=updateStatus&rowIndex=${rowIndex}&status=${encodeURIComponent(newStatus)}`);
-                const originalRowIndexInAll = allSubmissions.length - rowIndex + 1;
+                const originalRowIndexInAll = allSubmissions.findIndex(row => (allSubmissions.length - allSubmissions.indexOf(row) + 1) === rowIndex);
                 if(allSubmissions[originalRowIndexInAll]){
                     allSubmissions[originalRowIndexInAll][submissionHeaders.indexOf('Status')] = newStatus;
                 }
