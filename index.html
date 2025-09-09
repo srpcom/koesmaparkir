@@ -77,9 +77,30 @@
         #form-status-toggle span:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         #form-status-toggle.on span { background-color: var(--success-color); }
         #form-status-toggle.on span:before { transform: translateX(24px); }
-        #submissions-table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; }
-        #submissions-table th, #submissions-table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; word-break: break-word; }
-        #submissions-table th { background-color: #f2f2f2; }
+        
+        /* --- PERBAIKAN: Gaya tabel admin yang lebih hemat ruang --- */
+        #submissions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: fixed;
+            font-family: 'Arial Narrow', Arial, sans-serif; /* Menggunakan font yang lebih ramping */
+        }
+        #submissions-table th, #submissions-table td {
+            border: 1px solid #ddd;
+            padding: 6px 8px; /* Mengurangi padding vertikal */
+            text-align: left;
+            font-size: 0.85em; /* Sedikit memperkecil font */
+            word-break: break-word;
+        }
+        #submissions-table th {
+            background-color: #f2f2f2;
+            white-space: nowrap; /* Mencegah header terpotong */
+        }
+        #submissions-table td {
+            white-space: normal; /* Memungkinkan isi sel untuk wrap jika perlu */
+        }
+
         .table-container { max-height: 500px; overflow-x: auto; }
         #logout-button { background-color: var(--error-color); margin-top: 20px; }
         .admin-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; align-items: center; }
@@ -89,7 +110,7 @@
         .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 15px; }
         .pagination-controls button { width: auto; padding: 5px 10px; font-size: 0.9em; }
         .pagination-controls .page-info { font-size: 0.9em; }
-        #submissions-table td select { padding: 8px; border-radius: 5px; width:100%; font-weight: bold; border-width: 1px; transition: background-color 0.3s, border-color 0.3s; }
+        #submissions-table td select { padding: 6px; border-radius: 5px; width:100%; font-weight: bold; border-width: 1px; transition: background-color 0.3s, border-color 0.3s; font-size: 1em; }
         .status-pending { background-color: var(--pending-bg); color: var(--pending-color); border-color: var(--pending-border); }
         .status-selesai { background-color: var(--completed-bg); color: var(--completed-color); border-color: var(--completed-border); }
         .status-ditolak { background-color: var(--rejected-bg); color: var(--rejected-color); border-color: var(--rejected-border); }
@@ -166,7 +187,6 @@
                     <legend>Informasi Karyawan</legend>
                     <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div>
                     
-                    <!-- --- PERBAIKAN: Menambahkan Status Kepegawaian --- -->
                     <div class="form-group">
                         <label>Status Kepegawaian</label>
                         <div class="radio-group">
@@ -175,7 +195,6 @@
                         </div>
                     </div>
 
-                    <!-- Muncul jika "Karyawan RSUD" dipilih -->
                     <div id="rsud-employee-section" class="hidden">
                         <div class="form-group">
                             <label for="unitKerja">Unit / Bagian Kerja</label>
@@ -244,7 +263,6 @@
                         <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
                     </div>
 
-                    <!-- Muncul jika "Pihak Ketiga" dipilih -->
                     <div id="other-employee-section" class="hidden">
                         <div class="form-group">
                             <label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label>
@@ -480,7 +498,10 @@
                         updateSelectColor(select);
                     } else if (header === 'Link File Identitas' && !isEmpty && cell.startsWith('http')) {
                         td.innerHTML = `<a href="${cell}" target="_blank" rel="noopener noreferrer">Lihat File</a>`;
-                    } else {
+                    } else if (header === 'Timestamp') {
+                        td.textContent = cell.replace(' WIB', '');
+                    }
+                    else {
                         td.textContent = cell;
                     }
 
@@ -596,7 +617,7 @@
             const allDescriptions = document.querySelectorAll('.keterangan-text');
             const keteranganBox = document.getElementById('keterangan-tujuan-box');
 
-            allLabels.forEach(label => { if(label.parentElement.parentElement.id !== 'karyawan-status-group') label.classList.remove('selected-label')});
+            allLabels.forEach(label => { if(label.parentElement.id !== 'karyawan-status-group') label.classList.remove('selected-label')});
             allDescriptions.forEach(desc => desc.classList.add('hidden'));
             keteranganBox.classList.add('hidden');
 
@@ -627,7 +648,6 @@
             }
         }
         
-        // --- PERBAIKAN: Fungsi baru untuk menangani Status Kepegawaian ---
         function handleStatusKepegawaianChange() {
             const choice = document.querySelector('input[name="statusKepegawaian"]:checked')?.value;
             const rsudSection = document.getElementById('rsud-employee-section');
