@@ -76,7 +76,6 @@
             #submissions-table td:last-child { border-bottom: none; }
             #submissions-table td::before { content: attr(data-label); font-weight: bold; text-align: left; margin-right: 15px; color: var(--primary-color); flex-shrink: 0; }
             .admin-controls { flex-direction: column; align-items: stretch; }
-            /* PERUBAIKAN: Sembunyikan sel kosong di tampilan HP */
             #submissions-table td.empty-cell { display: none; }
         }
     </style>
@@ -321,7 +320,6 @@
                         td.textContent = cell;
                     }
 
-                    // PERUBAIKAN: Tambahkan kelas 'empty-cell' jika data kosong, kecuali untuk kolom Status
                     if (header !== 'Status' && isEmpty) {
                         td.classList.add('empty-cell');
                     }
@@ -390,7 +388,48 @@
         }
 
         async function checkFormStatusForUser() { try { const response = await fetch(`${webAppUrl}?action=getSettings`); const result = await response.json(); const isOff = result.status === 'success' && result.data.formStatus === 'OFF'; document.getElementById('parkingForm').classList.toggle('hidden', isOff); document.getElementById('form-closed-message').classList.toggle('hidden', !isOff); } catch(e) { console.error("Gagal memeriksa status form.", e); } }
-        document.getElementById('parkingForm').addEventListener('submit', async function(e) { e.preventDefault(); showLoading(true, "Mengirim data..."); const formDataObject = Object.fromEntries(new FormData(this).entries()); try { const fileInput = document.getElementById('fileKtp').files[0]; if(fileInput) formDataObject.fileKtp = await compressAndReadFile(fileInput); await fetch(webAppUrl, { method: 'POST', body: JSON.stringify(formDataObject), mode: 'no-cors' }); alert('Pengajuan Anda telah berhasil dikirim!'); this.reset(); toggleSections(); } catch(error) { alert('Terjadi kesalahan koneksi. Pastikan internet Anda stabil.'); } finally { showLoading(false); } });
+        
+        // --- PERBAIKAN PADA FUNGSI PENGIRIMAN FORM ---
+        document.getElementById('parkingForm').addEventListener('submit', async function(e) { 
+            e.preventDefault(); 
+            showLoading(true, "Mengirim data..."); 
+            const formDataObject = Object.fromEntries(new FormData(this).entries()); 
+            
+            try { 
+                const fileInput = document.getElementById('fileKtp').files[0]; 
+                if(fileInput) {
+                    formDataObject.fileKtp = await compressAndReadFile(fileInput);
+                }
+                
+                // Menghapus 'mode: no-cors' dan menambahkan penanganan respons yang benar
+                const response = await fetch(webAppUrl, { 
+                    method: 'POST', 
+                    // Menggunakan header text/plain untuk kompatibilitas terbaik dengan Google Apps Script
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
+                    body: JSON.stringify(formDataObject)
+                });
+                
+                // Sekarang kita bisa membaca respons dari server
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('Pengajuan Anda telah berhasil dikirim!');
+                    this.reset(); 
+                    toggleSections(); 
+                } else {
+                    // Jika server mengirim pesan error, kita menampilkannya
+                    throw new Error(result.message || 'Terjadi kesalahan di server.');
+                }
+            } catch(error) { 
+                console.error('Submit Error:', error);
+                alert('Terjadi kesalahan koneksi. Pastikan internet Anda stabil. Pesan: ' + error.message); 
+            } finally { 
+                showLoading(false); 
+            } 
+        });
+
         const formSections = { update: document.getElementById('update-section'), cardReplacement: document.getElementById('card-replacement-section'), newVehicle: document.getElementById('new-vehicle-section'), lainnya: document.getElementById('lainnya-section'), agreement: document.getElementById('agreement-section') };
         function toggleSections(){ const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value; Object.values(formSections).forEach(s => s.style.display = 'none'); if (!choice) return; const show = (keys) => keys.forEach(k => formSections[k].style.display = 'block'); switch(choice){ case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(['newVehicle', 'agreement']); break; case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle', 'agreement']); break; case 'Hapus Nomor Kendaraan': show(['update', 'agreement']); break; case 'Penggantian Kartu': show(['update', 'cardReplacement', 'agreement']); break; case 'Lainnya': show(['lainnya', 'agreement']); break; } }
         function handleUnitKerjaChange(select){ const lainnyaGroup = document.getElementById('unitKerjaLainnya-group'); const lainnyaInput = document.getElementById('unitKerjaLainnya'); const isLainnya = select.value === 'LAINNYA'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
