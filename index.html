@@ -94,9 +94,8 @@
         }
         #submissions-table th {
             background-color: #f2f2f2;
-            /* --- PERBAIKAN: Mengubah white-space agar teks header bisa wrap --- */
             white-space: normal;
-            vertical-align: middle; /* Memastikan teks tetap di tengah jika ada 2 baris */
+            vertical-align: middle;
         }
         #submissions-table td {
             white-space: normal;
@@ -172,7 +171,8 @@
                         <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
                         <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
                         <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Penggantian Kartu" onchange="toggleSections()" required> Ganti Kartu</label>
+                        <!-- --- PERBAIKAN: Mengubah teks dan value --- -->
+                        <label><input type="radio" name="jenisPengajuan" value="Buat/Ganti Kartu Parkir" onchange="toggleSections()" required> Buat/Ganti Kartu Parkir</label>
                         <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
                     </div>
                     <div id="keterangan-tujuan-box" class="keterangan-box hidden">
@@ -180,7 +180,8 @@
                         <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK) namun kendaraannya masih sama. Anda perlu mengisi Nopol lama dan baru.</p>
                         <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar. Anda akan diminta mengisi Nopol kendaraan yang akan dihapus.</p>
                         <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil). Anda akan mengisi detail kendaraan baru.</p>
-                        <p id="desc-penggantian-kartu" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang atau rusak. Anda perlu mengisi Nopol kendaraan yang terdaftar dan alasan penggantian.</p>
+                        <!-- --- PERBAIKAN: Menyesuaikan ID dan teks deskripsi --- -->
+                        <p id="desc-buat/ganti-kartu-parkir" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang, rusak, atau jika Anda belum pernah menerima kartu sebelumnya.</p>
                         <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci pada kolom keterangan yang disediakan.</p>
                     </div>
                 </fieldset>
@@ -191,8 +192,8 @@
                     <div class="form-group">
                         <label>Status Kepegawaian</label>
                         <div class="radio-group">
-                            <label><input type="radio" name="statusKepegawaian" value="Karyawan RSUD" onchange="handleStatusKepegawaianChange()" required> Karyawan RSUD dr. R Koesma</label>
-                            <label><input type="radio" name="statusKepegawaian" value="Pihak Ketiga" onchange="handleStatusKepegawaianChange()" required> Lainnya / Pihak Ketiga</label>
+                            <label><input type="radio" name="statusKepegawaian" value="Karyawan RSUD" onchange="handleStatusKepegawaianChange(); handleRadioStyle(this);" required> Karyawan RSUD dr. R Koesma</label>
+                            <label><input type="radio" name="statusKepegawaian" value="Pihak Ketiga" onchange="handleStatusKepegawaianChange(); handleRadioStyle(this);" required> Lainnya / Pihak Ketiga</label>
                         </div>
                     </div>
 
@@ -278,21 +279,36 @@
                     <legend>Data Kendaraan Lama</legend>
                     <div class="form-group radio-group">
                         <label>Jenis Kendaraan Lama</label>
-                        <label><input type="radio" name="jenisKendaraanLama" value="Mobil"> Mobil</label>
-                        <label><input type="radio" name="jenisKendaraanLama" value="Motor"> Motor</label>
+                        <label><input type="radio" name="jenisKendaraanLama" value="Mobil" onchange="handleRadioStyle(this)"> Mobil</label>
+                        <label><input type="radio" name="jenisKendaraanLama" value="Motor" onchange="handleRadioStyle(this)"> Motor</label>
                     </div>
                     <div class="form-group">
                         <label for="noPolisiLama">Nomor Polisi Lama</label>
                         <input type="text" id="noPolisiLama" name="noPolisiLama">
                     </div>
                 </fieldset>
-                <fieldset id="card-replacement-section" class="hidden"><legend>Informasi Penggantian Kartu</legend><div class="form-group"><label for="alasanPenggantian">Alasan Penggantian</label><textarea id="alasanPenggantian" name="alasanPenggantian" rows="3"></textarea></div></fieldset>
+                <fieldset id="card-replacement-section" class="hidden">
+                    <!-- --- PERBAIKAN: Mengubah legend --- -->
+                    <legend>Alasan Pembuatan/Penggantian Kartu Parkir</legend>
+                    <div class="form-group">
+                        <label>Pilih Alasan</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="alasanPenggantian" value="Kartu Rusak/Hilang" onchange="handleAlasanChange(); handleRadioStyle(this)"> Kartu Rusak/Hilang</label>
+                            <label><input type="radio" name="alasanPenggantian" value="Belum pernah menerima kartu" onchange="handleAlasanChange(); handleRadioStyle(this)"> Belum pernah menerima kartu</label>
+                            <label><input type="radio" name="alasanPenggantian" value="Lainnya" onchange="handleAlasanChange(); handleRadioStyle(this)"> Lainnya</label>
+                        </div>
+                    </div>
+                    <div class="form-group hidden" id="alasanLainnya-group">
+                        <label for="alasanPenggantianLainnya">Sebutkan Alasan Lainnya</label>
+                        <input type="text" id="alasanPenggantianLainnya" name="alasanPenggantianLainnya">
+                    </div>
+                </fieldset>
                 <fieldset id="new-vehicle-section" class="hidden">
                     <legend>Detail Kendaraan Baru</legend>
                     <div class="form-group radio-group">
                         <label>Jenis Kendaraan Baru</label>
-                        <label><input type="radio" name="jenisKendaraanBaru" value="Mobil"> Mobil</label>
-                        <label><input type="radio" name="jenisKendaraanBaru" value="Motor"> Motor</label>
+                        <label><input type="radio" name="jenisKendaraanBaru" value="Mobil" onchange="handleRadioStyle(this)"> Mobil</label>
+                        <label><input type="radio" name="jenisKendaraanBaru" value="Motor" onchange="handleRadioStyle(this)"> Motor</label>
                     </div>
                     <div class="form-group">
                         <label for="noPolisiBaru">Nomor Polisi Baru</label>
@@ -598,7 +614,8 @@
                     alert('Pengajuan Anda telah berhasil dikirim!');
                     this.reset(); 
                     toggleSections(); 
-                    handleStatusKepegawaianChange(); // Reset dynamic fields
+                    handleStatusKepegawaianChange();
+                    handleAlasanChange();
                 } else {
                     throw new Error(result.message || 'Terjadi kesalahan di server.');
                 }
@@ -614,21 +631,16 @@
         
         function toggleSections(){
             const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value;
-            const allLabels = document.querySelectorAll('#parkingForm .radio-group label');
+            handleRadioStyle(document.querySelector(`input[name="jenisPengajuan"][value="${choice}"]`));
+
             const allDescriptions = document.querySelectorAll('.keterangan-text');
             const keteranganBox = document.getElementById('keterangan-tujuan-box');
 
-            allLabels.forEach(label => { if(label.parentElement.id !== 'karyawan-status-group') label.classList.remove('selected-label')});
             allDescriptions.forEach(desc => desc.classList.add('hidden'));
             keteranganBox.classList.add('hidden');
 
             if (choice) {
-                const selectedRadio = document.querySelector(`input[name="jenisPengajuan"][value="${choice}"]`);
-                if (selectedRadio) {
-                    selectedRadio.parentElement.classList.add('selected-label');
-                }
-
-                const descriptionId = `desc-${choice.toLowerCase().replace(/ /g, '-')}`;
+                const descriptionId = `desc-${choice.toLowerCase().replace(/\//g, '-').replace(/ /g, '-')}`;
                 const descriptionEl = document.getElementById(descriptionId);
                 
                 if (descriptionEl) {
@@ -644,7 +656,7 @@
                 case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(['newVehicle', 'agreement']); break;
                 case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle', 'agreement']); break;
                 case 'Hapus Nomor Kendaraan': show(['update', 'agreement']); break;
-                case 'Penggantian Kartu': show(['update', 'cardReplacement', 'agreement']); break;
+                case 'Buat/Ganti Kartu Parkir': show(['update', 'cardReplacement', 'agreement']); handleAlasanChange(); break;
                 case 'Lainnya': show(['lainnya', 'agreement']); break;
             }
         }
@@ -675,6 +687,30 @@
                 unitKerjaSelect.required = false;
                 afiliasiInput.required = false;
             }
+        }
+        
+        function handleAlasanChange() {
+            const choice = document.querySelector('input[name="alasanPenggantian"]:checked')?.value;
+            const lainnyaGroup = document.getElementById('alasanLainnya-group');
+            const lainnyaInput = document.getElementById('alasanPenggantianLainnya');
+            const isLainnya = choice === 'Lainnya';
+
+            lainnyaGroup.classList.toggle('hidden', !isLainnya);
+            lainnyaInput.required = isLainnya;
+            if (!isLainnya) {
+                lainnyaInput.value = '';
+            }
+        }
+        
+        // --- PERBAIKAN: Fungsi generik untuk gaya radio button ---
+        function handleRadioStyle(radioElement) {
+            if (!radioElement) return;
+            const radioName = radioElement.name;
+            const allLabels = document.querySelectorAll(`input[name="${radioName}"]`);
+            allLabels.forEach(radio => {
+                radio.parentElement.classList.remove('selected-label');
+            });
+            radioElement.parentElement.classList.add('selected-label');
         }
 
         function handleUnitKerjaChange(select){ const lainnyaGroup = document.getElementById('unitKerjaLainnya-group'); const lainnyaInput = document.getElementById('unitKerjaLainnya'); const isLainnya = select.value === 'LAINNYA'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
