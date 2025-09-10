@@ -84,6 +84,8 @@
         .status-selesai { background-color: var(--completed-bg); color: var(--completed-color); border-color: var(--completed-border); }
         .status-ditolak { background-color: var(--rejected-bg); color: var(--rejected-color); border-color: var(--rejected-border); }
         
+        .input-hint { font-size: 0.8em; color: #555; margin-top: 5px; }
+
         body.admin-view { padding: 0; background-image: none; background-color: #f0f2f5; }
 
         @media (min-width: 769px) { #admin-dashboard .container { max-width: none; width: 100%; min-height: 100vh; margin: 0; border-radius: 0; box-shadow: none; } }
@@ -245,7 +247,11 @@
                     <div id="other-employee-section" class="hidden">
                         <div class="form-group"><label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label><input type="text" id="afiliasiLainnya" name="afiliasiLainnya"></div>
                     </div>
-                    <div class="form-group"><label for="telepon">Nomor Telepon / WA (Aktif)</label><input type="tel" id="telepon" name="telepon" required></div>
+                    <div class="form-group">
+                        <label for="telepon">Nomor Telepon / WA (Aktif)</label>
+                        <input type="tel" id="telepon" name="telepon" required>
+                        <p id="telepon-hint" class="input-hint hidden">contoh format: 081330639240</p>
+                    </div>
                     <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
                 </fieldset>
                 <fieldset id="update-section" class="hidden">
@@ -599,7 +605,25 @@
         function handleUnitKerjaChange(select){ const lainnyaGroup = document.getElementById('unitKerjaLainnya-group'); const lainnyaInput = document.getElementById('unitKerjaLainnya'); const isLainnya = select.value === 'LAINNYA'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
         function compressAndReadFile(file){ return new Promise((resolve, reject) => { if (!file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name }); reader.onerror = reject; reader.readAsDataURL(file); return; } const reader = new FileReader(); reader.onload = e => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const MAX_WIDTH = 1024; const scaleSize = MAX_WIDTH / img.width; canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; ctx.drawImage(img, 0, 0, canvas.width, canvas.height); const dataUrl = canvas.toDataURL('image/jpeg', 0.8); resolve({ base64: dataUrl.split(',')[1], type: 'image/jpeg', name: 'compressed_id.jpg' }); }; img.src = e.target.result; }; reader.onerror = reject; reader.readAsDataURL(file); }); }
         function showLoading(show, message = "Mohon tunggu...") { const overlay = document.getElementById('loading-overlay'); overlay.style.display = show ? 'flex' : 'none'; overlay.querySelector('p').textContent = message; }
-        window.addEventListener('load', () => { handleRouteChange(); toggleSections(); });
+        
+        window.addEventListener('load', () => { 
+            handleRouteChange(); 
+            toggleSections(); 
+
+            // Menambahkan hint dinamis untuk kolom telepon
+            const teleponInput = document.getElementById('telepon');
+            const teleponHint = document.getElementById('telepon-hint');
+            if (teleponInput && teleponHint) {
+                teleponInput.addEventListener('focus', () => {
+                    teleponHint.classList.remove('hidden');
+                });
+
+                teleponInput.addEventListener('blur', () => {
+                    teleponHint.classList.add('hidden');
+                });
+            }
+        });
     </script>
 </body>
 </html>
+
