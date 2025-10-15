@@ -33,7 +33,7 @@
         legend { font-weight: bold; font-size: 1.2em; color: var(--primary-color); padding: 5px 15px; border-radius: 20px; background-color: #fff; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: 600; }
-        input[type="text"], input[type="tel"], input[type="password"], select, textarea, input[type="file"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: rgba(255, 255, 255, 0.9); }
+        input[type="text"], input[type="tel"], input[type="password"], select, textarea, input[type="file"], input[type="date"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: rgba(255, 255, 255, 0.9); }
         .radio-group label { display: flex; align-items: center; margin-bottom: 10px; font-weight: normal; cursor: pointer; transition: all 0.2s ease-in-out; }
         .radio-group input { margin-right: 10px; flex-shrink: 0; }
         
@@ -125,7 +125,7 @@
         </div>
     </div>
     
-    <!-- BARU: Modal Alasan Penolakan -->
+    <!-- Modal Alasan Penolakan -->
     <div id="rejection-modal" class="overlay">
         <div style="background: white; padding: 20px 30px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
             <h2 style="margin-top:0; color: var(--error-color);">Alasan Penolakan</h2>
@@ -260,7 +260,15 @@
                         <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
                     </div>
                     <div id="other-employee-section" class="hidden">
-                        <div class="form-group"><label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label><input type="text" id="afiliasiLainnya" name="afiliasiLainnya"></div>
+                        <div class="form-group">
+                            <label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label>
+                            <input type="text" id="afiliasiLainnya" name="afiliasiLainnya">
+                        </div>
+                        <!-- BARU: Kolom tanggal selesai tugas -->
+                        <div class="form-group hidden" id="tanggalSelesai-group">
+                            <label for="tanggalSelesai">Bertugas/Magang di RSUD dr. R. Koesma sampai dengan:</label>
+                            <input type="date" id="tanggalSelesai" name="tanggalSelesai">
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="telepon">Nomor Telepon / WA (Aktif)</label>
@@ -357,7 +365,7 @@
     </div>
     <!-- HALAMAN ADMIN BERAKHIR DI SINI -->
 
-    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">ver 1.5 | Developed with ❤️ by : syam</footer>
+    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">ver 1.6 | Developed with ❤️ by : syam</footer>
 
     <script>
         // Variabel global
@@ -365,7 +373,6 @@
         let formDataToSubmit = null; 
         let submissionHeaders = [];
         let currentPage = 1;
-        // BARU: Konteks untuk modal penolakan
         let rejectionContext = {
             rowIndex: null,
             selectElement: null,
@@ -411,6 +418,7 @@
             const fieldLabels = {
                 jenisPengajuan: 'Tujuan Pengajuan', namaLengkap: 'Nama Lengkap', statusKepegawaian: 'Status Kepegawaian',
                 unitKerja: 'Unit Kerja', unitKerjaLainnya: 'Unit Kerja Lainnya', afiliasiLainnya: 'Instansi/Perusahaan',
+                tanggalSelesai: 'Selesai Tugas s/d',
                 telepon: 'Nomor Telepon', fileKtp: 'File Identitas', jenisKendaraanLama: 'Jenis Kendaraan Lama',
                 noPolisiLama: 'Nopol Lama', alasanPenggantian: 'Alasan Ganti Kartu', alasanPenggantianLainnya: 'Alasan Lainnya',
                 jenisKendaraanBaru: 'Jenis Kendaraan Baru', noPolisiBaru: 'Nopol Baru', keteranganLainnya: 'Keterangan Lainnya'
@@ -550,7 +558,6 @@
                         const select = document.createElement('select');
                         select.innerHTML = `<option value="Belum diproses">Belum diproses</option><option value="Selesai">Selesai</option><option value="Ditolak">Ditolak</option><option value="Hapus">Hapus</option>`;
                         select.value = cell;
-                        // Simpan nilai asli untuk pembatalan
                         select.setAttribute('data-previous-value', cell);
                         select.onchange = (event) => handleStatusChange(event.target, originalIndex);
                         td.appendChild(select);
@@ -586,7 +593,7 @@
                 if (confirm('Apakah Anda yakin ingin menghapus data ini secara permanen?')) {
                     updateStatus(newStatus, rowIndex);
                 } else {
-                   selectElement.value = previousStatus; // Kembalikan jika batal
+                   selectElement.value = previousStatus;
                    updateSelectColor(selectElement);
                 }
             } else {
@@ -600,7 +607,6 @@
             else if (value === 'Selesai') selectElement.classList.add('status-selesai');
             else if (value === 'Ditolak') selectElement.classList.add('status-ditolak');
         }
-        // DIMODIFIKASI: Menambahkan parameter alasan
         async function updateStatus(newStatus, rowIndex, reason = '') {
             showLoading(true, 'Menyimpan...');
             try {
@@ -622,7 +628,6 @@
                 }
             } catch (e) { 
                 alert("Gagal menyimpan status."); 
-                // Jika gagal, kembalikan ke nilai sebelumnya
                 if (rejectionContext.selectElement) {
                     rejectionContext.selectElement.value = rejectionContext.previousValue;
                     updateSelectColor(rejectionContext.selectElement);
@@ -654,7 +659,45 @@
         async function checkFormStatusForUser() { try { const response = await fetch(`${webAppUrl}?action=getSettings`); const result = await response.json(); const isOff = result.status === 'success' && result.data.formStatus === 'OFF'; document.getElementById('parkingForm').classList.toggle('hidden', isOff); document.getElementById('form-closed-message').classList.toggle('hidden', !isOff); } catch(e) { console.error("Gagal memeriksa status form.", e); } }
         const formSections = { update: document.getElementById('update-section'), cardReplacement: document.getElementById('card-replacement-section'), newVehicle: document.getElementById('new-vehicle-section'), lainnya: document.getElementById('lainnya-section') };
         function toggleSections(){ const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value; handleRadioStyle(document.querySelector(`input[name="jenisPengajuan"][value="${choice}"]`)); const allDescriptions = document.querySelectorAll('.keterangan-text'); const keteranganBox = document.getElementById('keterangan-tujuan-box'); allDescriptions.forEach(desc => desc.classList.add('hidden')); keteranganBox.classList.add('hidden'); if (choice) { const descriptionId = `desc-${choice.toLowerCase().replace(/\//g, '-').replace(/ /g, '-')}`; const descriptionEl = document.getElementById(descriptionId); if (descriptionEl) { keteranganBox.classList.remove('hidden'); descriptionEl.classList.remove('hidden'); } } Object.values(formSections).forEach(s => s.style.display = 'none'); if (!choice) return; const show = (keys) => keys.forEach(k => formSections[k].style.display = 'block'); switch(choice){ case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(['newVehicle']); break; case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle']); break; case 'Hapus Nomor Kendaraan': show(['update']); break; case 'Buat/Ganti Kartu Parkir': show(['update', 'cardReplacement']); handleAlasanChange(); break; case 'Lainnya': show(['lainnya']); break; } }
-        function handleStatusKepegawaianChange() { const choice = document.querySelector('input[name="statusKepegawaian"]:checked')?.value; const rsudSection = document.getElementById('rsud-employee-section'); const otherSection = document.getElementById('other-employee-section'); const unitKerjaSelect = document.getElementById('unitKerja'); const afiliasiInput = document.getElementById('afiliasiLainnya'); if (choice === 'Karyawan RSUD') { rsudSection.classList.remove('hidden'); otherSection.classList.add('hidden'); unitKerjaSelect.required = true; afiliasiInput.required = false; afiliasiInput.value = ''; } else if (choice === 'Pihak Ketiga') { rsudSection.classList.add('hidden'); otherSection.classList.remove('hidden'); unitKerjaSelect.required = false; afiliasiInput.required = true; unitKerjaSelect.value = ''; handleUnitKerjaChange(unitKerjaSelect); } else { rsudSection.classList.add('hidden'); otherSection.classList.add('hidden'); unitKerjaSelect.required = false; afiliasiInput.required = false; } }
+        
+        // DIMODIFIKASI: untuk menampilkan/menyembunyikan kolom tanggal
+        function handleStatusKepegawaianChange() { 
+            const choice = document.querySelector('input[name="statusKepegawaian"]:checked')?.value; 
+            const rsudSection = document.getElementById('rsud-employee-section'); 
+            const otherSection = document.getElementById('other-employee-section'); 
+            const unitKerjaSelect = document.getElementById('unitKerja'); 
+            const afiliasiInput = document.getElementById('afiliasiLainnya');
+            const tanggalSelesaiGroup = document.getElementById('tanggalSelesai-group');
+            const tanggalSelesaiInput = document.getElementById('tanggalSelesai');
+
+            if (choice === 'Karyawan RSUD') { 
+                rsudSection.classList.remove('hidden'); 
+                otherSection.classList.add('hidden'); 
+                unitKerjaSelect.required = true; 
+                afiliasiInput.required = false; 
+                afiliasiInput.value = ''; 
+                tanggalSelesaiGroup.classList.add('hidden');
+                tanggalSelesaiInput.required = false;
+                tanggalSelesaiInput.value = '';
+            } else if (choice === 'Pihak Ketiga') { 
+                rsudSection.classList.add('hidden'); 
+                otherSection.classList.remove('hidden'); 
+                unitKerjaSelect.required = false; 
+                afiliasiInput.required = true; 
+                unitKerjaSelect.value = ''; 
+                handleUnitKerjaChange(unitKerjaSelect); 
+                tanggalSelesaiGroup.classList.remove('hidden');
+                tanggalSelesaiInput.required = true;
+            } else { 
+                rsudSection.classList.add('hidden'); 
+                otherSection.classList.add('hidden'); 
+                unitKerjaSelect.required = false; 
+                afiliasiInput.required = false;
+                tanggalSelesaiGroup.classList.add('hidden');
+                tanggalSelesaiInput.required = false;
+            } 
+        }
+
         function handleAlasanChange() { const choice = document.querySelector('input[name="alasanPenggantian"]:checked')?.value; const lainnyaGroup = document.getElementById('alasanLainnya-group'); const lainnyaInput = document.getElementById('alasanPenggantianLainnya'); const isLainnya = choice === 'Lainnya'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
         function handleRadioStyle(radioElement) { if (!radioElement) return; const radioName = radioElement.name; const allLabels = document.querySelectorAll(`input[name="${radioName}"]`); allLabels.forEach(radio => { radio.parentElement.classList.remove('selected-label'); }); radioElement.parentElement.classList.add('selected-label'); }
         function handleUnitKerjaChange(select){ const lainnyaGroup = document.getElementById('unitKerjaLainnya-group'); const lainnyaInput = document.getElementById('unitKerjaLainnya'); const isLainnya = select.value === 'LAINNYA'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
@@ -665,7 +708,6 @@
             handleRouteChange(); 
             toggleSections(); 
 
-            // Listener untuk modal penolakan
             document.getElementById('cancel-rejection-btn').addEventListener('click', () => {
                 if (rejectionContext.selectElement) {
                     rejectionContext.selectElement.value = rejectionContext.previousValue;
@@ -696,3 +738,4 @@
     </script>
 </body>
 </html>
+
