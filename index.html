@@ -31,26 +31,21 @@
             background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); z-index: -1;
         }
 
-        /* Container Default (User View) */
+        /* Container Default */
         .container { 
             max-width: 1000px; width: 95%; margin: 30px auto; 
             background-color: var(--glass-bg); 
             border-radius: var(--border-radius); 
             box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
             overflow: hidden;
-            transition: all 0.3s ease-in-out; /* Animasi transisi lebar */
+            transition: all 0.3s ease-in-out;
         }
 
         /* Container Full Screen (Admin View) */
         .container.admin-mode {
-            max-width: 100%;
-            width: 100%;
-            margin: 0;
-            border-radius: 0;
-            min-height: 100vh;
+            max-width: 100%; width: 100%; margin: 0; border-radius: 0; min-height: 100vh;
         }
 
-        /* HEADER */
         header { 
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); 
             color: white; padding: 20px; text-align: center; 
@@ -73,10 +68,7 @@
             width: 90%; max-width: 400px;
         }
 
-        /* FIX: Memastikan SweetAlert selalu di atas Login Page */
-        .swal2-container {
-            z-index: 9999 !important;
-        }
+        .swal2-container { z-index: 9999 !important; }
 
         /* DASHBOARD USER */
         .dashboard-header {
@@ -172,6 +164,17 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
+        /* ROW COLORS FOR ADMIN TABLE */
+        tr.row-pending { background-color: #fff9db !important; } /* Kuning */
+        tr.row-approved { background-color: #e6fcf5 !important; } /* Hijau */
+        tr.row-rejected { background-color: #fff5f5 !important; } /* Merah */
+        
+        /* Dropdown Style inside Table */
+        .status-select {
+            padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold;
+            background: white; cursor: pointer;
+        }
+
         /* Utils & Status */
         .hidden { display: none !important; }
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
@@ -208,7 +211,6 @@
             <h2>Layanan Parkir</h2>
             <p>Silakan login untuk melanjutkan</p>
             
-            <!-- UPDATE: Tombol Google dibuat Rata Tengah -->
             <div id="g_id_onload" 
                  data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com" 
                  data-callback="handleCredentialResponse" 
@@ -309,9 +311,7 @@
                 <button id="close-profile-btn" class="btn-close" onclick="closeProfileModal()">&times;</button>
             </div>
             <form id="profileForm">
-                <!-- Hidden fields untuk mode admin input -->
                 <input type="hidden" id="prof-target-email"> 
-                
                 <div class="form-group">
                     <label>Nama Lengkap (Sesuai KTP)</label>
                     <input type="text" id="prof-nama" required>
@@ -337,13 +337,12 @@
                     <input type="file" id="prof-file" accept="image/*">
                     <small id="ktp-status" style="color:green; display:none;">Sudah ada file KTP. Upload ulang jika ingin mengganti.</small>
                 </div>
-
                 <button type="submit" class="btn-submit">Simpan Profil</button>
             </form>
         </div>
     </div>
 
-    <!-- MODAL ADMIN INPUT EMAIL (Langkah 1 Offline) -->
+    <!-- MODAL ADMIN INPUT EMAIL -->
     <div id="admin-input-modal" class="modal-overlay">
         <div class="modal-content" style="max-width:400px;">
             <div class="modal-header">
@@ -379,7 +378,6 @@
                         <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
-
                 <div id="sub-kendaraan-baru" class="hidden">
                     <div class="form-group">
                         <label>Jenis Kendaraan</label>
@@ -393,17 +391,14 @@
                         <input type="text" id="sub-nopol-baru" style="text-transform:uppercase;" placeholder="CTH: S 1234 XX">
                     </div>
                 </div>
-
                 <div id="sub-kendaraan-lama" class="hidden form-group">
-                    <label>Nomor Polisi Lama (Yang diganti)</label>
+                    <label>Nomor Polisi Lama</label>
                     <input type="text" id="sub-nopol-lama" style="text-transform:uppercase;">
                 </div>
-
                 <div class="form-group">
-                    <label>Keterangan Tambahan (Opsional)</label>
+                    <label>Keterangan Tambahan</label>
                     <textarea id="sub-ket" rows="2"></textarea>
                 </div>
-
                 <button type="submit" class="btn-submit">Kirim Pengajuan</button>
             </form>
         </div>
@@ -416,79 +411,48 @@
         let userProfile = null;
         let currentUserEmail = '';
         let currentUserRole = 'USER';
-        
-        // Variables for Admin Offline Mode
         let offlineTargetEmail = ''; 
         let offlineUserProfile = null;
 
-        // --- AUTH & INIT ---
         function handleCredentialResponse(response) {
-            // 1. SEMBUNYIKAN HALAMAN LOGIN SEGERA
             document.getElementById('login-page').classList.add('hidden');
-
-            // 2. TAMPILKAN LOADING (Swal z-index sudah diset 9999)
-            Swal.fire({ 
-                title: 'Sedang Masuk...', 
-                text: 'Memverifikasi akun Anda...', 
-                allowOutsideClick: false, 
-                didOpen: () => Swal.showLoading() 
-            });
-
+            Swal.fire({ title: 'Sedang Masuk...', text: 'Memverifikasi akun Anda...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
             currentUserEmail = payload.email;
             checkUserBackend(payload.email, payload.name);
         }
 
         async function checkUserBackend(email, googleName) {
-            // Swal sudah loading dari handleCredentialResponse, tidak perlu fire lagi, 
-            // tapi jika dipanggil dari tempat lain, kita pastikan loading.
-            if (!Swal.isVisible()) {
-                Swal.fire({ title: 'Memuat Profil...', didOpen: () => Swal.showLoading() });
-            }
-            
+            if (!Swal.isVisible()) Swal.fire({ title: 'Memuat Profil...', didOpen: () => Swal.showLoading() });
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${email}&name=${encodeURIComponent(googleName)}`);
                 const json = await res.json();
                 Swal.close();
-
                 if (json.status === 'blocked') {
-                    Swal.fire('Ditolak', 'Akun diblokir.', 'error')
-                        .then(() => location.reload()); // Reload jika diblokir untuk reset view
+                    Swal.fire('Ditolak', 'Akun diblokir.', 'error').then(() => location.reload());
                     return;
                 }
-
-                // Pastikan login page benar-benar hidden dan app muncul
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-
                 userProfile = json.profile;
                 currentUserRole = json.role || 'USER';
-
                 if (currentUserRole === 'SUPERADMIN' || currentUserRole === 'ADMIN') {
                     initAdmin();
                 } else {
                     initUserDashboard(googleName);
                     if (json.status === 'new_user' || json.status === 'incomplete_profile') {
-                        // Regular user first login
-                        offlineTargetEmail = email; // Set target to self
-                        openProfileModal(false); 
+                        offlineTargetEmail = email; openProfileModal(false); 
                     }
                 }
             } catch (e) {
-                Swal.fire('Error', 'Gagal koneksi server.', 'error').then(() => {
-                    // Jika error koneksi, reload halaman agar user bisa coba lagi
-                    location.reload(); 
-                });
+                Swal.fire('Error', 'Gagal koneksi server.', 'error').then(() => location.reload());
             }
         }
 
         function initUserDashboard(name) {
             document.getElementById('user-dashboard').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
-            
-            // UPDATE: Hapus class admin-mode untuk kembali ke lebar terbatas
             document.getElementById('app-container').classList.remove('admin-mode');
-
             const dispName = userProfile ? userProfile.nama : name;
             const dispUnit = userProfile ? userProfile.unit : 'Lengkapi Profil Anda';
             document.getElementById('display-name').textContent = dispName;
@@ -497,25 +461,16 @@
             fetchHistory();
         }
 
-        function handleLogout() {
-            location.reload();
-        }
+        function handleLogout() { location.reload(); }
 
-        // --- PROFILE LOGIC (SHARED) ---
         function openProfileModal(canClose) {
             const modal = document.getElementById('profile-modal');
             const closeBtn = document.getElementById('close-profile-btn');
             modal.style.display = 'flex';
             closeBtn.style.display = canClose ? 'block' : 'none';
-            
-            // Tentukan data siapa yang ditampilkan
-            // Jika Admin sedang mode offline input, pakai offlineUserProfile
-            // Jika User biasa, pakai userProfile
             const dataToShow = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) ? offlineUserProfile : userProfile;
             const targetEmail = (currentUserRole !== 'USER' && offlineTargetEmail) ? offlineTargetEmail : currentUserEmail;
-
             document.getElementById('prof-target-email').value = targetEmail;
-
             if (dataToShow) {
                 document.getElementById('prof-nama').value = dataToShow.nama || '';
                 document.getElementById('prof-status').value = dataToShow.statusPegawai || '';
@@ -526,37 +481,28 @@
                     document.getElementById('prof-file').required = false;
                 }
             } else {
-                // New Profile
                 document.getElementById('profileForm').reset();
                 document.getElementById('prof-file').required = true;
             }
         }
 
-        function closeProfileModal() {
-            document.getElementById('profile-modal').style.display = 'none';
-        }
-
+        function closeProfileModal() { document.getElementById('profile-modal').style.display = 'none'; }
         function toggleUnitInput() {
             const status = document.getElementById('prof-status').value;
             const unitInput = document.getElementById('prof-unit');
-            if(status === 'Pihak Ketiga') unitInput.placeholder = "Nama Perusahaan / Instansi";
-            else unitInput.placeholder = "Nama Unit / Ruangan";
+            unitInput.placeholder = (status === 'Pihak Ketiga') ? "Nama Perusahaan / Instansi" : "Nama Unit / Ruangan";
         }
 
         document.getElementById('profileForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const targetEmail = document.getElementById('prof-target-email').value || currentUserEmail;
             const fileInput = document.getElementById('prof-file');
-            
-            // Cek file requirement (tergantung konteks)
             const currentContextProfile = (targetEmail === currentUserEmail) ? userProfile : offlineUserProfile;
             if (!currentContextProfile && fileInput.files.length === 0) {
                 Swal.fire('Wajib Upload', 'Silakan upload foto KTP/SIM.', 'warning');
                 return;
             }
-
             Swal.fire({ title: 'Menyimpan Profil...', didOpen: () => Swal.showLoading() });
-
             const payload = {
                 email: targetEmail,
                 nama: document.getElementById('prof-nama').value,
@@ -565,120 +511,71 @@
                 hp: document.getElementById('prof-hp').value,
                 existingKtp: currentContextProfile ? currentContextProfile.linkKtp : ''
             };
-
-            if (fileInput.files.length > 0) {
-                payload.fileKtp = await compressImage(fileInput.files[0]);
-            }
-
+            if (fileInput.files.length > 0) payload.fileKtp = await compressImage(fileInput.files[0]);
             try {
-                const res = await fetch(`${WEB_APP_URL}?action=saveProfile`, {
-                    method: 'POST', body: JSON.stringify(payload)
-                });
+                const res = await fetch(`${WEB_APP_URL}?action=saveProfile`, { method: 'POST', body: JSON.stringify(payload) });
                 const json = await res.json();
-                
                 if (json.status === 'success') {
                     const updatedProfile = { ...payload, linkKtp: json.linkKtp };
                     delete updatedProfile.fileKtp;
-
-                    // Update local state
                     if (targetEmail === currentUserEmail) {
                         userProfile = updatedProfile;
                         if(currentUserRole === 'USER') initUserDashboard(userProfile.nama);
-                    } else {
-                        // Admin Mode
-                        offlineUserProfile = updatedProfile;
-                    }
-                    
+                    } else { offlineUserProfile = updatedProfile; }
                     Swal.fire('Berhasil', 'Profil disimpan.', 'success');
                     closeProfileModal();
-
-                    // Jika ini flow Admin Offline, lanjut ke pengajuan
-                    if (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) {
-                         openSubmissionModal();
-                    }
-
-                } else {
-                    throw new Error(json.message);
-                }
-            } catch (err) {
-                Swal.fire('Gagal', err.message, 'error');
-            }
+                    if (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) openSubmissionModal();
+                } else { throw new Error(json.message); }
+            } catch (err) { Swal.fire('Gagal', err.message, 'error'); }
         });
 
-        // --- SUBMISSION LOGIC ---
-        
-        // Triggered by Admin "Input Offline" button
         function openAdminOfflineInput() {
             document.getElementById('admin-input-modal').style.display = 'flex';
             document.getElementById('offline-email-input').value = '';
-            offlineTargetEmail = '';
-            offlineUserProfile = null;
+            offlineTargetEmail = ''; offlineUserProfile = null;
         }
 
         async function checkOfflineUser() {
             const email = document.getElementById('offline-email-input').value;
             if(!email) return Swal.fire('Error', 'Masukkan email', 'warning');
-
             Swal.fire({ title: 'Mengecek User...', didOpen: () => Swal.showLoading() });
-            
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${email}&name=OfflineUser`);
                 const json = await res.json();
                 Swal.close();
-
                 offlineTargetEmail = email;
                 document.getElementById('admin-input-modal').style.display = 'none';
-
                 if (json.status === 'new_user' || json.status === 'incomplete_profile') {
-                    // User belum ada/belum lengkap -> Admin isi Profil dulu
-                    offlineUserProfile = json.profile; // Bisa null
-                    Swal.fire('Info', 'User belum terdaftar lengkap. Silakan isi profil dulu.', 'info')
-                    .then(() => openProfileModal(true));
+                    offlineUserProfile = json.profile;
+                    Swal.fire('Info', 'User belum terdaftar lengkap. Silakan isi profil dulu.', 'info').then(() => openProfileModal(true));
                 } else {
-                    // User sudah ada -> Lanjut Pengajuan
                     offlineUserProfile = json.profile;
                     openSubmissionModal();
                 }
-
             } catch(e) { Swal.fire('Error', 'Gagal cek user', 'error'); }
         }
 
         function openSubmissionModal() {
-            // Tentukan target
             const isOfflineMode = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail);
             const targetProf = isOfflineMode ? offlineUserProfile : userProfile;
-
-            if (!targetProf) {
-                Swal.fire('Profil Belum Lengkap', 'Lengkapi profil dulu.', 'warning');
-                return;
-            }
-
+            if (!targetProf) { Swal.fire('Profil Belum Lengkap', 'Lengkapi profil dulu.', 'warning'); return; }
             document.getElementById('submission-modal').style.display = 'flex';
-            
-            // UI Adjustment for Admin Mode
             const notice = document.getElementById('sub-admin-notice');
             if (isOfflineMode) {
                 notice.style.display = 'block';
                 document.getElementById('sub-target-user').textContent = `${targetProf.nama} (${offlineTargetEmail})`;
-            } else {
-                notice.style.display = 'none';
-            }
+            } else { notice.style.display = 'none'; }
         }
 
         function closeSubmissionModal() {
             document.getElementById('submission-modal').style.display = 'none';
-            // Reset offline mode vars if admin closes modal
-            if (currentUserRole !== 'USER') {
-                offlineTargetEmail = '';
-                offlineUserProfile = null;
-            }
+            if (currentUserRole !== 'USER') { offlineTargetEmail = ''; offlineUserProfile = null; }
         }
 
         function toggleSubFields() {
             const val = document.getElementById('sub-tujuan').value;
             const newSec = document.getElementById('sub-kendaraan-baru');
             const oldSec = document.getElementById('sub-kendaraan-lama');
-            
             newSec.classList.add('hidden'); oldSec.classList.add('hidden');
             if (val === 'Pendaftaran Baru' || val === 'Rubah Nomor Kendaraan') newSec.classList.remove('hidden');
             if (val === 'Rubah Nomor Kendaraan') oldSec.classList.remove('hidden');
@@ -687,21 +584,17 @@
         document.getElementById('submissionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             Swal.fire({ title: 'Mengirim...', didOpen: () => Swal.showLoading() });
-
-            // Logic: Target Email (Milik Siapa?) vs Submitter (Siapa yg login?)
             const isOfflineMode = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail);
             const targetEmail = isOfflineMode ? offlineTargetEmail : currentUserEmail;
-
             const payload = {
-                emailAkunGoogle: targetEmail, // INI YANG PENTING: Mengatasnamakan User Target
-                submitterEmail: currentUserEmail, // Audit Trail
+                emailAkunGoogle: targetEmail,
+                submitterEmail: currentUserEmail,
                 jenisPengajuan: document.getElementById('sub-tujuan').value,
                 jenisKendaraanBaru: document.getElementById('sub-jenis').value,
                 noPolisiBaru: document.getElementById('sub-nopol-baru').value,
                 noPolisiLama: document.getElementById('sub-nopol-lama').value,
                 keteranganLainnya: document.getElementById('sub-ket').value
             };
-
             try {
                 const res = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
                 const json = await res.json();
@@ -710,7 +603,7 @@
                     closeSubmissionModal();
                     this.reset();
                     if(currentUserRole === 'USER') fetchHistory();
-                    if(currentUserRole !== 'USER') fetchSubmissions(1); // Refresh Admin Table
+                    if(currentUserRole !== 'USER') fetchSubmissions(1);
                 } else { throw new Error(json.message); }
             } catch (err) { Swal.fire('Gagal', err.message, 'error'); }
         });
@@ -755,14 +648,10 @@
         function initAdmin() {
             document.getElementById('user-dashboard').classList.add('hidden');
             document.getElementById('admin-dashboard').classList.remove('hidden');
-            
-            // UPDATE: Tambahkan class admin-mode untuk Full Screen
             document.getElementById('app-container').classList.add('admin-mode');
-
             const badge = document.getElementById('admin-role-badge');
             badge.textContent = currentUserRole;
             badge.className = `role-badge ${currentUserRole === 'SUPERADMIN' ? 'role-super' : 'role-admin'}`;
-            
             fetchSubmissions(1);
         }
         function switchTab(t) {
@@ -772,6 +661,7 @@
             event.target.classList.add('active');
             if(t==='users') fetchUsers();
         }
+        
         async function fetchSubmissions(p) {
             const res = await fetch(`${WEB_APP_URL}?action=getSubmissions&page=${p}`);
             const json = await res.json();
@@ -779,19 +669,68 @@
             tbody.innerHTML = '';
             document.querySelector('#submissions-table thead').innerHTML = `<tr>${json.data.headers.map(h=>`<th>${h}</th>`).join('')}</tr>`;
             json.data.pageData.forEach(r => {
-                const rowHtml = r.rowData.map((c, i) => {
-                    if(json.data.headers[i] === 'Status') return `<td><select onchange="updateSubStatus(this.value, ${r.originalIndex})"><option value="${c}">${c}</option><option value="Selesai">Selesai</option><option value="Ditolak">Ditolak</option><option value="Hapus">Hapus</option></select></td>`;
+                const rowData = r.rowData;
+                const statusIdx = json.data.headers.indexOf('Status');
+                const status = rowData[statusIdx];
+                
+                // Add Row Coloring Class
+                let rowClass = 'row-pending'; // Default Kuning
+                if (status === 'Selesai') rowClass = 'row-approved'; // Hijau
+                if (status === 'Ditolak') rowClass = 'row-rejected'; // Merah
+
+                const tr = document.createElement('tr');
+                tr.className = rowClass;
+
+                const rowHtml = rowData.map((c, i) => {
+                    if(json.data.headers[i] === 'Status') {
+                        return `<td>
+                            <select class="status-select" onchange="updateSubStatus(this.value, ${r.originalIndex}, this)">
+                                <option value="Belum diproses" ${c==='Belum diproses'?'selected':''}>Belum diproses</option>
+                                <option value="Selesai" ${c==='Selesai'?'selected':''}>Disetujui/Selesai</option>
+                                <option value="Ditolak" ${c==='Ditolak'?'selected':''}>Ditolak</option>
+                                <option value="Hapus">Hapus</option>
+                            </select>
+                        </td>`;
+                    }
                     if(String(c).includes('http')) return `<td><a href="${c}" target="_blank">Lihat</a></td>`;
                     return `<td>${c}</td>`;
                 }).join('');
-                tbody.innerHTML += `<tr>${rowHtml}</tr>`;
+                
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
             });
         }
-        async function updateSubStatus(st, idx) {
+
+        async function updateSubStatus(st, idx, selectEl) {
+            let reason = '';
+            if (st === 'Ditolak') {
+                const { value: text, isConfirmed } = await Swal.fire({
+                    input: 'textarea',
+                    title: 'Alasan Penolakan',
+                    text: 'Wajib diisi untuk notifikasi user',
+                    showCancelButton: true
+                });
+                
+                if (!isConfirmed) {
+                    // Reset dropdown if cancelled (reload table simple way)
+                    fetchSubmissions(1); 
+                    return; 
+                }
+                if (!text) { 
+                    Swal.fire('Error', 'Alasan wajib diisi', 'error'); 
+                    fetchSubmissions(1);
+                    return; 
+                }
+                reason = text;
+            } else if (st === 'Hapus') {
+                const conf = await Swal.fire({ title: 'Hapus Data?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' });
+                if (!conf.isConfirmed) { fetchSubmissions(1); return; }
+            }
+
             Swal.showLoading();
-            await fetch(`${WEB_APP_URL}?action=updateStatus&rowIndex=${idx}&status=${st}`);
+            await fetch(`${WEB_APP_URL}?action=updateStatus&rowIndex=${idx}&status=${st}&reason=${encodeURIComponent(reason)}`);
             Swal.close();
-            if(st==='Hapus') fetchSubmissions(1);
+            fetchSubmissions(1);
         }
 
         async function fetchUsers() {
@@ -801,40 +740,21 @@
                 const res = await fetch(`${WEB_APP_URL}?action=getUsersList`);
                 const json = await res.json();
                 tbody.innerHTML = '';
-                
                 json.data.forEach(u => {
-                    const email = u[0];
-                    const name = u[1];
-                    const role = u[2]; // Role
-                    const status = u[3]; // ACTIVE/BLOCKED
-                    
-                    const isSuper = role === 'SUPERADMIN';
-                    const isBlocked = status === 'BLOCKED';
-                    
+                    const email = u[0]; const name = u[1]; const role = u[2]; const status = u[3];
+                    const isSuper = role === 'SUPERADMIN'; const isBlocked = status === 'BLOCKED';
                     let actions = '';
-                    
                     if (currentUserRole === 'SUPERADMIN') {
                         if (!isSuper) {
                              if (role === 'USER') actions += `<button class="btn-action btn-promote" onclick="changeRole('${email}', 'ADMIN')">Jadikan Admin</button>`;
                              if (role === 'ADMIN') actions += `<button class="btn-action btn-demote" onclick="changeRole('${email}', 'USER')">Jadikan User</button>`;
                         }
                     }
-
                     if (!isSuper) {
                          actions += `<button class="btn-action ${isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${email}', '${status}')">${isBlocked ? 'Aktifkan' : 'Blokir'}</button>`;
                     }
-
                     const roleClass = role === 'SUPERADMIN' ? 'role-super' : (role === 'ADMIN' ? 'role-admin' : 'role-user');
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td data-label="Email">${email}</td>
-                            <td data-label="Nama">${name}</td>
-                            <td data-label="Role"><span class="role-badge ${roleClass}">${role}</span></td>
-                            <td data-label="Status"><span class="status-badge ${isBlocked?'st-blocked':'st-active'}">${status}</span></td>
-                            <td data-label="Aksi">${actions || '-'}</td>
-                        </tr>
-                    `;
+                    tbody.innerHTML += `<tr><td data-label="Email">${email}</td><td data-label="Nama">${name}</td><td data-label="Role"><span class="role-badge ${roleClass}">${role}</span></td><td data-label="Status"><span class="status-badge ${isBlocked?'st-blocked':'st-active'}">${status}</span></td><td data-label="Aksi">${actions || '-'}</td></tr>`;
                 });
             } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:red">Error.</td></tr>'; }
         }
