@@ -31,7 +31,6 @@
             background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); z-index: -1;
         }
 
-        /* Container Default */
         .container { 
             max-width: 1000px; width: 95%; margin: 30px auto; 
             background-color: var(--glass-bg); 
@@ -41,7 +40,6 @@
             transition: all 0.3s ease-in-out;
         }
 
-        /* Container Full Screen (Admin View) */
         .container.admin-mode {
             max-width: 100%; width: 100%; margin: 0; border-radius: 0; min-height: 100vh;
             background-color: #ffffff;
@@ -147,14 +145,12 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: #555; }
         
-        /* GENERAL INPUT STYLING */
         input, select, textarea { 
             width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; 
             font-size: 1em; box-sizing: border-box;
         }
         input:focus { border-color: var(--primary-color); outline: none; }
 
-        /* FILE INPUT FIX */
         input[type="file"] {
             padding: 6px;
             background: #f9f9f9; 
@@ -191,7 +187,6 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
-        /* ROW COLORS FOR ADMIN TABLE - TARGET TD */
         tr.row-pending td { background-color: #fff9db !important; }
         tr.row-approved td { background-color: #e6fcf5 !important; }
         tr.row-rejected td { background-color: #fff5f5 !important; }
@@ -201,7 +196,6 @@
             background: white; cursor: pointer;
         }
 
-        /* Utils & Status */
         .hidden { display: none !important; }
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
         .st-active { background: #e6fcf5; color: #087f5b; }
@@ -339,7 +333,7 @@
             <div class="modal-header">
                 <h3><i class="fas fa-id-card"></i> Data User</h3>
                 <div style="display:flex; gap:10px; align-items:center;">
-                    <!-- UPDATE: Tombol Logout khusus untuk modal profil yang terkunci -->
+                    <!-- Tombol Logout Khusus saat Wajib Isi Profil -->
                     <button id="logout-profile-btn" class="btn-small btn-logout hidden" onclick="handleLogout()" style="padding:5px 10px; font-size:0.8em;">
                         <i class="fas fa-sign-out-alt"></i> Keluar
                     </button>
@@ -477,7 +471,7 @@
         async function checkUserBackend(email, googleName) {
             if (!Swal.isVisible()) Swal.fire({ title: 'Memuat Profil...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
-                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${email}&name=${encodeURIComponent(googleName)}`);
+                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${encodeURIComponent(email)}&name=${encodeURIComponent(googleName)}`);
                 const json = await res.json();
                 Swal.close();
                 
@@ -489,6 +483,7 @@
                 
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
+                
                 userProfile = json.profile;
                 currentUserRole = json.role || 'USER';
                 
@@ -496,8 +491,11 @@
                     initAdmin();
                 } else {
                     initUserDashboard(googleName);
+                    // LOGIKA UTAMA: Jika user baru, paksa buka modal
                     if (json.status === 'new_user' || json.status === 'incomplete_profile') {
-                        offlineTargetEmail = email; openProfileModal(false); 
+                        // Pastikan target email kosong agar menggunakan currentUserEmail (diri sendiri)
+                        offlineTargetEmail = ''; 
+                        openProfileModal(false); 
                     }
                 }
             } catch (e) {
@@ -532,7 +530,6 @@
             
             modal.style.display = 'flex';
             
-            // LOGIKA TOMBOL MODAL: Jika wajib isi (canClose=false), tombol X hilang, tapi tombol Logout muncul
             if (canClose) {
                 closeBtn.style.display = 'block';
                 logoutBtn.style.display = 'none';
@@ -541,9 +538,15 @@
                 logoutBtn.style.display = 'block';
             }
 
-            const dataToShow = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) ? offlineUserProfile : userProfile;
-            const targetEmail = (currentUserRole !== 'USER' && offlineTargetEmail) ? offlineTargetEmail : currentUserEmail;
+            // LOGIKA PENTING:
+            // Jika user biasa login -> target adalah diri sendiri (currentUserEmail)
+            // Jika Admin sedang mode offline -> target adalah offlineTargetEmail
+            const isAdminMode = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail);
+            const dataToShow = isAdminMode ? offlineUserProfile : userProfile;
+            const targetEmail = isAdminMode ? offlineTargetEmail : currentUserEmail;
+
             document.getElementById('prof-target-email').value = targetEmail;
+
             if (dataToShow) {
                 document.getElementById('prof-nama').value = dataToShow.nama || '';
                 document.getElementById('prof-status').value = dataToShow.statusPegawai || '';
@@ -570,12 +573,16 @@
             e.preventDefault();
             const targetEmail = document.getElementById('prof-target-email').value || currentUserEmail;
             const fileInput = document.getElementById('prof-file');
+            
+            // Cek file requirement (tergantung konteks)
             const currentContextProfile = (targetEmail === currentUserEmail) ? userProfile : offlineUserProfile;
             if (!currentContextProfile && fileInput.files.length === 0) {
                 Swal.fire('Wajib Upload', 'Silakan upload foto KTP/SIM.', 'warning');
                 return;
             }
+
             Swal.fire({ title: 'Menyimpan Profil...', didOpen: () => Swal.showLoading() });
+
             const payload = {
                 email: targetEmail,
                 nama: document.getElementById('prof-nama').value,
@@ -584,22 +591,42 @@
                 hp: document.getElementById('prof-hp').value,
                 existingKtp: currentContextProfile ? currentContextProfile.linkKtp : ''
             };
-            if (fileInput.files.length > 0) payload.fileKtp = await compressImage(fileInput.files[0]);
+
+            if (fileInput.files.length > 0) {
+                payload.fileKtp = await compressImage(fileInput.files[0]);
+            }
+
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=saveProfile`, { method: 'POST', body: JSON.stringify(payload) });
                 const json = await res.json();
+                
                 if (json.status === 'success') {
                     const updatedProfile = { ...payload, linkKtp: json.linkKtp };
                     delete updatedProfile.fileKtp;
+
+                    // Update local state
                     if (targetEmail === currentUserEmail) {
                         userProfile = updatedProfile;
                         if(currentUserRole === 'USER') initUserDashboard(userProfile.nama);
-                    } else { offlineUserProfile = updatedProfile; }
+                    } else {
+                        // Admin Mode
+                        offlineUserProfile = updatedProfile;
+                    }
+                    
                     Swal.fire('Berhasil', 'Profil disimpan.', 'success');
                     closeProfileModal();
-                    if (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) openSubmissionModal();
-                } else { throw new Error(json.message); }
-            } catch (err) { Swal.fire('Gagal', err.message, 'error'); }
+
+                    // Jika ini flow Admin Offline, lanjut ke pengajuan
+                    if (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) {
+                         openSubmissionModal();
+                    }
+
+                } else {
+                    throw new Error(json.message);
+                }
+            } catch (err) {
+                Swal.fire('Gagal', err.message, 'error');
+            }
         });
 
         function openAdminOfflineInput() {
@@ -609,11 +636,11 @@
         }
 
         async function checkOfflineUser() {
-            const email = document.getElementById('offline-email-input').value;
+            const email = document.getElementById('offline-email-input').value.trim().toLowerCase();
             if(!email) return Swal.fire('Error', 'Masukkan email', 'warning');
             Swal.fire({ title: 'Mengecek User...', didOpen: () => Swal.showLoading() });
             try {
-                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${email}&name=OfflineUser`);
+                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${encodeURIComponent(email)}&name=OfflineUser`);
                 const json = await res.json();
                 Swal.close();
                 offlineTargetEmail = email;
@@ -687,7 +714,7 @@
             const empty = document.getElementById('empty-state');
             container.innerHTML = ''; loading.style.display = 'block'; empty.classList.add('hidden');
             try {
-                const res = await fetch(`${WEB_APP_URL}?action=getUserHistory&email=${currentUserEmail}`);
+                const res = await fetch(`${WEB_APP_URL}?action=getUserHistory&email=${encodeURIComponent(currentUserEmail)}`);
                 const json = await res.json();
                 loading.style.display = 'none';
                 if (json.data && json.data.length > 0) {
@@ -853,7 +880,6 @@
                     const isSuper = role === 'SUPERADMIN'; const isBlocked = status === 'BLOCKED';
                     let actions = '';
                     
-                    // Logic tombol hanya untuk SUPERADMIN
                     if (currentUserRole === 'SUPERADMIN') {
                         if (!isSuper) {
                              if (role === 'USER') actions += `<button class="btn-action btn-promote" onclick="changeRole('${email}', 'ADMIN')">Jadikan Admin</button>`;
