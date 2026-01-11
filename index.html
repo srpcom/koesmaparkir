@@ -31,12 +31,23 @@
             background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); z-index: -1;
         }
 
+        /* Container Default (User View) */
         .container { 
             max-width: 1000px; width: 95%; margin: 30px auto; 
             background-color: var(--glass-bg); 
             border-radius: var(--border-radius); 
             box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
             overflow: hidden;
+            transition: all 0.3s ease-in-out; /* Animasi transisi lebar */
+        }
+
+        /* Container Full Screen (Admin View) */
+        .container.admin-mode {
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
+            border-radius: 0;
+            min-height: 100vh;
         }
 
         /* HEADER */
@@ -196,8 +207,23 @@
             <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo" style="width:80px; margin-bottom:15px;">
             <h2>Layanan Parkir</h2>
             <p>Silakan login untuk melanjutkan</p>
-            <div id="g_id_onload" data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
-            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="pill" data-logo_alignment="left"></div>
+            
+            <!-- UPDATE: Tombol Google dibuat Rata Tengah -->
+            <div id="g_id_onload" 
+                 data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com" 
+                 data-callback="handleCredentialResponse" 
+                 data-auto_prompt="false">
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 15px;">
+                <div class="g_id_signin" 
+                     data-type="standard" 
+                     data-size="large" 
+                     data-theme="outline" 
+                     data-text="sign_in_with" 
+                     data-shape="pill" 
+                     data-logo_alignment="left">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -459,6 +485,10 @@
         function initUserDashboard(name) {
             document.getElementById('user-dashboard').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
+            
+            // UPDATE: Hapus class admin-mode untuk kembali ke lebar terbatas
+            document.getElementById('app-container').classList.remove('admin-mode');
+
             const dispName = userProfile ? userProfile.nama : name;
             const dispUnit = userProfile ? userProfile.unit : 'Lengkapi Profil Anda';
             document.getElementById('display-name').textContent = dispName;
@@ -726,6 +756,9 @@
             document.getElementById('user-dashboard').classList.add('hidden');
             document.getElementById('admin-dashboard').classList.remove('hidden');
             
+            // UPDATE: Tambahkan class admin-mode untuk Full Screen
+            document.getElementById('app-container').classList.add('admin-mode');
+
             const badge = document.getElementById('admin-role-badge');
             badge.textContent = currentUserRole;
             badge.className = `role-badge ${currentUserRole === 'SUPERADMIN' ? 'role-super' : 'role-admin'}`;
