@@ -32,7 +32,6 @@
             background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); z-index: -1;
         }
 
-        /* Container Default */
         .container { 
             max-width: 1000px; width: 95%; margin: 30px auto; 
             background-color: var(--glass-bg); 
@@ -42,7 +41,6 @@
             transition: all 0.3s ease-in-out;
         }
 
-        /* Container Full Screen (Admin View) */
         .container.admin-mode {
             max-width: 100%; width: 100%; margin: 0; border-radius: 0; min-height: 100vh;
             background-color: #ffffff;
@@ -57,6 +55,63 @@
         header div { text-align: left; }
         header h1 { margin: 0; font-size: 1.2rem; font-weight: 700; }
         header p { margin: 0; font-size: 0.8rem; opacity: 0.9; }
+
+        /* SEARCH BAR */
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        .search-container input {
+            width: 100%;
+            padding: 10px 10px 10px 40px; /* Space for icon */
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+        .search-container input:focus {
+            box-shadow: 0 0 8px rgba(0, 90, 156, 0.2);
+            border-color: var(--primary-color);
+        }
+        .search-container i.fa-search {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        .search-container i.fa-times {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            cursor: pointer;
+            display: none;
+        }
+        .search-container input:not(:placeholder-shown) + i.fa-times {
+            display: block;
+        }
+
+        /* SORTABLE TABLE */
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 20px; /* Space for sort icon */
+        }
+        th.sortable:hover {
+            background-color: #e9ecef;
+        }
+        th.sortable .sort-icon {
+            margin-left: 5px;
+            font-size: 0.8em;
+            color: #888;
+        }
+        th.sortable.asc .sort-icon::before { content: "\f0de"; /* FontAwesome Up */ }
+        th.sortable.desc .sort-icon::before { content: "\f0dd"; /* FontAwesome Down */ }
+        th.sortable .sort-icon::before { content: "\f0dc"; /* FontAwesome Sort (default) */ }
+
 
         /* LOGIN PAGE */
         #login-page {
@@ -148,14 +203,12 @@
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: #555; }
         
-        /* GENERAL INPUT STYLING */
         input, select, textarea { 
             width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; 
             font-size: 1em; box-sizing: border-box; background-color: #fff;
         }
         input:focus { border-color: var(--primary-color); outline: none; }
 
-        /* FILE INPUT FIX */
         input[type="file"] {
             padding: 6px;
             background: #f9f9f9; 
@@ -177,17 +230,8 @@
         }
         
         .btn-submit {
-            width: 100%; padding: 15px; 
-            background-color: var(--success-color) !important;
-            color: white !important;
-            border: none; border-radius: 8px; 
-            font-weight: bold; font-size: 1.1em; 
-            cursor: pointer; margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
-        }
-        .btn-submit:hover {
-            background-color: #218838 !important;
-            transform: translateY(-1px);
+            width: 100%; padding: 12px; background: var(--success-color); color: white;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer;
         }
 
         /* Admin Styles */
@@ -201,7 +245,6 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
-        /* ROW COLORS FOR ADMIN TABLE - TARGET TD */
         tr.row-pending td { background-color: #fff9db !important; }
         tr.row-approved td { background-color: #e6fcf5 !important; }
         tr.row-rejected td { background-color: #fff5f5 !important; }
@@ -211,7 +254,6 @@
             background: white; cursor: pointer;
         }
 
-        /* Utils & Status */
         .hidden { display: none !important; }
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
         .st-active { background: #e6fcf5; color: #087f5b; }
@@ -327,10 +369,36 @@
                 <button class="tab-btn active" id="btn-tab-submissions" onclick="switchTab('submissions')">Data Pengajuan</button>
                 <button class="tab-btn" id="btn-tab-users" onclick="switchTab('users')">Manajemen User</button>
             </div>
+            
+            <!-- TAB SUBMISSIONS -->
             <div id="tab-submissions" class="admin-panel active">
-                <button onclick="fetchSubmissions(1)" class="btn-small">Refresh Data</button>
-                <div style="overflow-x:auto;"><table id="submissions-table"><thead></thead><tbody></tbody></table></div>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: center;">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Cari Nama/Nopol/Reg...">
+                        <i class="fas fa-times" id="clear-search" onclick="clearSearch()"></i>
+                    </div>
+                    
+                    <select id="status-filter" style="width: auto; flex-shrink: 0;" onchange="fetchSubmissions(1)">
+                        <option value="Semua">Semua Status</option>
+                        <option value="Belum diproses">Belum diproses</option>
+                        <option value="Selesai">Selesai</option>
+                        <option value="Ditolak">Ditolak</option>
+                    </select>
+                    
+                    <button onclick="fetchSubmissions(1)" class="btn-small" style="height: 42px;">Refresh</button>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table id="submissions-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="pagination-controls" style="margin-top:20px; text-align:center;"></div>
             </div>
+
+            <!-- TAB USERS -->
             <div id="tab-users" class="admin-panel">
                 <button onclick="fetchUsers()" class="btn-small">Refresh User</button>
                 <div style="overflow-x:auto;">
@@ -415,7 +483,6 @@
                 <small><strong>Mode Admin:</strong> Mengajukan atas nama <span id="sub-target-user"></span></small>
             </div>
             <form id="submissionForm">
-                <!-- UPDATE: FIELD HIDDEN EMAIL TARGET AGAR TIDAK KOSONG -->
                 <input type="hidden" id="sub-target-email-hidden">
 
                 <div class="form-group">
@@ -464,6 +531,11 @@
         let offlineTargetEmail = ''; 
         let offlineUserProfile = null;
         let currentFormStatus = 'ON';
+        
+        // Sorting & Searching State
+        let currentSortCol = '';
+        let currentSortDir = 'asc';
+        let searchTimeout = null;
 
         // --- SESSION PERSISTENCE (AUTO LOGIN) ---
         window.addEventListener('load', () => {
@@ -474,6 +546,17 @@
                 document.getElementById('login-page').classList.add('hidden');
                 currentUserEmail = savedEmail;
                 checkUserBackend(savedEmail, savedName);
+            }
+            
+            // Attach Search Debounce Listener
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        fetchSubmissions(1);
+                    }, 500); // 500ms Delay
+                });
             }
         });
 
@@ -642,25 +725,14 @@
         }
 
         function openSubmissionModal() {
-            // Tentukan target email & profil
             const isOfflineMode = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail);
             const targetProf = isOfflineMode ? offlineUserProfile : userProfile;
             const targetEmail = isOfflineMode ? offlineTargetEmail : currentUserEmail;
 
-            // SAFETY CHECK: Pastikan email target valid
-            if (!targetEmail) {
-                Swal.fire('Error Sistem', 'Gagal mendeteksi email pengguna. Silakan refresh halaman dan coba lagi.', 'error');
-                return;
-            }
+            if (!targetEmail) { Swal.fire('Error Sistem', 'Gagal mendeteksi email.', 'error'); return; }
+            if (!targetProf) { Swal.fire('Profil Belum Lengkap', 'Lengkapi profil dulu.', 'warning'); return; }
 
-            if (!targetProf) {
-                Swal.fire('Profil Belum Lengkap', 'Lengkapi profil dulu.', 'warning');
-                return;
-            }
-
-            // SIMPAN EMAIL TARGET KE HIDDEN INPUT
             document.getElementById('sub-target-email-hidden').value = targetEmail;
-
             document.getElementById('submission-modal').style.display = 'flex';
             
             const notice = document.getElementById('sub-admin-notice');
@@ -686,13 +758,8 @@
 
         document.getElementById('submissionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            // AMBIL EMAIL DARI HIDDEN INPUT (LEBIH STABIL)
             const finalTargetEmail = document.getElementById('sub-target-email-hidden').value;
-            if(!finalTargetEmail) {
-                Swal.fire('Error', 'Target email tidak ditemukan. Refresh halaman.', 'error');
-                return;
-            }
+            if(!finalTargetEmail) { Swal.fire('Error', 'Target email tidak ditemukan.', 'error'); return; }
 
             Swal.fire({ title: 'Mengirim...', didOpen: () => Swal.showLoading() });
             
@@ -824,11 +891,30 @@
         }
         
         async function fetchSubmissions(p) {
-            const res = await fetch(`${WEB_APP_URL}?action=getSubmissions&page=${p}`);
+            const search = document.getElementById('search-input').value;
+            const status = document.getElementById('status-filter').value;
+            
+            const res = await fetch(`${WEB_APP_URL}?action=getSubmissions&page=${p}&searchTerm=${encodeURIComponent(search)}&statusFilter=${encodeURIComponent(status)}&sortColumn=${currentSortCol}&sortDirection=${currentSortDir}`);
             const json = await res.json();
+            
             const tbody = document.querySelector('#submissions-table tbody');
+            const thead = document.querySelector('#submissions-table thead');
             tbody.innerHTML = '';
-            document.querySelector('#submissions-table thead').innerHTML = `<tr>${json.data.headers.map(h=>`<th>${h}</th>`).join('')}</tr>`;
+            
+            // Render Headers with Sort Icons
+            let headerHtml = '<tr>';
+            json.data.headers.forEach(h => {
+                let sortClass = 'sortable';
+                let sortIcon = '<i class="fas fa-sort sort-icon"></i>';
+                if (h === currentSortCol) {
+                    sortClass += currentSortDir === 'asc' ? ' asc' : ' desc';
+                    sortIcon = currentSortDir === 'asc' ? '<i class="fas fa-sort-up sort-icon"></i>' : '<i class="fas fa-sort-down sort-icon"></i>';
+                }
+                headerHtml += `<th class="${sortClass}" onclick="handleSort('${h}')">${h} ${sortIcon}</th>`;
+            });
+            headerHtml += '</tr>';
+            thead.innerHTML = headerHtml;
+
             json.data.pageData.forEach(r => {
                 const rowData = r.rowData;
                 const statusIdx = json.data.headers.indexOf('Status');
@@ -857,6 +943,28 @@
                 tr.innerHTML = rowHtml;
                 tbody.appendChild(tr);
             });
+            renderPagination(json.data.currentPage, json.data.totalPages);
+        }
+
+        function handleSort(colName) {
+            if (currentSortCol === colName) {
+                currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortCol = colName;
+                currentSortDir = 'asc';
+            }
+            fetchSubmissions(1);
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            fetchSubmissions(1);
+        }
+
+        function renderPagination(curr, total) {
+            const div = document.getElementById('pagination-controls');
+            if (total <= 1) { div.innerHTML = ''; return; }
+            div.innerHTML = `<button onclick="fetchSubmissions(${curr-1})" ${curr===1?'disabled':''}>Prev</button> <span>Halaman ${curr} dari ${total}</span> <button onclick="fetchSubmissions(${curr+1})" ${curr===total?'disabled':''}>Next</button>`;
         }
 
         async function updateSubStatus(st, idx, selectEl) {
