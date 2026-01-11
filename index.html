@@ -54,11 +54,17 @@
         #login-page {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center; z-index: 2000;
+            transition: opacity 0.5s ease;
         }
         .login-card {
             background: white; padding: 40px; border-radius: 20px;
             text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.3);
             width: 90%; max-width: 400px;
+        }
+
+        /* FIX: Memastikan SweetAlert selalu di atas Login Page */
+        .swal2-container {
+            z-index: 9999 !important;
         }
 
         /* DASHBOARD USER */
@@ -391,13 +397,28 @@
 
         // --- AUTH & INIT ---
         function handleCredentialResponse(response) {
+            // 1. SEMBUNYIKAN HALAMAN LOGIN SEGERA
+            document.getElementById('login-page').classList.add('hidden');
+
+            // 2. TAMPILKAN LOADING (Swal z-index sudah diset 9999)
+            Swal.fire({ 
+                title: 'Sedang Masuk...', 
+                text: 'Memverifikasi akun Anda...', 
+                allowOutsideClick: false, 
+                didOpen: () => Swal.showLoading() 
+            });
+
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
             currentUserEmail = payload.email;
             checkUserBackend(payload.email, payload.name);
         }
 
         async function checkUserBackend(email, googleName) {
-            Swal.fire({ title: 'Memuat Profil...', didOpen: () => Swal.showLoading() });
+            // Swal sudah loading dari handleCredentialResponse, tidak perlu fire lagi, 
+            // tapi jika dipanggil dari tempat lain, kita pastikan loading.
+            if (!Swal.isVisible()) {
+                Swal.fire({ title: 'Memuat Profil...', didOpen: () => Swal.showLoading() });
+            }
             
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${email}&name=${encodeURIComponent(googleName)}`);
@@ -405,10 +426,12 @@
                 Swal.close();
 
                 if (json.status === 'blocked') {
-                    Swal.fire('Ditolak', 'Akun diblokir.', 'error');
+                    Swal.fire('Ditolak', 'Akun diblokir.', 'error')
+                        .then(() => location.reload()); // Reload jika diblokir untuk reset view
                     return;
                 }
 
+                // Pastikan login page benar-benar hidden dan app muncul
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
 
@@ -426,7 +449,10 @@
                     }
                 }
             } catch (e) {
-                Swal.fire('Error', 'Gagal koneksi server.', 'error');
+                Swal.fire('Error', 'Gagal koneksi server.', 'error').then(() => {
+                    // Jika error koneksi, reload halaman agar user bisa coba lagi
+                    location.reload(); 
+                });
             }
         }
 
@@ -471,7 +497,7 @@
                 }
             } else {
                 // New Profile
-                document.getElementById('profForm').reset();
+                document.getElementById('profileForm').reset();
                 document.getElementById('prof-file').required = true;
             }
         }
