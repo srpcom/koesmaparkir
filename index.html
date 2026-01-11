@@ -68,7 +68,6 @@
             width: 90%; max-width: 400px;
         }
 
-        /* SweetAlert z-index fix */
         .swal2-container { z-index: 9999 !important; }
 
         /* DASHBOARD USER */
@@ -165,10 +164,10 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
-        /* ROW COLORS FOR ADMIN TABLE */
-        tr.row-pending { background-color: #fff9db !important; }
-        tr.row-approved { background-color: #e6fcf5 !important; }
-        tr.row-rejected { background-color: #fff5f5 !important; }
+        /* ROW COLORS FOR ADMIN TABLE - TARGET TD AGAR OVERRIDE EFEKTIF */
+        tr.row-pending td { background-color: #fff9db !important; } /* Kuning */
+        tr.row-approved td { background-color: #e6fcf5 !important; } /* Hijau */
+        tr.row-rejected td { background-color: #fff5f5 !important; } /* Merah */
         
         .status-select {
             padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold;
@@ -211,7 +210,6 @@
             <h2>Layanan Parkir</h2>
             <p>Silakan login untuk melanjutkan</p>
             
-            <!-- Tombol Google Login -->
             <div id="g_id_onload" 
                  data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com" 
                  data-callback="handleCredentialResponse" 
@@ -421,7 +419,6 @@
             const savedName = localStorage.getItem('userName');
 
             if (savedEmail && savedName) {
-                // Sembunyikan login page
                 document.getElementById('login-page').classList.add('hidden');
                 currentUserEmail = savedEmail;
                 checkUserBackend(savedEmail, savedName);
@@ -433,7 +430,6 @@
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
             currentUserEmail = payload.email;
             
-            // Simpan ke storage
             localStorage.setItem('userEmail', payload.email);
             localStorage.setItem('userName', payload.name);
             
@@ -448,7 +444,7 @@
                 Swal.close();
                 
                 if (json.status === 'blocked') {
-                    localStorage.clear(); // Bersihkan sesi
+                    localStorage.clear();
                     Swal.fire('Ditolak', 'Akun diblokir.', 'error').then(() => location.reload());
                     return;
                 }
@@ -468,7 +464,7 @@
                 }
             } catch (e) {
                 Swal.fire('Error', 'Gagal koneksi server.', 'error').then(() => {
-                    localStorage.clear(); // Reset sesi jika error
+                    localStorage.clear();
                     location.reload();
                 });
             }
@@ -681,7 +677,6 @@
             badge.textContent = currentUserRole;
             badge.className = `role-badge ${currentUserRole === 'SUPERADMIN' ? 'role-super' : 'role-admin'}`;
             
-            // Check last active tab
             const lastTab = localStorage.getItem('lastAdminTab') || 'submissions';
             switchTab(lastTab);
         }
@@ -691,7 +686,6 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${t}`).classList.add('active');
             
-            // Activate button style
             if(t === 'submissions') document.getElementById('btn-tab-submissions').classList.add('active');
             if(t === 'users') document.getElementById('btn-tab-users').classList.add('active');
 
@@ -767,6 +761,8 @@
                     const email = u[0]; const name = u[1]; const role = u[2]; const status = u[3];
                     const isSuper = role === 'SUPERADMIN'; const isBlocked = status === 'BLOCKED';
                     let actions = '';
+                    
+                    // Logic tombol hanya untuk SUPERADMIN
                     if (currentUserRole === 'SUPERADMIN') {
                         if (!isSuper) {
                              if (role === 'USER') actions += `<button class="btn-action btn-promote" onclick="changeRole('${email}', 'ADMIN')">Jadikan Admin</button>`;
