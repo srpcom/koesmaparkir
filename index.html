@@ -44,7 +44,7 @@
         /* Container Full Screen (Admin View) */
         .container.admin-mode {
             max-width: 100%; width: 100%; margin: 0; border-radius: 0; min-height: 100vh;
-            background-color: #ffffff; /* UPDATE: Putih Solid tanpa transparansi */
+            background-color: #ffffff;
         }
 
         header { 
@@ -85,11 +85,15 @@
         .user-info h3 { margin: 0; font-size: 1.1em; color: var(--primary-dark); }
         .user-info span { font-size: 0.85em; color: #666; }
         
-        .action-buttons { display: flex; gap: 10px; }
-        .btn-small { padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 0.9em; transition: 0.2s; }
+        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .btn-small { padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 0.9em; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
         .btn-small:hover { background: #f0f0f0; }
         .btn-logout { color: var(--error-color); border-color: #ffdce0; background: #fff0f1; }
         .btn-edit-profile { color: var(--primary-color); border-color: #d0ebff; background: #e7f5ff; }
+        
+        /* TOMBOL STATUS FORMULIR ADMIN */
+        .btn-status-on { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .btn-status-off { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
 
         .dashboard-content { padding: 25px; }
         .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; border-left: 4px solid var(--primary-color); padding-left: 10px; color: #444; }
@@ -143,11 +147,34 @@
         form { padding: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: #555; }
+        
+        /* GENERAL INPUT STYLING */
         input, select, textarea { 
             width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; 
             font-size: 1em; box-sizing: border-box;
         }
         input:focus { border-color: var(--primary-color); outline: none; }
+
+        /* FILE INPUT FIX */
+        input[type="file"] {
+            padding: 6px;
+            background: #f9f9f9; 
+            cursor: pointer;
+        }
+        input[type="file"]::file-selector-button {
+            margin-right: 15px;
+            border: none;
+            background: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background .2s ease-in-out;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background: var(--primary-dark);
+        }
         
         .btn-submit {
             width: 100%; padding: 12px; background: var(--success-color); color: white;
@@ -165,10 +192,10 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
-        /* ROW COLORS FOR ADMIN TABLE - TARGET TD AGAR OVERRIDE EFEKTIF */
-        tr.row-pending td { background-color: #fff9db !important; } /* Kuning */
-        tr.row-approved td { background-color: #e6fcf5 !important; } /* Hijau */
-        tr.row-rejected td { background-color: #fff5f5 !important; } /* Merah */
+        /* ROW COLORS FOR ADMIN TABLE - TARGET TD */
+        tr.row-pending td { background-color: #fff9db !important; }
+        tr.row-approved td { background-color: #e6fcf5 !important; }
+        tr.row-rejected td { background-color: #fff5f5 !important; }
         
         .status-select {
             padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold;
@@ -211,7 +238,6 @@
             <h2>Layanan Parkir</h2>
             <p>Silakan login untuk melanjutkan</p>
             
-            <!-- Tombol Google Login -->
             <div id="g_id_onload" 
                  data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com" 
                  data-callback="handleCredentialResponse" 
@@ -277,9 +303,14 @@
                     <h3 style="color:#00487a">Dashboard Admin</h3>
                     <span id="admin-role-badge" class="role-badge role-admin">ADMIN</span>
                 </div>
-                <div style="display:flex; gap:5px;">
+                <div class="action-buttons">
+                    <!-- Tombol Toggle Status Formulir -->
+                    <button id="btn-toggle-status" class="btn-small btn-status-on" onclick="toggleFormStatus()">
+                        <i class="fas fa-toggle-on"></i> Formulir: Loading...
+                    </button>
+                    
                     <button class="btn-small btn-edit-profile" onclick="openAdminOfflineInput()">
-                        <i class="fas fa-keyboard"></i> Input Pengajuan Offline
+                        <i class="fas fa-keyboard"></i> Input Offline
                     </button>
                     <button class="btn-small btn-logout" onclick="handleLogout()">Keluar</button>
                 </div>
@@ -414,6 +445,7 @@
         let currentUserRole = 'USER';
         let offlineTargetEmail = ''; 
         let offlineUserProfile = null;
+        let currentFormStatus = 'ON';
 
         // --- SESSION PERSISTENCE (AUTO LOGIN) ---
         window.addEventListener('load', () => {
@@ -681,6 +713,48 @@
             
             const lastTab = localStorage.getItem('lastAdminTab') || 'submissions';
             switchTab(lastTab);
+            
+            loadFormStatus(); // Load Status Form
+        }
+
+        async function loadFormStatus() {
+            try {
+                const res = await fetch(`${WEB_APP_URL}?action=getSettings`);
+                const json = await res.json();
+                if(json.status === 'success') {
+                    currentFormStatus = json.data.formStatus;
+                    updateStatusButton();
+                }
+            } catch(e) {}
+        }
+
+        function updateStatusButton() {
+            const btn = document.getElementById('btn-toggle-status');
+            if(currentFormStatus === 'ON') {
+                btn.className = 'btn-small btn-status-on';
+                btn.innerHTML = '<i class="fas fa-toggle-on"></i> Formulir: BUKA';
+            } else {
+                btn.className = 'btn-small btn-status-off';
+                btn.innerHTML = '<i class="fas fa-toggle-off"></i> Formulir: TUTUP';
+            }
+        }
+
+        async function toggleFormStatus() {
+            const newStatus = currentFormStatus === 'ON' ? 'OFF' : 'ON';
+            const action = newStatus === 'ON' ? 'Membuka' : 'Menutup';
+            const confirm = await Swal.fire({ title: `Formulir ${newStatus === 'ON' ? 'Dibuka' : 'Ditutup'}?`, text: `Anda akan ${action.toLowerCase()} akses formulir.`, icon: 'question', showCancelButton: true });
+            
+            if(confirm.isConfirmed) {
+                Swal.showLoading();
+                const res = await fetch(`${WEB_APP_URL}?action=updateSettings&formStatus=${newStatus}`);
+                const json = await res.json();
+                Swal.close();
+                if(json.status === 'success') {
+                    currentFormStatus = newStatus;
+                    updateStatusButton();
+                    Swal.fire('Berhasil', `Formulir sekarang ${newStatus === 'ON' ? 'DIBUKA' : 'DITUTUP'}`, 'success');
+                } else { Swal.fire('Gagal', 'Update status gagal', 'error'); }
+            }
         }
 
         function switchTab(t) {
