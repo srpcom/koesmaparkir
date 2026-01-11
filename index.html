@@ -138,10 +138,9 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
-        /* ROW COLORS FOR ADMIN TABLE - UPDATED FOR BETTER VISIBILITY */
-        tr.row-pending td { background-color: #ffeeb0 !important; color: #664d03; } /* Kuning Lebih Terang */
-        tr.row-approved td { background-color: #b8e6bf !important; color: #0f5132; } /* Hijau Lebih Jelas */
-        tr.row-rejected td { background-color: #f5c2c7 !important; color: #842029; } /* Merah Lebih Jelas */
+        tr.row-pending td { background-color: #fff9db !important; }
+        tr.row-approved td { background-color: #e6fcf5 !important; }
+        tr.row-rejected td { background-color: #fff5f5 !important; }
         
         .status-select { padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold; background: white; cursor: pointer; }
         .hidden { display: none !important; }
@@ -489,12 +488,12 @@
                     </div>
                     <div class="form-group">
                         <label>Nomor Polisi (Baru)</label>
-                        <input type="text" id="sub-nopol-baru" style="text-transform:uppercase;" placeholder="CTH: S 1234 XX">
+                        <input type="text" id="sub-nopol-baru" style="text-transform:uppercase;" placeholder="CTH: S1234XX">
                     </div>
                 </div>
                 <div id="sub-kendaraan-lama" class="hidden form-group">
                     <label id="lbl-nopol-lama">Nomor Polisi Lama</label>
-                    <input type="text" id="sub-nopol-lama" style="text-transform:uppercase;">
+                    <input type="text" id="sub-nopol-lama" style="text-transform:uppercase;" placeholder="CTH: S1234XX">
                 </div>
                 <div class="form-group">
                     <label>Keterangan Tambahan</label>
@@ -517,6 +516,19 @@
         let currentFormStatus = 'ON';
         let currentSortCol = '', currentSortDir = 'asc', searchTimeout = null;
 
+        // FUNGSI VALIDASI NOPOL OTOMATIS
+        function setupNopolFormatter(inputId) {
+            const el = document.getElementById(inputId);
+            if(el) {
+                el.addEventListener('input', function(e) {
+                    // Ambil value, ubah ke uppercase, hapus semua karakter kecuali huruf dan angka
+                    let val = this.value.toUpperCase();
+                    val = val.replace(/[^A-Z0-9]/g, ''); 
+                    this.value = val;
+                });
+            }
+        }
+
         window.addEventListener('load', () => {
             const savedEmail = localStorage.getItem('userEmail');
             const savedName = localStorage.getItem('userName');
@@ -536,6 +548,10 @@
                     }, 500); 
                 });
             }
+
+            // Setup Nopol Formatters
+            setupNopolFormatter('sub-nopol-baru');
+            setupNopolFormatter('sub-nopol-lama');
         });
 
         function handleCredentialResponse(response) {
