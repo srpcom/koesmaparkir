@@ -10,714 +10,640 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Library Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <!-- SweetAlert2 (Notifikasi Keren) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
             --primary-color: #005A9C; 
             --primary-dark: #00487a;
-            --secondary-color: #F0F8FF; 
-            --text-color: #333; 
-            --success-color: #28a745; 
-            --error-color: #dc3545;
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.4);
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --accent-color: #00b4d8;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --border-radius: 12px;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            font-family: var(--font-family); 
             background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg'); 
             background-size: cover; 
             background-position: center; 
             background-attachment: fixed; 
-            color: var(--text-color); 
-            margin: 0; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            color: #333; margin: 0; min-height: 100vh;
+            display: flex; flex-direction: column;
         }
 
-        /* Overlay gelap untuk background agar text lebih terbaca */
         body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.1);
-            z-index: -1;
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); z-index: -1;
         }
 
         .container { 
-            max-width: 800px; 
-            width: 95%; 
-            margin: 30px auto; 
+            max-width: 900px; width: 95%; margin: 30px auto; 
             background-color: var(--glass-bg); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px); 
-            border-radius: 16px; 
-            box-shadow: var(--shadow); 
-            border: 1px solid var(--glass-border); 
+            border-radius: var(--border-radius); 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
             overflow: hidden;
-            animation: fadeIn 0.5s ease-out;
+            animation: slideUp 0.5s ease-out;
+            position: relative;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- LOGIN PAGE STYLE --- */
-        #login-page {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            width: 100%;
-            position: fixed;
-            top: 0; left: 0;
-            z-index: 2000;
-            background: rgba(0,90,156, 0.1);
-            backdrop-filter: blur(5px);
-        }
-
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 400px;
-            width: 90%;
-        }
-
-        .login-card img {
-            width: 80px;
-            margin-bottom: 20px;
-        }
-
-        .login-card h2 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        
-        .login-card p {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 0.95em;
-        }
-
-        /* --- HEADER & FORM --- */
+        /* --- HEADER --- */
         header { 
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); 
-            color: white; 
-            padding: 25px; 
-            text-align: center; 
+            color: white; padding: 20px; text-align: center; 
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+        }
+        header img { width: 50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+        header div { text-align: left; }
+        header h1 { margin: 0; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        header p { margin: 0; font-size: 0.8rem; opacity: 0.9; }
+
+        /* --- LOGIN PAGE --- */
+        #login-page {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000;
+        }
+        .login-card {
+            background: white; padding: 40px; border-radius: 20px;
+            text-align: center; box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+            width: 90%; max-width: 400px;
+        }
+        .login-card h2 { color: var(--primary-color); margin: 15px 0 5px; }
+        
+        /* --- USER DASHBOARD --- */
+        .dashboard-header {
+            padding: 15px 25px; background: #fff; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .user-welcome h3 { margin: 0; color: var(--primary-color); }
+        .user-welcome span { font-size: 0.9em; color: #666; }
+        .btn-logout { 
+            background: #ffebee; color: var(--error-color); border: none; 
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: 600; 
+            transition: 0.2s;
+        }
+        .btn-logout:hover { background: #ffcdd2; }
+
+        .dashboard-content { padding: 25px; }
+        
+        .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; border-left: 4px solid var(--primary-color); padding-left: 10px; color: #444; }
+
+        /* Kendaraanku Grid */
+        .vehicle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .vehicle-card {
+            background: white; border: 1px solid #eee; border-radius: 10px; padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; position: relative; overflow: hidden;
+        }
+        .vehicle-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .vehicle-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%;
+            background: var(--primary-color);
+        }
+        .v-nopol { font-size: 1.4em; font-weight: 800; color: #333; margin-bottom: 5px; display: block; }
+        .v-info { font-size: 0.9em; color: #666; display: block; margin-bottom: 5px; }
+        .v-status { 
+            display: inline-block; padding: 3px 10px; border-radius: 12px; 
+            font-size: 0.75em; font-weight: bold; text-transform: uppercase; 
         }
         
-        header .logo-image { width: 60px; margin-bottom: 10px; }
-        header h1 { margin: 0; font-size: 1.4em; letter-spacing: 0.5px; }
-        header p { margin: 5px 0 0; font-size: 0.9em; opacity: 0.9; }
-
-        .user-info-bar {
-            background-color: #e3f2fd;
-            color: var(--primary-dark);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9em;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+        /* Button Ajukan */
+        .btn-float-add {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; background: var(--primary-color); color: white;
+            padding: 15px; border-radius: 10px; border: none;
+            font-size: 1.1em; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,90,156, 0.3); transition: 0.2s;
         }
+        .btn-float-add:hover { background: var(--primary-dark); transform: translateY(-2px); }
 
-        .logout-link {
-            color: var(--error-color);
-            text-decoration: underline;
-            cursor: pointer;
-            font-weight: bold;
+        /* --- MODAL FORM --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2500;
+            display: none; justify-content: center; align-items: flex-start;
+            overflow-y: auto; padding: 20px 0;
         }
-
+        .modal-content {
+            background: white; width: 95%; max-width: 700px;
+            border-radius: 15px; overflow: hidden; animation: zoomIn 0.3s;
+            margin: auto; position: relative;
+        }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header {
+            background: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .btn-close { background: none; border: none; font-size: 1.5em; cursor: pointer; color: #666; }
+        
         form { padding: 25px; }
-
-        fieldset { 
-            border: 1px solid #e0e0e0; 
-            border-radius: 10px; 
-            padding: 20px; 
-            margin-bottom: 25px; 
-            background-color: rgba(255, 255, 255, 0.6); 
-        }
-
-        legend { 
-            font-weight: bold; 
-            color: var(--primary-color); 
-            padding: 5px 15px; 
-            background: #fff; 
-            border-radius: 20px; 
-            border: 1px solid #eee;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95em; color: #444; }
-        
-        input[type="text"], input[type="tel"], select, textarea, input[type="file"] { 
-            width: 100%; 
-            padding: 12px 15px; 
-            border: 1px solid #ccc; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 15px; 
-            background-color: #fff;
-            transition: border-color 0.3s;
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9em; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; 
+            font-size: 1em; box-sizing: border-box;
         }
+        input:focus { border-color: var(--primary-color); outline: none; }
         
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(0,90,156, 0.1);
+        .radio-group label {
+            display: flex; align-items: center; padding: 10px; border: 1px solid #eee;
+            border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .radio-group label:hover { background: #f0f7ff; }
+        .radio-group label.selected-label { background: #e3f2fd; border-color: var(--primary-color); color: var(--primary-color); font-weight: bold; }
+        .radio-group input { margin-right: 10px; width: auto; }
+
+        .btn-submit {
+            width: 100%; padding: 15px; background: var(--success-color); color: white;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer;
         }
 
-        /* Custom Radio Buttons */
-        .radio-group { display: flex; flex-direction: column; gap: 10px; }
-        .radio-group label { 
-            display: flex; 
-            align-items: center; 
-            margin: 0; 
-            padding: 10px 15px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        /* --- ADMIN DASHBOARD --- */
+        .admin-tabs { display: flex; border-bottom: 1px solid #ddd; background: white; }
+        .tab-btn { flex: 1; padding: 15px; border: none; background: none; cursor: pointer; font-weight: 600; border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--primary-color); border-bottom-color: var(--primary-color); background: #f8f9fa; }
         
-        .radio-group label:hover { background: #f8f9fa; }
-        .radio-group label.selected-label { 
-            background: #e3f2fd; 
-            border-color: var(--primary-color); 
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-        .radio-group input { margin-right: 12px; accent-color: var(--primary-color); width: 18px; height: 18px; }
+        .admin-panel { display: none; padding: 20px; background: white; }
+        .admin-panel.active { display: block; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th { background: #f1f3f5; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .st-active { background: #e6fcf5; color: #087f5b; }
+        .st-blocked { background: #fff5f5; color: #c92a2a; }
 
-        button { 
-            width: 100%; 
-            padding: 16px; 
-            background-color: var(--primary-color); 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 1.1em; 
-            font-weight: bold; 
-            cursor: pointer; 
-            box-shadow: 0 4px 6px rgba(0,90,156, 0.2);
-            transition: all 0.3s; 
-        }
-        
-        button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
-        
+        .btn-action { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; font-size: 0.8em; }
+        .btn-block { background: #ffc9c9; color: #c92a2a; }
+        .btn-unblock { background: #b2f2bb; color: #2b8a3e; }
+
+        /* --- UTILS --- */
         .hidden { display: none !important; }
-
-        /* Status Colors & Admin Table */
-        .status-pending { background-color: #fffbe6; color: #d48806; border: 1px solid #ffe58f; }
-        .status-selesai { background-color: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
-        .status-ditolak { background-color: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
-
-        /* Admin Dashboard Specifics */
-        .admin-view body { background: #f0f2f5; padding: 0; }
-        #admin-dashboard .container { max-width: 100%; margin: 0; border-radius: 0; height: 100vh; display: flex; flex-direction: column; }
-        .admin-content { flex: 1; padding: 20px; overflow-y: auto; }
-        
-        #submissions-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; background: white; }
-        #submissions-table th { background-color: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
-        #submissions-table td { padding: 12px; border-bottom: 1px solid #eee; }
-        
-        /* Loading Overlay */
-        .overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background-color: rgba(0,0,0,0.7); z-index: 3000; 
-            display: none; justify-content: center; align-items: center; 
-            backdrop-filter: blur(5px); flex-direction: column;
-        }
-        .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .overlay p { color: white; margin-top: 15px; font-weight: bold; }
 
-        /* Mobile Responsiveness */
+        /* Mobile Adjustments */
         @media (max-width: 768px) {
-            .container { width: 100%; margin: 0; border-radius: 0; border: none; }
-            #admin-dashboard .container { height: auto; min-height: 100vh; }
-            #submissions-table thead { display: none; }
-            #submissions-table tr { display: block; margin-bottom: 15px; border: 1px solid #eee; border-radius: 8px; background: white; padding: 10px; }
-            #submissions-table td { display: flex; justify-content: space-between; text-align: right; border: none; border-bottom: 1px solid #f0f0f0; padding: 8px 0; }
-            #submissions-table td::before { content: attr(data-label); font-weight: bold; color: #555; text-align: left; margin-right: 10px; }
+            .container { width: 100%; margin: 0; border-radius: 0; box-shadow: none; }
+            .dashboard-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .btn-logout { width: 100%; text-align: center; }
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr { border: 1px solid #eee; margin-bottom: 10px; padding: 10px; border-radius: 8px; }
+            td { display: flex; justify-content: space-between; border: none; padding: 5px 0; }
+            td::before { content: attr(data-label); font-weight: bold; color: #777; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. HALAMAN LOGIN SSO -->
+    <!-- LOGIN PAGE -->
     <div id="login-page">
         <div class="login-card">
-            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD">
-            <h2>Selamat Datang</h2>
-            <p>Silakan login menggunakan akun Google Anda untuk mengakses Layanan Parkir.</p>
-            
-            <!-- Google Sign-In Button Container -->
-            <div id="g_id_onload"
-                 data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com"
-                 data-callback="handleCredentialResponse"
-                 data-auto_prompt="false">
+            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo">
+            <h2>Layanan Parkir</h2>
+            <p>Silakan login menggunakan akun Google Anda.</p>
+            <div id="g_id_onload" data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="pill" data-logo_alignment="left"></div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app-container" class="container hidden">
+        
+        <!-- HEADER -->
+        <header>
+            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo">
+            <div>
+                <h1>Layanan Parkir</h1>
+                <p>RSUD dr. R. KOESMA TUBAN</p>
             </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="outline"
-                 data-text="sign_in_with"
-                 data-shape="pill"
-                 data-logo_alignment="left">
+        </header>
+
+        <!-- USER DASHBOARD -->
+        <div id="user-dashboard">
+            <div class="dashboard-header">
+                <div class="user-welcome">
+                    <h3>Halo, <span id="display-name">User</span></h3>
+                    <span id="display-email">email@example.com</span>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+            </div>
+
+            <div class="dashboard-content">
+                <div class="section-title"><i class="fas fa-car"></i> Kendaraanku</div>
+                
+                <!-- Loading State -->
+                <div id="loading-vehicles" class="spinner"></div>
+                
+                <!-- List Kendaraan -->
+                <div id="vehicle-list" class="vehicle-grid">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <div id="empty-state" class="hidden" style="text-align: center; color: #777; margin-bottom: 20px;">
+                    <i class="fas fa-clipboard-list" style="font-size: 3em; color: #ddd;"></i>
+                    <p>Belum ada riwayat pengajuan.</p>
+                </div>
+
+                <button class="btn-float-add" onclick="openFormModal()">
+                    <i class="fas fa-plus-circle"></i> Ajukan Layanan Parkir
+                </button>
+            </div>
+        </div>
+
+        <!-- ADMIN DASHBOARD (Hidden by default) -->
+        <div id="admin-dashboard" class="hidden">
+            <div class="dashboard-header" style="background: #e3f2fd;">
+                <div class="user-welcome">
+                    <h3 style="color:var(--primary-dark)">Administrator Mode</h3>
+                    <span>Superadmin Access</span>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">Keluar</button>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchAdminTab('submissions')">Data Pengajuan</button>
+                <button class="tab-btn" onclick="switchAdminTab('users')">Manajemen Pengguna</button>
+            </div>
+
+            <!-- TAB 1: SUBMISSIONS -->
+            <div id="tab-submissions" class="admin-panel active">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <input type="text" id="search-input" placeholder="Cari Nama/Nopol..." style="padding:10px; flex:1; border:1px solid #ddd; border-radius:5px;">
+                    <select id="status-filter" style="width:auto; padding:10px;">
+                        <option value="Semua">Semua Status</option>
+                        <option value="Belum diproses">Belum diproses</option>
+                        <option value="Selesai">Selesai</option>
+                    </select>
+                    <button onclick="fetchPage(1)" style="padding:10px 20px; background:var(--primary-color); color:white; border:none; border-radius:5px; cursor:pointer;">Cari</button>
+                    <button onclick="downloadExcel()" style="padding:10px; background:green; color:white; border:none; border-radius:5px; cursor:pointer;"><i class="fas fa-file-excel"></i></button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="submissions-table">
+                        <thead></thead><tbody></tbody>
+                    </table>
+                </div>
+                <div id="pagination-controls" style="margin-top:20px; text-align:center;"></div>
+            </div>
+
+            <!-- TAB 2: USER MANAGEMENT -->
+            <div id="tab-users" class="admin-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3>Daftar Pengguna Login</h3>
+                    <button onclick="fetchUsersList()" style="padding:5px 10px; font-size:0.8em; cursor:pointer;">Refresh</button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table id="users-table">
+                        <thead><tr><th>Email</th><th>Nama</th><th>Status</th><th>Last Login</th><th>Aksi</th></tr></thead>
+                        <tbody><tr><td colspan="5" style="text-align:center;">Memuat...</td></tr></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 2. LOADING OVERLAY -->
-    <div id="loading-overlay" class="overlay">
-        <div class="spinner"></div>
-        <p>Memproses data...</p>
-    </div>
-
-    <!-- 3. HALAMAN USER FORMULIR -->
-    <div id="main-form-container" class="hidden">
-         <div class="container">
-            <header>
-                <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo" class="logo-image">
-                <h1>FORMULIR LAYANAN PARKIR</h1>
-                <p>RSUD dr. R. KOESMA TUBAN</p>
-            </header>
+    <!-- MODAL FORMULIR PENGAJUAN -->
+    <div id="form-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0">Formulir Pengajuan</h3>
+                <button class="btn-close" onclick="closeFormModal()">&times;</button>
+            </div>
             
-            <div class="user-info-bar">
-                <span id="user-display-name">Halo, User</span>
-                <span class="logout-link" onclick="handleLogout()">Keluar</span>
-            </div>
-
-            <div id="form-closed-message" class="hidden" style="text-align: center; padding: 40px;">
-                <h2 style="color: var(--error-color);">Formulir Ditutup</h2>
-                <p>Mohon maaf, saat ini formulir sedang ditutup sementara oleh administrator.</p>
-            </div>
-
             <form id="parkingForm" novalidate>
-                <!-- Field hidden untuk menyimpan email SSO -->
                 <input type="hidden" id="emailAkunGoogle" name="emailAkunGoogle">
 
-                <!-- STEP 1: INFORMASI KARYAWAN (Wajib Diisi Pertama Kali) -->
-                <fieldset>
-                    <legend>Informasi Karyawan</legend>
-                    <div style="background-color: #e8f4fc; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; border-left: 4px solid var(--primary-color);">
-                        <strong>Info:</strong> Mohon lengkapi data diri Anda dengan benar. Data ini akan digunakan untuk verifikasi parkir.
-                    </div>
+                <!-- INFORMASI KARYAWAN -->
+                <div style="background:#e8f4fc; padding:15px; border-radius:8px; margin-bottom:20px; font-size:0.9em;">
+                    <i class="fas fa-info-circle"></i> Pastikan data diri sesuai KTP.
+                </div>
 
-                    <div class="form-group">
-                        <label for="namaLengkap">Nama Lengkap</label>
-                        <input type="text" id="namaLengkap" name="namaLengkap" required placeholder="Sesuai KTP">
-                    </div>
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="namaLengkap" name="namaLengkap" required>
+                </div>
 
-                    <div class="form-group">
-                        <label>Status Kepegawaian</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="statusKepegawaian" value="Karyawan RSUD" onchange="handleStatusKepegawaianChange(); handleRadioStyle(this);" required> Karyawan RSUD dr. R Koesma</label>
-                            <label><input type="radio" name="statusKepegawaian" value="Pihak Ketiga" onchange="handleStatusKepegawaianChange(); handleRadioStyle(this);" required> Lainnya / Pihak Ketiga</label>
-                        </div>
+                <div class="form-group">
+                    <label>Status Kepegawaian</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="statusKepegawaian" value="Karyawan RSUD" onchange="togglePegawai(this); styleRadio(this)" required> Karyawan RSUD</label>
+                        <label><input type="radio" name="statusKepegawaian" value="Pihak Ketiga" onchange="togglePegawai(this); styleRadio(this)" required> Pihak Ketiga / Lainnya</label>
                     </div>
+                </div>
 
-                    <!-- Pilihan Unit Kerja (Sama seperti sebelumnya) -->
-                    <div id="rsud-employee-section" class="hidden">
-                        <div class="form-group">
-                            <label for="unitKerja">Unit / Bagian Kerja</label>
-                            <select id="unitKerja" name="unitKerja" onchange="handleUnitKerjaChange(this)">
-                                <option value="">-- Pilih Unit --</option>
-                                <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
-                                <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
-                                <option value="INSTALASI BEDAH SENTRAL">INSTALASI BEDAH SENTRAL</option>
-                                <option value="INSTALASI GAWAT DARURAT">INSTALASI GAWAT DARURAT</option>
-                                <option value="ICU">ICU</option>
-                                <option value="ICCU">ICCU</option>
-                                <option value="HCU">HCU</option>
-                                <option value="INSTALASI LABORATORIUM">INSTALASI LABORATORIUM</option>
-                                <option value="INSTALASI HEMODIALISA">INSTALASI HEMODIALISA</option>
-                                <option value="INSTALASI GIZI">INSTALASI GIZI</option>
-                                <option value="INSTALASI REKAM MEDIK">INSTALASI REKAM MEDIK</option>
-                                <option value="INSTALASI PEMELIHARAAN SARANA">INSTALASI PEMELIHARAAN SARANA</option>
-                                <option value="INSTALASI PENYEHATAN LINGKUNGAN">INSTALASI PENYEHATAN LINGKUNGAN</option>
-                                <option value="INSTALASI FORENSIK DAN MEDIKOLEGAL">INSTALASI FORENSIK DAN MEDIKOLEGAL</option>
-                                <option value="INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER">INSTALASI DIAGNOSTIK DAN INTERVENSI KORDIOVASKULER</option>
-                                <option value="INSTALASI MATERNAL DAN PERINATAL">INSTALASI MATERNAL DAN PERINATAL</option>
-                                <option value="INSTALASI REHABILITASI MEDIK">INSTALASI REHABILITASI MEDIK</option>
-                                <option value="INSTALASI SIM RS">INSTALASI SIM RS</option>
-                                <option value="INSTALASI PKRS">INSTALASI PKRS</option>
-                                <option value="POLI KIR">POLI KIR</option>
-                                <option value="POLI EKSKUTIF">POLI EKSKUTIF</option>
-                                <option value="POLI TMS">POLI TMS</option>
-                                <option value="POLI EEG">POLI EEG</option>
-                                <option value="POLI ENDOSKOPI">POLI ENDOSKOPI</option>
-                                <option value="POLI ESWL">POLI ESWL</option>
-                                <option value="RUANG MAWAR/ASTER">RUANG MAWAR/ASTER</option>
-                                <option value="RUANG ANYELIR/MELATI">RUANG ANYELIR/MELATI</option>
-                                <option value="RUANG ANGGREK/DAHLIA">RUANG ANGGREK/DAHLIA</option>
-                                <option value="RUANG BOUGENVILLE">RUANG BOUGENVILLE</option>
-                                <option value="RUANG TERATAI/ASOKA">RUANG TERATAI/ASOKA</option>
-                                <option value="RUANG LILY">RUANG LILY</option>
-                                <option value="RUANG FLAMBOYAN">RUANG FLAMBOYAN</option>
-                                <option value="POLI ANAK">POLI ANAK</option>
-                                <option value="POLI PENYAKIT DALAM">POLI PENYAKIT DALAM</option>
-                                <option value="POLI BEDAH">POLI BEDAH</option>
-                                <option value="POLI MATA">POLI MATA</option>
-                                <option value="POLI THT">POLI THT</option>
-                                <option value="POLI SYARAF">POLI SYARAF</option>
-                                <option value="POLI JANTUNG">POLI JANTUNG</option>
-                                <option value="POLI PARU">POLI PARU</option>
-                                <option value="POLI GIGI">POLI GIGI</option>
-                                <option value="POLI KULIT DAN KELAMIN">POLI KULIT DAN KELAMIN</option>
-                                <option value="POLI JIWA">POLI JIWA</option>
-                                <option value="POLI TB">POLI TB</option>
-                                <option value="POLI VCT">POLI VCT</option>
-                                <option value="POLI UMUM">POLI UMUM</option>
-                                <option value="POLI GERIATRI">POLI GERIATRI</option>
-                                <option value="POLI UROLOGI">POLI UROLOGI</option>
-                                <option value="POLI ORTHOPEDI">POLI ORTHOPEDI</option>
-                                <option value="POLI OBSGYN">POLI OBSGYN</option>
-                                <option value="POLI BEDAH SYARAF">POLI BEDAH SYARAF</option>
-                                <option value="BAGIAN PROGPEL">BAGIAN PROGPEL</option>
-                                <option value="BAGIAN KEUANGAN">BAGIAN KEUANGAN</option>
-                                <option value="BAGIAN ADMINISTRASI DAN UMUM">BAGIAN ADMINISTRASI DAN UMUM</option>
-                                <option value="BIDANG PELAYANAN MEDIK">BIDANG PELAYANAN MEDIK</option>
-                                <option value="BIDANG KEPERAWATAN">BIDANG KEPERAWATAN</option>
-                                <option value="BIDANG PELAYANAN PENUNJANG">BIDANG PENUNJANG</option>
-                                <option value="KOMITE MEDIK">KOMITE MEDIK</option>
-                                <option value="KOMITE KEPERAWATAN">KOMITE KEPERAWATAN</option>
-                                <option value="KOMITE PPI">KOMITE PPI</option>
-                                <option value="KOMITE KESEHATAN DAN KESELAMATAN KERJA">KOMITE KESEHATAN DAN KESELAMATAN KERJA</option>
-                                <option value="SATUAN PEMERIKSAAN INTERNAL">SATUAN PEMERIKSAAN INTERNAL</option>
-                                <option value="UNIT AMBULAN">UNIT AMBULAN</option>
-                                <option value="UNIT LOUNDRY">UNIT LOUNDRY</option>
-                                <option value="UNIT CSSD">UNIT CSSD</option>
-                                <option value="UNIT PENGADUAN">UNIT PENGADUAN</option>
-                                <option value="UNIT DIKLAT">UNIT DIKLAT</option>
-                                <option value="UNIT KLAIM DAN PENJAMINAN">UNIT KLAIM DAN PENJAMINAN</option>
-                                <option value="LAINNYA">Lainnya...</option>
-                            </select>
-                        </div>
-                        <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
-                    </div>
-                    <div id="other-employee-section" class="hidden">
-                        <div class="form-group"><label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label><input type="text" id="afiliasiLainnya" name="afiliasiLainnya"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="telepon">Nomor Telepon / WA (Aktif)</label>
-                        <input type="tel" id="telepon" name="telepon" required placeholder="08xxxxxxxxxx">
-                    </div>
-                    <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
-                </fieldset>
+                <div id="rsud-section" class="hidden form-group">
+                    <label>Unit Kerja</label>
+                    <select id="unitKerja" name="unitKerja" onchange="checkUnitLainnya(this)">
+                        <option value="">-- Pilih Unit --</option>
+                        <option value="INSTALASI FARMASI">INSTALASI FARMASI</option>
+                        <option value="INSTALASI RADIOLOGI">INSTALASI RADIOLOGI</option>
+                        <option value="INSTALASI GAWAT DARURAT">IGD</option>
+                        <option value="ICU">ICU / ICCU / HCU</option>
+                        <option value="MANAJEMEN">MANAJEMEN / ADM</option>
+                        <option value="LAINNYA">Lainnya...</option>
+                        <!-- Tambahkan opsi lain sesuai kebutuhan -->
+                    </select>
+                    <input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya" class="hidden" placeholder="Tulis nama unit..." style="margin-top:10px;">
+                </div>
 
-                <!-- STEP 2: TUJUAN PENGISIAN -->
-                <fieldset>
-                    <legend>Tujuan Pengisian</legend>
-                    <div class="form-group radio-group">
-                        <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Buat/Ganti Kartu Parkir" onchange="toggleSections()" required> Buat/Ganti Kartu Parkir</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
-                    </div>
-                </fieldset>
+                <div id="other-section" class="hidden form-group">
+                    <label>Nama Instansi / Perusahaan</label>
+                    <input type="text" id="afiliasiLainnya" name="afiliasiLainnya">
+                </div>
 
-                <fieldset id="update-section" class="hidden">
-                    <legend>Data Kendaraan Lama</legend>
-                    <div class="form-group radio-group">
-                        <label>Jenis Kendaraan Lama</label>
-                        <label><input type="radio" name="jenisKendaraanLama" value="Mobil" onchange="handleRadioStyle(this)"> Mobil</label>
-                        <label><input type="radio" name="jenisKendaraanLama" value="Motor" onchange="handleRadioStyle(this)"> Motor</label>
-                    </div>
-                    <div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama"></div>
-                </fieldset>
+                <div class="form-group">
+                    <label>No. HP / WhatsApp</label>
+                    <input type="tel" id="telepon" name="telepon" required placeholder="08xxxxxxxxxx">
+                </div>
 
-                <fieldset id="card-replacement-section" class="hidden">
-                    <legend>Alasan Kartu Parkir</legend>
-                    <div class="form-group">
-                        <div class="radio-group">
-                            <label><input type="radio" name="alasanPenggantian" value="Kartu Rusak/Hilang" onchange="handleAlasanChange(); handleRadioStyle(this)"> Kartu Rusak/Hilang</label>
-                            <label><input type="radio" name="alasanPenggantian" value="Belum pernah menerima kartu" onchange="handleAlasanChange(); handleRadioStyle(this)"> Belum pernah menerima kartu</label>
-                            <label><input type="radio" name="alasanPenggantian" value="Lainnya" onchange="handleAlasanChange(); handleRadioStyle(this)"> Lainnya</label>
-                        </div>
-                    </div>
-                    <div class="form-group hidden" id="alasanLainnya-group"><label for="alasanPenggantianLainnya">Sebutkan Alasan Lainnya</label><input type="text" id="alasanPenggantianLainnya" name="alasanPenggantianLainnya"></div>
-                </fieldset>
+                <div class="form-group">
+                    <label>Upload KTP/SIM</label>
+                    <input type="file" id="fileKtp" name="fileKtp" accept="image/*" required>
+                </div>
 
-                <fieldset id="new-vehicle-section" class="hidden">
-                    <legend>Detail Kendaraan Baru</legend>
-                    <div class="form-group radio-group">
-                        <label>Jenis Kendaraan Baru</label>
-                        <label><input type="radio" name="jenisKendaraanBaru" value="Mobil" onchange="handleRadioStyle(this)"> Mobil</label>
-                        <label><input type="radio" name="jenisKendaraanBaru" value="Motor" onchange="handleRadioStyle(this)"> Motor</label>
-                    </div>
-                    <div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru"></div>
-                </fieldset>
+                <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
 
-                <fieldset id="lainnya-section" class="hidden"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Tulis keterangan lengkap Anda</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
-                
-                <button type="submit" id="submit-button">Kirim Formulir</button>
+                <div class="form-group">
+                    <label>Tujuan Pengajuan</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections(); styleRadio(this)" required> Pendaftaran Baru</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections(); styleRadio(this)" required> Ganti Nopol</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Buat/Ganti Kartu Parkir" onchange="toggleSections(); styleRadio(this)" required> Kartu Rusak/Hilang</label>
+                    </div>
+                </div>
+
+                <div id="new-vehicle-section" class="hidden form-group">
+                    <label>Data Kendaraan Baru</label>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <select name="jenisKendaraanBaru" style="width:100px;">
+                            <option value="Motor">Motor</option>
+                            <option value="Mobil">Mobil</option>
+                        </select>
+                        <input type="text" name="noPolisiBaru" placeholder="Nopol Baru (cth: S 1234 XX)" style="text-transform:uppercase;">
+                    </div>
+                </div>
+
+                <div id="old-vehicle-section" class="hidden form-group">
+                    <label>Nopol Lama (Yang diganti)</label>
+                    <input type="text" name="noPolisiLama" placeholder="Nopol Lama" style="text-transform:uppercase;">
+                </div>
+
+                <button type="submit" class="btn-submit">Kirim Pengajuan</button>
             </form>
         </div>
     </div>
 
-    <!-- 4. HALAMAN DASHBOARD ADMIN (KHUSUS SUPERADMIN) -->
-    <div id="admin-dashboard" class="hidden">
-        <div class="container">
-            <header>
-                <h1>Dashboard Admin</h1>
-                <div class="user-info-bar" style="background: transparent; color: white; border: none; justify-content: center;">
-                    <span id="admin-display-name">Superadmin Mode</span>
-                </div>
-            </header>
-            
-            <div class="admin-content">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div>
-                         <h3 style="margin:0; color: var(--primary-color);">Kontrol Formulir</h3>
-                         <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-                            <button id="toggle-form-btn" onclick="toggleFormStatus()" style="width: auto; padding: 5px 15px; font-size: 0.9em; background: #666;">Status: Loading...</button>
-                         </div>
-                    </div>
-                    <button onclick="handleLogout()" style="width: auto; background-color: var(--error-color);">Logout</button>
-                </div>
-
-                <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-                        <input type="text" id="search-input" placeholder="Cari Nama / Nopol..." style="flex: 1;">
-                        <select id="status-filter" style="flex: 0 0 150px;">
-                            <option value="Semua">Semua Status</option>
-                            <option value="Belum diproses">Belum diproses</option>
-                            <option value="Selesai">Selesai</option>
-                            <option value="Ditolak">Ditolak</option>
-                        </select>
-                        <button onclick="fetchPage(1)" style="width: auto;">Cari</button>
-                        <button id="download-xlsx" style="width: auto; background-color: var(--success-color);">Download Excel</button>
-                    </div>
-
-                    <div style="overflow-x: auto;">
-                        <table id="submissions-table">
-                            <thead></thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <div id="pagination-controls" style="margin-top: 20px; text-align: center;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // --- KONFIGURASI ---
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxGXkhavdS4mFvczIUQNxv0xEodHX28VFMYboSq6LnE7RXxQ-guNA_s7TfsE0zWlrLXTw/exec';
         const SUPERADMIN_EMAIL = 'syamsul18782@gmail.com';
         
         let currentUserEmail = '';
+        let currentUserName = '';
         let submissionHeaders = [];
-        let currentPage = 1;
 
-        // --- GOOGLE SSO HANDLER ---
+        // --- AUTHENTICATION ---
         function handleCredentialResponse(response) {
-            const responsePayload = decodeJwtResponse(response.credential);
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+            currentUserEmail = payload.email;
+            currentUserName = payload.name;
             
-            console.log("ID: " + responsePayload.sub);
-            console.log('Full Name: ' + responsePayload.name);
-            console.log('Given Name: ' + responsePayload.given_name);
-            console.log('Family Name: ' + responsePayload.family_name);
-            console.log("Image URL: " + responsePayload.picture);
-            console.log("Email: " + responsePayload.email);
-
-            currentUserEmail = responsePayload.email;
-            
-            // Simpan sesi di localStorage
+            // Simpan sesi
             localStorage.setItem('userEmail', currentUserEmail);
-            localStorage.setItem('userName', responsePayload.name);
+            localStorage.setItem('userName', currentUserName);
 
-            document.getElementById('login-page').classList.add('hidden');
-
-            if (currentUserEmail === SUPERADMIN_EMAIL) {
-                // LOGIKA ADMIN
-                document.getElementById('admin-display-name').textContent = `Admin: ${responsePayload.name}`;
-                showDashboard();
-            } else {
-                // LOGIKA USER BIASA
-                document.getElementById('user-display-name').textContent = `Login sebagai: ${responsePayload.name}`;
-                document.getElementById('emailAkunGoogle').value = currentUserEmail;
-                
-                // Auto-fill Nama Lengkap jika belum diisi manual
-                const namaInput = document.getElementById('namaLengkap');
-                if(!namaInput.value) namaInput.value = responsePayload.name;
-                
-                showMainForm();
-            }
+            // Verifikasi User di Backend (Cek Blokir)
+            verifyUserBackend(currentUserEmail, currentUserName);
         }
 
-        // Fungsi Decode JWT tanpa library eksternal yang berat
-        function decodeJwtResponse(token) {
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            return JSON.parse(jsonPayload);
+        async function verifyUserBackend(email, name) {
+            Swal.fire({ title: 'Memverifikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            try {
+                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${email}&name=${encodeURIComponent(name)}`);
+                const result = await res.json();
+                
+                Swal.close();
+
+                if (result.status === 'blocked') {
+                    Swal.fire('Akses Ditolak', 'Akun Anda telah dinonaktifkan oleh Admin.', 'error')
+                    .then(() => handleLogout());
+                } else {
+                    document.getElementById('login-page').classList.add('hidden');
+                    document.getElementById('app-container').classList.remove('hidden');
+                    
+                    if (email === SUPERADMIN_EMAIL) {
+                        initAdminDashboard();
+                    } else {
+                        initUserDashboard();
+                    }
+                }
+            } catch (e) {
+                Swal.fire('Error', 'Gagal terhubung ke server.', 'error');
+            }
         }
 
         function handleLogout() {
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userName');
-            location.reload(); // Refresh halaman untuk kembali ke login screen
+            localStorage.clear();
+            location.reload();
         }
 
-        // Cek sesi saat load (opsional, tapi Google Button menangani ini dengan baik)
-        window.onload = function() {
-            // Kita biarkan tombol Google yang menangani flow login agar token selalu segar
-            // Tapi jika ingin persistensi refresh, bisa ditambahkan logika cek localStorage di sini
-            
-            // Inisialisasi UI
-            toggleSections();
-        };
-
-        function showMainForm() {
-            document.getElementById('main-form-container').classList.remove('hidden');
+        // --- USER DASHBOARD LOGIC ---
+        function initUserDashboard() {
+            document.getElementById('user-dashboard').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
-            document.body.classList.remove('admin-view');
-            checkFormStatusForUser();
+            document.getElementById('display-name').innerText = currentUserName;
+            document.getElementById('display-email').innerText = currentUserEmail;
+            document.getElementById('emailAkunGoogle').value = currentUserEmail;
+            document.getElementById('namaLengkap').value = currentUserName;
+            
+            fetchUserVehicles();
         }
 
-        function showDashboard() {
-            document.getElementById('main-form-container').classList.add('hidden');
-            document.getElementById('admin-dashboard').classList.remove('hidden');
-            document.body.classList.add('admin-view');
-            loadAdminData();
+        async function fetchUserVehicles() {
+            const listContainer = document.getElementById('vehicle-list');
+            const loading = document.getElementById('loading-vehicles');
+            const emptyState = document.getElementById('empty-state');
+            
+            listContainer.innerHTML = '';
+            loading.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            try {
+                const res = await fetch(`${WEB_APP_URL}?action=getUserHistory&email=${currentUserEmail}`);
+                const json = await res.json();
+                loading.classList.add('hidden');
+
+                if (json.status === 'success' && json.data.length > 0) {
+                    json.data.forEach(v => {
+                        let colorClass = 'st-active'; // Default
+                        let displayStatus = v.status;
+                        
+                        if (v.status === 'Belum diproses') { 
+                            displayStatus = 'Dalam Pengajuan'; 
+                            colorClass = 'st-blocked'; // Pakai warna merah/orange
+                        }
+
+                        const card = `
+                            <div class="vehicle-card" style="border-left: 4px solid ${v.status === 'Selesai' ? '#28a745' : '#ffc107'}">
+                                <span class="v-status ${colorClass}" style="background:${v.status === 'Selesai' ? '#e6fcf5' : '#fff9db'}; color:${v.status === 'Selesai' ? '#087f5b' : '#f08c00'}">${displayStatus}</span>
+                                <span class="v-nopol">${v.nopol}</span>
+                                <span class="v-info"><i class="fas fa-info-circle"></i> ${v.jenis}</span>
+                                <span class="v-info" style="font-size:0.75em; margin-top:5px; color:#999;">${v.tanggal}</span>
+                            </div>
+                        `;
+                        listContainer.innerHTML += card;
+                    });
+                } else {
+                    emptyState.classList.remove('hidden');
+                }
+            } catch (e) {
+                loading.classList.add('hidden');
+                listContainer.innerHTML = '<p style="color:red; text-align:center;">Gagal memuat data.</p>';
+            }
         }
 
-        // --- FORM LOGIC (SAMA SEPERTI SEBELUMNYA DENGAN PENYESUAIAN) ---
+        // --- FORM HANDLERS ---
+        function openFormModal() {
+            document.getElementById('form-modal').style.display = 'flex';
+        }
+        function closeFormModal() {
+            document.getElementById('form-modal').style.display = 'none';
+        }
         
+        // UI Helpers Form
+        function styleRadio(el) {
+            const name = el.name;
+            document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.parentElement.classList.remove('selected-label'));
+            el.parentElement.classList.add('selected-label');
+        }
+        function togglePegawai(el) {
+            const isRSUD = el.value === 'Karyawan RSUD';
+            document.getElementById('rsud-section').classList.toggle('hidden', !isRSUD);
+            document.getElementById('other-section').classList.toggle('hidden', isRSUD);
+            document.getElementById('unitKerja').required = isRSUD;
+            document.getElementById('afiliasiLainnya').required = !isRSUD;
+        }
+        function checkUnitLainnya(el) {
+            const isLain = el.value === 'LAINNYA';
+            const inputLain = document.getElementById('unitKerjaLainnya');
+            inputLain.classList.toggle('hidden', !isLain);
+            inputLain.required = isLain;
+        }
+        function toggleSections() {
+            const val = document.querySelector('input[name="jenisPengajuan"]:checked')?.value;
+            const newSec = document.getElementById('new-vehicle-section');
+            const oldSec = document.getElementById('old-vehicle-section');
+            
+            newSec.classList.add('hidden');
+            oldSec.classList.add('hidden');
+            
+            if (val === 'Pendaftaran Baru' || val === 'Rubah Nomor Kendaraan') newSec.classList.remove('hidden');
+            if (val === 'Rubah Nomor Kendaraan') oldSec.classList.remove('hidden');
+        }
+
+        // SUBMIT FORM
         document.getElementById('parkingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (!this.checkValidity()) {
-                alert('Mohon lengkapi semua kolom yang wajib diisi (termasuk Foto Identitas).');
+                Swal.fire('Data Tidak Lengkap', 'Mohon lengkapi semua field wajib.', 'warning');
                 return;
             }
 
-            // Validasi tambahan: Pastikan email tersimpan
-            if (!currentUserEmail) {
-                alert("Sesi login berakhir. Silakan refresh halaman dan login kembali.");
-                return;
-            }
+            const result = await Swal.fire({
+                title: 'Kirim Pengajuan?',
+                text: "Pastikan data sudah benar.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Kirim',
+                cancelButtonText: 'Batal'
+            });
 
-            if(confirm("Apakah data yang Anda masukkan sudah benar?\n\nKlik OK untuk mengirim.")) {
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Mengirim...', didOpen: () => Swal.showLoading() });
+                
                 const formData = new FormData(this);
-                await submitFinalData(formData);
+                const dataObj = Object.fromEntries(formData.entries());
+                
+                // Compress Image
+                const fileInput = document.getElementById('fileKtp');
+                if (fileInput.files.length > 0) {
+                    dataObj.fileKtp = await compressImage(fileInput.files[0]);
+                }
+
+                try {
+                    const res = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(dataObj) });
+                    const json = await res.json();
+                    
+                    if (json.status === 'success') {
+                        Swal.fire('Berhasil!', 'Pengajuan Anda telah dikirim.', 'success');
+                        closeFormModal();
+                        this.reset();
+                        fetchUserVehicles(); // Refresh list
+                    } else {
+                        throw new Error(json.message);
+                    }
+                } catch (err) {
+                    Swal.fire('Gagal', err.message || 'Terjadi kesalahan.', 'error');
+                }
             }
         });
 
-        async function submitFinalData(formData) {
-            showLoading(true, "Mengirim data ke server...");
-            const formDataObject = Object.fromEntries(formData.entries());
+        // --- ADMIN DASHBOARD LOGIC ---
+        function initAdminDashboard() {
+            document.getElementById('user-dashboard').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            fetchPage(1); // Load submissions
+        }
+
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
             
-            try {
-                // Handle File Upload
-                const fileInput = formData.get('fileKtp');
-                if (fileInput && fileInput.size > 0) {
-                    formDataObject.fileKtp = await compressAndReadFile(fileInput);
-                }
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
 
-                const response = await fetch(WEB_APP_URL, { 
-                    method: 'POST', 
-                    body: JSON.stringify(formDataObject) 
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    alert('Pengajuan Berhasil! Terima kasih.');
-                    document.getElementById('parkingForm').reset();
-                    document.getElementById('namaLengkap').value = localStorage.getItem('userName') || ''; // Reset nama kembali
-                    document.getElementById('emailAkunGoogle').value = currentUserEmail; // Reset email
-                    toggleSections();
-                } else { 
-                    throw new Error(result.message); 
-                }
-            } catch(error) {
-                alert('Gagal mengirim: ' + error.message);
-            } finally {
-                showLoading(false);
-            }
+            if (tab === 'users') fetchUsersList();
         }
 
-        // --- ADMIN LOGIC ---
-        async function loadAdminData() {
-            await loadSettings();
-            await fetchPage(1);
-        }
-
-        async function loadSettings() {
-            try {
-                const response = await fetch(`${WEB_APP_URL}?action=getSettings`);
-                const result = await response.json();
-                if (result.status === 'success') {
-                    const status = result.data.formStatus;
-                    const btn = document.getElementById('toggle-form-btn');
-                    btn.textContent = `Status Formulir: ${status}`;
-                    btn.style.background = status === 'ON' ? 'var(--success-color)' : 'var(--error-color)';
-                    btn.dataset.status = status;
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        async function toggleFormStatus() {
-            const currentStatus = document.getElementById('toggle-form-btn').dataset.status;
-            const newStatus = currentStatus === 'ON' ? 'OFF' : 'ON';
-            showLoading(true, 'Mengupdate status...');
-            try {
-                await fetch(`${WEB_APP_URL}?action=updateSettings&formStatus=${newStatus}`);
-                await loadSettings();
-            } catch (e) { alert("Gagal update status"); }
-            finally { showLoading(false); }
-        }
-
+        // Admin: Submissions
         async function fetchPage(page) {
-            currentPage = page;
-            showLoading(true, "Mengambil data...");
-            const searchTerm = document.getElementById('search-input').value;
+            Swal.showLoading();
+            const search = document.getElementById('search-input').value;
             const status = document.getElementById('status-filter').value;
             
             try {
-                const url = `${WEB_APP_URL}?action=getSubmissions&page=${page}&searchTerm=${encodeURIComponent(searchTerm)}&statusFilter=${encodeURIComponent(status)}`;
-                const response = await fetch(url);
-                const result = await response.json();
+                const res = await fetch(`${WEB_APP_URL}?action=getSubmissions&page=${page}&searchTerm=${encodeURIComponent(search)}&statusFilter=${encodeURIComponent(status)}`);
+                const json = await res.json();
+                Swal.close();
                 
-                if (result.status === 'success') {
-                    submissionHeaders = result.data.headers;
-                    renderTable(result.data.pageData);
-                    renderPagination(result.data.currentPage, result.data.totalPages);
+                if (json.status === 'success') {
+                    submissionHeaders = json.data.headers;
+                    renderSubmissions(json.data.pageData);
+                    renderPagination(json.data.currentPage, json.data.totalPages);
                 }
-            } catch(e) { console.error(e); }
-            finally { showLoading(false); }
+            } catch(e) { Swal.close(); }
         }
 
-        function renderTable(data) {
+        function renderSubmissions(rows) {
             const tbody = document.querySelector('#submissions-table tbody');
             const thead = document.querySelector('#submissions-table thead');
             tbody.innerHTML = '';
             
-            if(!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Tidak ada data.</td></tr>';
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center">Tidak ada data.</td></tr>';
                 return;
             }
 
-            // Render Header
             thead.innerHTML = `<tr>${submissionHeaders.map(h => `<th>${h}</th>`).join('')}</tr>`;
-
-            // Render Rows
-            data.forEach(item => {
+            
+            rows.forEach(item => {
                 const tr = document.createElement('tr');
                 item.rowData.forEach((cell, idx) => {
                     const td = document.createElement('td');
@@ -728,12 +654,9 @@
                         select.innerHTML = `<option value="Belum diproses">Belum diproses</option><option value="Selesai">Selesai</option><option value="Ditolak">Ditolak</option><option value="Hapus">Hapus</option>`;
                         select.value = cell;
                         select.onchange = (e) => updateStatus(e.target.value, item.originalIndex);
-                        
-                        // Styling select
-                        select.className = cell === 'Selesai' ? 'status-selesai' : (cell === 'Ditolak' ? 'status-ditolak' : 'status-pending');
                         td.appendChild(select);
                     } else if (submissionHeaders[idx].includes('Link') && cell.includes('http')) {
-                        td.innerHTML = `<a href="${cell}" target="_blank" style="color:var(--primary-color);font-weight:bold;">Lihat File</a>`;
+                        td.innerHTML = `<a href="${cell}" target="_blank" style="color:blue">Lihat File</a>`;
                     } else {
                         td.textContent = cell;
                     }
@@ -743,135 +666,96 @@
             });
         }
 
-        function renderPagination(current, total) {
-            const container = document.getElementById('pagination-controls');
-            if (total <= 1) { container.innerHTML = ''; return; }
-            container.innerHTML = `
-                <button onclick="fetchPage(${current - 1})" ${current === 1 ? 'disabled' : ''} style="width:auto; display:inline-block;">&laquo;</button>
-                <span style="margin: 0 10px;">Halaman ${current} dari ${total}</span>
-                <button onclick="fetchPage(${current + 1})" ${current === total ? 'disabled' : ''} style="width:auto; display:inline-block;">&raquo;</button>
-            `;
-        }
-
-        async function updateStatus(newStatus, rowIndex) {
-            if(newStatus === 'Hapus' && !confirm("Yakin ingin menghapus data ini permanen?")) {
-                fetchPage(currentPage); return;
+        async function updateStatus(newVal, idx) {
+            if (newVal === 'Hapus') {
+                const conf = await Swal.fire({ title: 'Hapus Data?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33' });
+                if (!conf.isConfirmed) { fetchPage(1); return; }
             }
             
-            showLoading(true, "Menyimpan perubahan...");
-            try {
-                await fetch(`${WEB_APP_URL}?action=updateStatus&rowIndex=${rowIndex}&status=${newStatus}`);
-                if(newStatus === 'Hapus') fetchPage(currentPage);
-            } catch(e) { alert("Gagal update status"); }
-            finally { showLoading(false); }
+            Swal.showLoading();
+            await fetch(`${WEB_APP_URL}?action=updateStatus&rowIndex=${idx}&status=${newVal}`);
+            Swal.close();
+            if (newVal === 'Hapus') fetchPage(1);
         }
 
-        document.getElementById('download-xlsx').addEventListener('click', async () => {
-            showLoading(true, "Mendownload...");
+        // Admin: User Management
+        async function fetchUsersList() {
+            const tbody = document.querySelector('#users-table tbody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>';
+            
             try {
-                const response = await fetch(`${WEB_APP_URL}?action=downloadData`);
-                const result = await response.json();
-                if(result.status === 'success') {
-                    const ws = XLSX.utils.aoa_to_sheet([result.data.headers, ...result.data.rows]);
-                    const wb = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(wb, ws, "Data Parkir");
-                    XLSX.writeFile(wb, "Data_Parkir_RSUD.xlsx");
+                const res = await fetch(`${WEB_APP_URL}?action=getUsersList`);
+                const json = await res.json();
+                
+                if (json.status === 'success') {
+                    tbody.innerHTML = '';
+                    json.data.forEach(user => {
+                        const email = user[0];
+                        const name = user[1];
+                        const status = user[2]; // ACTIVE / BLOCKED
+                        const lastLogin = user[3];
+                        
+                        const isBlocked = status === 'BLOCKED';
+                        
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td data-label="Email">${email}</td>
+                            <td data-label="Nama">${name}</td>
+                            <td data-label="Status"><span class="status-badge ${isBlocked ? 'st-blocked' : 'st-active'}">${status}</span></td>
+                            <td data-label="Last Login">${lastLogin}</td>
+                            <td data-label="Aksi">
+                                <button class="btn-action ${isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${email}', '${status}')">
+                                    ${isBlocked ? 'Aktifkan' : 'Blokir'}
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
                 }
-            } catch(e) { alert("Gagal download"); }
-            finally { showLoading(false); }
-        });
+            } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:red">Gagal memuat.</td></tr>'; }
+        }
+
+        async function toggleBlock(email, currentStatus) {
+            const action = currentStatus === 'ACTIVE' ? 'Blokir' : 'Aktifkan';
+            const res = await Swal.fire({ 
+                title: `${action} User?`, 
+                text: `Yakin ingin ${action.toLowerCase()} akses untuk ${email}?`, 
+                icon: 'warning', 
+                showCancelButton: true 
+            });
+            
+            if (res.isConfirmed) {
+                Swal.showLoading();
+                await fetch(`${WEB_APP_URL}?action=toggleUserBlock&email=${email}&status=${currentStatus}`);
+                Swal.fire('Berhasil', 'Status user diperbarui.', 'success');
+                fetchUsersList();
+            }
+        }
 
         // --- UTILS ---
-        async function checkFormStatusForUser() { 
-            try { 
-                const response = await fetch(`${WEB_APP_URL}?action=getSettings`); 
-                const result = await response.json(); 
-                const isOff = result.status === 'success' && result.data.formStatus === 'OFF'; 
-                document.getElementById('parkingForm').classList.toggle('hidden', isOff); 
-                document.getElementById('form-closed-message').classList.toggle('hidden', !isOff); 
-            } catch(e) {} 
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = e => {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const scale = 800 / img.width;
+                        canvas.width = 800;
+                        canvas.height = img.height * scale;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve({ base64: canvas.toDataURL('image/jpeg', 0.7).split(',')[1], type: 'image/jpeg' });
+                    }
+                }
+            });
         }
-
-        const formSections = { 
-            update: document.getElementById('update-section'), 
-            cardReplacement: document.getElementById('card-replacement-section'), 
-            newVehicle: document.getElementById('new-vehicle-section'), 
-            lainnya: document.getElementById('lainnya-section') 
-        };
-
-        function toggleSections(){ 
-            const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value; 
-            handleRadioStyle(document.querySelector(`input[name="jenisPengajuan"][value="${choice}"]`)); 
-            
-            Object.values(formSections).forEach(s => s.classList.add('hidden')); 
-            if (!choice) return; 
-            
-            if(['Pendaftaran Baru', 'Tambah Kendaraan Baru', 'Rubah Nomor Kendaraan'].includes(choice)) formSections.newVehicle.classList.remove('hidden');
-            if(['Rubah Nomor Kendaraan', 'Hapus Nomor Kendaraan', 'Buat/Ganti Kartu Parkir'].includes(choice)) formSections.update.classList.remove('hidden');
-            if(choice === 'Buat/Ganti Kartu Parkir') formSections.cardReplacement.classList.remove('hidden');
-            if(choice === 'Lainnya') formSections.lainnya.classList.remove('hidden');
-        }
-
-        function handleStatusKepegawaianChange() { 
-            const choice = document.querySelector('input[name="statusKepegawaian"]:checked')?.value; 
-            const rsudSection = document.getElementById('rsud-employee-section'); 
-            const otherSection = document.getElementById('other-employee-section'); 
-            
-            if (choice === 'Karyawan RSUD') { 
-                rsudSection.classList.remove('hidden'); otherSection.classList.add('hidden'); 
-                document.getElementById('unitKerja').required = true; 
-                document.getElementById('afiliasiLainnya').required = false; 
-            } else { 
-                rsudSection.classList.add('hidden'); otherSection.classList.remove('hidden'); 
-                document.getElementById('unitKerja').required = false; 
-                document.getElementById('afiliasiLainnya').required = true; 
-            } 
-        }
-
-        function handleUnitKerjaChange(select){ 
-            const isLainnya = select.value === 'LAINNYA'; 
-            document.getElementById('unitKerjaLainnya-group').classList.toggle('hidden', !isLainnya); 
-            document.getElementById('unitKerjaLainnya').required = isLainnya; 
-        }
-
-        function handleAlasanChange() {
-             const isLainnya = document.querySelector('input[name="alasanPenggantian"]:checked')?.value === 'Lainnya';
-             document.getElementById('alasanLainnya-group').classList.toggle('hidden', !isLainnya);
-             document.getElementById('alasanPenggantianLainnya').required = isLainnya;
-        }
-
-        function handleRadioStyle(radioElement) { 
-            if (!radioElement) return; 
-            const name = radioElement.name;
-            document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.parentElement.classList.remove('selected-label'));
-            radioElement.parentElement.classList.add('selected-label');
-        }
-
-        function compressAndReadFile(file){ 
-            return new Promise((resolve, reject) => { 
-                const reader = new FileReader(); 
-                reader.readAsDataURL(file); 
-                reader.onload = event => { 
-                    const img = new Image(); 
-                    img.src = event.target.result; 
-                    img.onload = () => { 
-                        const canvas = document.createElement('canvas'); 
-                        const ctx = canvas.getContext('2d'); 
-                        const scale = 1024 / img.width; 
-                        canvas.width = 1024; 
-                        canvas.height = img.height * scale; 
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height); 
-                        resolve({ base64: canvas.toDataURL('image/jpeg', 0.7).split(',')[1], type: 'image/jpeg', name: 'id_card.jpg' }); 
-                    }; 
-                }; 
-                reader.onerror = error => reject(error); 
-            }); 
-        }
-
-        function showLoading(show, message) { 
-            const ol = document.getElementById('loading-overlay'); 
-            ol.style.display = show ? 'flex' : 'none'; 
-            ol.querySelector('p').textContent = message || 'Loading...'; 
+        function renderPagination(curr, total) {
+            const div = document.getElementById('pagination-controls');
+            if (total <= 1) { div.innerHTML = ''; return; }
+            div.innerHTML = `<button onclick="fetchPage(${curr-1})" ${curr===1?'disabled':''}>Prev</button> <span>${curr}/${total}</span> <button onclick="fetchPage(${curr+1})" ${curr===total?'disabled':''}>Next</button>`;
         }
     </script>
 </body>
