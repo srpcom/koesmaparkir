@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Koesma Parkir RSUD</title>
+    <title>Sistem Layanan Parkir RSUD</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png">
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -138,9 +138,10 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
-        tr.row-pending td { background-color: #fff9db !important; }
-        tr.row-approved td { background-color: #e6fcf5 !important; }
-        tr.row-rejected td { background-color: #fff5f5 !important; }
+        /* ROW COLORS FOR ADMIN TABLE - UPDATED FOR BETTER VISIBILITY */
+        tr.row-pending td { background-color: #ffeeb0 !important; color: #664d03; } /* Kuning Lebih Terang */
+        tr.row-approved td { background-color: #b8e6bf !important; color: #0f5132; } /* Hijau Lebih Jelas */
+        tr.row-rejected td { background-color: #f5c2c7 !important; color: #842029; } /* Merah Lebih Jelas */
         
         .status-select { padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold; background: white; cursor: pointer; }
         .hidden { display: none !important; }
@@ -175,7 +176,7 @@
     <div id="login-page">
         <div class="login-card">
             <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo" style="width:80px; margin-bottom:15px;">
-            <h2>Koesma Parkir</h2>
+            <h2>Layanan Parkir</h2>
             <p>Silakan login untuk melanjutkan</p>
             
             <div id="g_id_onload" 
@@ -201,7 +202,7 @@
         <header>
             <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo">
             <div>
-                <h1>Koesma Parkir</h1>
+                <h1>Layanan Parkir</h1>
                 <p>RSUD dr. R. KOESMA TUBAN</p>
             </div>
         </header>
@@ -231,7 +232,7 @@
                     <p>Belum ada data pengajuan.</p>
                 </div>
                 <button class="btn-float-add" onclick="openSubmissionModal()">
-                    <i class="fas fa-plus-circle"></i> Ajukan Koesma Parkir
+                    <i class="fas fa-plus-circle"></i> Ajukan Layanan Parkir
                 </button>
             </div>
         </div>
@@ -473,6 +474,7 @@
                         <option value="">-- Pilih Tujuan --</option>
                         <option value="Pendaftaran Baru">Daftar Kendaraan Baru</option>
                         <option value="Rubah Nomor Kendaraan">Ganti Plat Nomor</option>
+                        <option value="Hapus Nomor Kendaraan">Hapus Kendaraan</option> <!-- NEW OPTION -->
                         <option value="Buat/Ganti Kartu Parkir">Kartu Hilang/Rusak</option>
                         <option value="Lainnya">Lainnya</option>
                     </select>
@@ -491,7 +493,7 @@
                     </div>
                 </div>
                 <div id="sub-kendaraan-lama" class="hidden form-group">
-                    <label>Nomor Polisi Lama</label>
+                    <label id="lbl-nopol-lama">Nomor Polisi Lama</label>
                     <input type="text" id="sub-nopol-lama" style="text-transform:uppercase;">
                 </div>
                 <div class="form-group">
@@ -827,9 +829,20 @@
             const val = document.getElementById('sub-tujuan').value;
             const newSec = document.getElementById('sub-kendaraan-baru');
             const oldSec = document.getElementById('sub-kendaraan-lama');
-            newSec.classList.add('hidden'); oldSec.classList.add('hidden');
+            const oldLabel = document.getElementById('lbl-nopol-lama');
+
+            newSec.classList.add('hidden'); 
+            oldSec.classList.add('hidden');
+            
             if (val === 'Pendaftaran Baru' || val === 'Rubah Nomor Kendaraan') newSec.classList.remove('hidden');
-            if (val === 'Rubah Nomor Kendaraan') oldSec.classList.remove('hidden');
+            
+            if (val === 'Rubah Nomor Kendaraan') {
+                oldSec.classList.remove('hidden');
+                oldLabel.innerText = "Nomor Polisi Lama";
+            } else if (val === 'Hapus Nomor Kendaraan') {
+                oldSec.classList.remove('hidden');
+                oldLabel.innerText = "Nomor Polisi yang akan Dihapus";
+            }
         }
 
         document.getElementById('submissionForm').addEventListener('submit', async function(e) {
