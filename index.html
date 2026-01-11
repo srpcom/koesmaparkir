@@ -3,177 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulir Layanan Parkir</title>
+    <title>Sistem Layanan Parkir RSUD</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png">
+    
+    <!-- Library Google Sign-In (SSO) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Library Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    
     <style>
         :root {
-            --primary-color: #005A9C; --secondary-color: #F0F8FF; --border-color: #DCDCDC;
-            --text-color: #333; --success-color: #28a745; --error-color: #dc3545;
-            --pending-bg: #fffbe6; --pending-color: #9c6f00; --pending-border: #ffe58f;
-            --completed-bg: #f6ffed; --completed-color: #389e0d; --completed-border: #b7eb8f;
-            --rejected-bg: #fff1f0; --rejected-color: #cf1322; --rejected-border: #ffa39e;
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --primary-color: #005A9C; 
+            --primary-dark: #00487a;
+            --secondary-color: #F0F8FF; 
+            --text-color: #333; 
+            --success-color: #28a745; 
+            --error-color: #dc3545;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
-        body { font-family: var(--font-family); background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: var(--text-color); margin: 0; padding: 10px; transition: background-color 0.3s; }
-        .container { max-width: 800px; width: 100%; margin: 20px auto; background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 12px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); }
-        
-        #main-form-container .container {
-            background-color: rgba(255, 255, 255, 0.5); 
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+            background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            color: var(--text-color); 
+            margin: 0; 
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Overlay gelap untuk background agar text lebih terbaca */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: -1;
+        }
+
+        .container { 
+            max-width: 800px; 
+            width: 95%; 
+            margin: 30px auto; 
+            background-color: var(--glass-bg); 
             backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); 
+            border-radius: 16px; 
+            box-shadow: var(--shadow); 
+            border: 1px solid var(--glass-border); 
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
         }
 
-        header { background-color: var(--primary-color); color: white; padding: 20px; text-align: center; border-bottom: 5px solid #00487a; border-radius: 12px 12px 0 0; }
-        header .logo-image { width: 70px; margin: 0 auto 15px auto; display: block; }
-        header h1 { margin: 0; font-size: 1.5em; }
-        header p { margin: 5px 0 0; opacity: 0.9; font-size: 0.9em; }
-        form, .admin-container { padding: 20px; }
-        fieldset { border: 1px solid var(--border-color); border-radius: 8px; padding: 20px 15px; margin-bottom: 25px; background-color: rgba(255, 255, 255, 0.5); }
-        legend { font-weight: bold; font-size: 1.2em; color: var(--primary-color); padding: 5px 15px; border-radius: 20px; background-color: #fff; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- LOGIN PAGE STYLE --- */
+        #login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 2000;
+            background: rgba(0,90,156, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-card img {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .login-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .login-card p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        /* --- HEADER & FORM --- */
+        header { 
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); 
+            color: white; 
+            padding: 25px; 
+            text-align: center; 
+        }
+        
+        header .logo-image { width: 60px; margin-bottom: 10px; }
+        header h1 { margin: 0; font-size: 1.4em; letter-spacing: 0.5px; }
+        header p { margin: 5px 0 0; font-size: 0.9em; opacity: 0.9; }
+
+        .user-info-bar {
+            background-color: #e3f2fd;
+            color: var(--primary-dark);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .logout-link {
+            color: var(--error-color);
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        form { padding: 25px; }
+
+        fieldset { 
+            border: 1px solid #e0e0e0; 
+            border-radius: 10px; 
+            padding: 20px; 
+            margin-bottom: 25px; 
+            background-color: rgba(255, 255, 255, 0.6); 
+        }
+
+        legend { 
+            font-weight: bold; 
+            color: var(--primary-color); 
+            padding: 5px 15px; 
+            background: #fff; 
+            border-radius: 20px; 
+            border: 1px solid #eee;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; }
-        input[type="text"], input[type="tel"], input[type="password"], select, textarea, input[type="file"], input[type="date"] { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; box-sizing: border-box; font-size: 16px; background-color: rgba(255, 255, 255, 0.9); }
-        .radio-group label { display: flex; align-items: center; margin-bottom: 10px; font-weight: normal; cursor: pointer; transition: all 0.2s ease-in-out; }
-        .radio-group input { margin-right: 10px; flex-shrink: 0; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95em; color: #444; }
         
-        .radio-group label.selected-label { font-weight: 700; color: var(--primary-color); }
+        input[type="text"], input[type="tel"], select, textarea, input[type="file"] { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 1px solid #ccc; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 15px; 
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,90,156, 0.1);
+        }
 
-        button { width: 100%; padding: 15px; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background-color 0.3s, transform 0.2s; }
-        button:hover:not(:disabled) { background-color: #00487a; transform: translateY(-2px); }
-        button:disabled { background-color: #a0a0a0; cursor: not-allowed; }
-        .hidden { display: none; }
+        /* Custom Radio Buttons */
+        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+        .radio-group label { 
+            display: flex; 
+            align-items: center; 
+            margin: 0; 
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .radio-group label:hover { background: #f8f9fa; }
+        .radio-group label.selected-label { 
+            background: #e3f2fd; 
+            border-color: var(--primary-color); 
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .radio-group input { margin-right: 12px; accent-color: var(--primary-color); width: 18px; height: 18px; }
 
-        .keterangan-box { margin-top: 15px; padding: 15px; background-color: rgba(240, 248, 255, 0.85); border-radius: 8px; border-left: 5px solid var(--primary-color); transition: all 0.3s ease-in-out; }
-        .keterangan-text { margin: 0; font-size: 0.9em; color: #333; line-height: 1.5; }
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1em; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 6px rgba(0,90,156, 0.2);
+            transition: all 0.3s; 
+        }
+        
+        button:hover { background-color: var(--primary-dark); transform: translateY(-2px); }
+        
+        .hidden { display: none !important; }
 
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 1000; display: none; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box; backdrop-filter: blur(5px); }
-        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid var(--primary-color); border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; }
+        /* Status Colors & Admin Table */
+        .status-pending { background-color: #fffbe6; color: #d48806; border: 1px solid #ffe58f; }
+        .status-selesai { background-color: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+        .status-ditolak { background-color: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+
+        /* Admin Dashboard Specifics */
+        .admin-view body { background: #f0f2f5; padding: 0; }
+        #admin-dashboard .container { max-width: 100%; margin: 0; border-radius: 0; height: 100vh; display: flex; flex-direction: column; }
+        .admin-content { flex: 1; padding: 20px; overflow-y: auto; }
+        
+        #submissions-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; background: white; }
+        #submissions-table th { background-color: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #ddd; }
+        #submissions-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        
+        /* Loading Overlay */
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.7); z-index: 3000; 
+            display: none; justify-content: center; align-items: center; 
+            backdrop-filter: blur(5px); flex-direction: column;
+        }
+        .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--primary-color); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #loading-overlay p { color: white; margin-top: 20px; font-size: 1.2em; }
-        
-        #summary-content p { margin: 8px 0; }
-        #summary-content .summary-label { font-weight: 600; color: #555; }
-        #summary-content .summary-value { color: #000; }
+        .overlay p { color: white; margin-top: 15px; font-weight: bold; }
 
-        .admin-section { padding: 20px; border-bottom: 1px solid #eee; }
-        .admin-section h2 { margin-top: 0; color: var(--primary-color); }
-        .toggle-switch { display: flex; align-items: center; gap: 10px; }
-        #form-status-toggle { width: 50px; height: 26px; position: relative; cursor: pointer; }
-        #form-status-toggle span { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
-        #form-status-toggle span:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        #form-status-toggle.on span { background-color: var(--success-color); }
-        #form-status-toggle.on span:before { transform: translateX(24px); }
-        
-        #submissions-table { width: 100%; border-collapse: collapse; margin-top: 20px; table-layout: fixed; font-family: 'Arial Narrow', Arial, sans-serif; }
-        #submissions-table th, #submissions-table td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; font-size: 0.85em; word-break: break-word; }
-        #submissions-table th { background-color: #f2f2f2; white-space: normal; vertical-align: middle; }
-        #submissions-table td { white-space: normal; }
-
-        .table-container { max-height: 500px; overflow-x: auto; }
-        #logout-button { background-color: var(--error-color); margin-top: 20px; }
-        .admin-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; align-items: center; }
-        #search-input, #status-filter { padding: 8px; font-size: 0.9em; border-radius: 5px; border: 1px solid #ccc; }
-        #search-input { flex-grow: 1; }
-        .download-button { width: auto; padding: 8px 12px; font-size: 0.9em; background-color: var(--success-color); }
-        .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 5px; margin-top: 15px; }
-        .pagination-controls button { width: auto; padding: 5px 10px; font-size: 0.9em; }
-        .pagination-controls .page-info { font-size: 0.9em; }
-        #submissions-table td select { padding: 6px; border-radius: 5px; width:100%; font-weight: bold; border-width: 1px; transition: background-color 0.3s, border-color 0.3s; font-size: 1em; }
-        .status-pending { background-color: var(--pending-bg); color: var(--pending-color); border-color: var(--pending-border); }
-        .status-selesai { background-color: var(--completed-bg); color: var(--completed-color); border-color: var(--completed-border); }
-        .status-ditolak { background-color: var(--rejected-bg); color: var(--rejected-color); border-color: var(--rejected-border); }
-        
-        .input-hint { font-size: 0.8em; color: #555; margin-top: 5px; }
-
-        body.admin-view { padding: 0; background-image: none; background-color: #f0f2f5; }
-
-        @media (min-width: 769px) { #admin-dashboard .container { max-width: none; width: 100%; min-height: 100vh; margin: 0; border-radius: 0; box-shadow: none; } }
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
-            body { padding: 5px; }
-            .container { margin: 10px auto; padding: 0; }
-            #admin-dashboard .container, #admin-login-page .container { width: 100%; margin: 5px 0; padding: 0; border: none; border-radius: 0; background-color: transparent; backdrop-filter: none; box-shadow: none; }
-            #admin-dashboard .admin-container, #admin-login-page .admin-container { padding: 10px; background-color: #f9f9f9; border-radius: 8px; }
-            #admin-dashboard header { border-radius: 8px 8px 0 0; }
-            .table-container { overflow-x: hidden; max-height: none; }
-            #submissions-table, #submissions-table thead, #submissions-table tbody, #submissions-table th, #submissions-table td, #submissions-table tr { display: block; }
+            .container { width: 100%; margin: 0; border-radius: 0; border: none; }
+            #admin-dashboard .container { height: auto; min-height: 100vh; }
             #submissions-table thead { display: none; }
-            #submissions-table tr { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-            #submissions-table td { display: flex; justify-content: space-between; align-items: center; padding: 12px; text-align: right; border: none; border-bottom: 1px solid #eee; }
-            #submissions-table td:last-child { border-bottom: none; }
-            #submissions-table td::before { content: attr(data-label); font-weight: bold; text-align: left; margin-right: 15px; color: var(--primary-color); flex-shrink: 0; }
-            .admin-controls { flex-direction: column; align-items: stretch; }
-            #submissions-table td.empty-cell { display: none; }
+            #submissions-table tr { display: block; margin-bottom: 15px; border: 1px solid #eee; border-radius: 8px; background: white; padding: 10px; }
+            #submissions-table td { display: flex; justify-content: space-between; text-align: right; border: none; border-bottom: 1px solid #f0f0f0; padding: 8px 0; }
+            #submissions-table td::before { content: attr(data-label); font-weight: bold; color: #555; text-align: left; margin-right: 10px; }
         }
     </style>
 </head>
 <body>
-    <div id="loading-overlay" class="overlay"><div class="spinner"></div><p>Mohon tunggu...</p></div>
 
-    <!-- Modal Konfirmasi Data Pengguna -->
-    <div id="confirmation-modal" class="overlay">
-        <div style="background: white; padding: 20px 30px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-            <h2 style="margin-top:0; color: var(--primary-color); text-align: center; border-bottom: 2px solid #eee; padding-bottom: 15px;">Konfirmasi Data Anda</h2>
-            <div id="summary-content" style="text-align: left; line-height: 1.8; max-height: 60vh; overflow-y: auto; padding-right: 10px;">
-                <!-- Ringkasan data akan dimasukkan di sini oleh JavaScript -->
+    <!-- 1. HALAMAN LOGIN SSO -->
+    <div id="login-page">
+        <div class="login-card">
+            <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo RSUD">
+            <h2>Selamat Datang</h2>
+            <p>Silakan login menggunakan akun Google Anda untuk mengakses Layanan Parkir.</p>
+            
+            <!-- Google Sign-In Button Container -->
+            <div id="g_id_onload"
+                 data-client_id="783459415718-mp0vsmd2lopajf2ut0aqc6drjrs95pu8.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
             </div>
-            <p style="font-size: 0.9em; color: #555; text-align: center; margin-top: 20px;">Pastikan semua data yang Anda isikan sudah benar sebelum mengirim.</p>
-            <div style="display: flex; justify-content: space-between; margin-top: 25px; gap: 15px;">
-                <button id="edit-data-btn" style="background-color: #6c757d; width: 100%; padding: 12px;">Perbaiki Data</button>
-                <button id="confirm-submit-btn" style="background-color: var(--success-color); width: 100%; padding: 12px;">Ya, Kirim Data</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal Alasan Penolakan -->
-    <div id="rejection-modal" class="overlay">
-        <div style="background: white; padding: 20px 30px; border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-            <h2 style="margin-top:0; color: var(--error-color);">Alasan Penolakan</h2>
-            <p style="font-size: 0.9em; color: #555; margin-top: 0;">Mohon berikan alasan mengapa pengajuan ini ditolak. Alasan ini akan dikirimkan ke pengguna.</p>
-            <div class="form-group">
-                <textarea id="rejection-reason" rows="4" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;" placeholder="Contoh: Foto KTP tidak jelas, Nopol tidak sesuai, dll."></textarea>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 20px; gap: 15px;">
-                <button id="cancel-rejection-btn" style="background-color: #6c757d; width: 100%; padding: 12px;">Batal</button>
-                <button id="confirm-rejection-btn" style="background-color: var(--error-color); width: 100%; padding: 12px;">Kirim Penolakan</button>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="pill"
+                 data-logo_alignment="left">
             </div>
         </div>
     </div>
 
-    <div id="main-form-container">
+    <!-- 2. LOADING OVERLAY -->
+    <div id="loading-overlay" class="overlay">
+        <div class="spinner"></div>
+        <p>Memproses data...</p>
+    </div>
+
+    <!-- 3. HALAMAN USER FORMULIR -->
+    <div id="main-form-container" class="hidden">
          <div class="container">
             <header>
                 <img src="https://raw.githubusercontent.com/srpcom/koesmaparkir/main/new%20logo%20rsud%202025%20kecil.png" alt="Logo" class="logo-image">
                 <h1>FORMULIR LAYANAN PARKIR</h1>
                 <p>RSUD dr. R. KOESMA TUBAN</p>
             </header>
-            <div id="form-closed-message" class="admin-container hidden" style="text-align: center; padding: 40px;">
-                <h2>Formulir Ditutup</h2>
+            
+            <div class="user-info-bar">
+                <span id="user-display-name">Halo, User</span>
+                <span class="logout-link" onclick="handleLogout()">Keluar</span>
+            </div>
+
+            <div id="form-closed-message" class="hidden" style="text-align: center; padding: 40px;">
+                <h2 style="color: var(--error-color);">Formulir Ditutup</h2>
                 <p>Mohon maaf, saat ini formulir sedang ditutup sementara oleh administrator.</p>
             </div>
+
             <form id="parkingForm" novalidate>
-                 <fieldset>
-                    <legend>Tujuan Pengisian</legend>
-                    <div class="form-group radio-group">
-                        <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Buat/Ganti Kartu Parkir" onchange="toggleSections()" required> Buat/Ganti Kartu Parkir</label>
-                        <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
-                    </div>
-                    <div id="keterangan-tujuan-box" class="keterangan-box hidden">
-                        <p id="desc-pendaftaran-baru" class="keterangan-text hidden">Untuk mendaftarkan kendaraan pertama Anda. Anda akan diminta mengisi detail kendaraan baru dan mengupload identitas diri.</p>
-                        <p id="desc-rubah-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Nopol kendaraan Anda berubah (misal: setelah perpanjangan STNK) namun kendaraannya masih sama. Anda perlu mengisi Nopol lama dan baru.</p>
-                        <p id="desc-hapus-nomor-kendaraan" class="keterangan-text hidden">Pilih ini jika Anda tidak lagi menggunakan salah satu kendaraan yang terdaftar. Anda akan diminta mengisi Nopol kendaraan yang akan dihapus.</p>
-                        <p id="desc-tambah-kendaraan-baru" class="keterangan-text hidden">Pilih ini untuk mendaftarkan kendaraan tambahan (misal: mendaftarkan motor jika sebelumnya hanya mobil). Maksimal 3 kendaraan. Anda akan mengisi detail kendaraan baru.</p>
-                        <p id="desc-buat/ganti-kartu-parkir" class="keterangan-text hidden">Pilih ini jika kartu parkir Anda hilang, rusak, atau jika Anda belum pernah menerima kartu sebelumnya.</p>
-                        <p id="desc-lainnya" class="keterangan-text hidden">Untuk keperluan lain yang tidak tercakup di atas. Mohon jelaskan secara rinci pada kolom keterangan yang disediakan.</p>
-                    </div>
-                </fieldset>
+                <!-- Field hidden untuk menyimpan email SSO -->
+                <input type="hidden" id="emailAkunGoogle" name="emailAkunGoogle">
+
+                <!-- STEP 1: INFORMASI KARYAWAN (Wajib Diisi Pertama Kali) -->
                 <fieldset>
                     <legend>Informasi Karyawan</legend>
-                    <div class="form-group"><label for="namaLengkap">Nama Lengkap</label><input type="text" id="namaLengkap" name="namaLengkap" required></div>
+                    <div style="background-color: #e8f4fc; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9em; border-left: 4px solid var(--primary-color);">
+                        <strong>Info:</strong> Mohon lengkapi data diri Anda dengan benar. Data ini akan digunakan untuk verifikasi parkir.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="namaLengkap">Nama Lengkap</label>
+                        <input type="text" id="namaLengkap" name="namaLengkap" required placeholder="Sesuai KTP">
+                    </div>
+
                     <div class="form-group">
                         <label>Status Kepegawaian</label>
                         <div class="radio-group">
@@ -181,6 +326,8 @@
                             <label><input type="radio" name="statusKepegawaian" value="Pihak Ketiga" onchange="handleStatusKepegawaianChange(); handleRadioStyle(this);" required> Lainnya / Pihak Ketiga</label>
                         </div>
                     </div>
+
+                    <!-- Pilihan Unit Kerja (Sama seperti sebelumnya) -->
                     <div id="rsud-employee-section" class="hidden">
                         <div class="form-group">
                             <label for="unitKerja">Unit / Bagian Kerja</label>
@@ -260,23 +407,28 @@
                         <div class="form-group hidden" id="unitKerjaLainnya-group"><label for="unitKerjaLainnya">Tulis Nama Unit Anda</label><input type="text" id="unitKerjaLainnya" name="unitKerjaLainnya"></div>
                     </div>
                     <div id="other-employee-section" class="hidden">
-                        <div class="form-group">
-                            <label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label>
-                            <input type="text" id="afiliasiLainnya" name="afiliasiLainnya">
-                        </div>
-                        <!-- BARU: Kolom tanggal selesai tugas -->
-                        <div class="form-group hidden" id="tanggalSelesai-group">
-                            <label for="tanggalSelesai">Bertugas/Magang di RSUD dr. R. Koesma sampai dengan:</label>
-                            <input type="date" id="tanggalSelesai" name="tanggalSelesai">
-                        </div>
+                        <div class="form-group"><label for="afiliasiLainnya">Sebutkan Nama Instansi / Perusahaan Anda</label><input type="text" id="afiliasiLainnya" name="afiliasiLainnya"></div>
                     </div>
                     <div class="form-group">
                         <label for="telepon">Nomor Telepon / WA (Aktif)</label>
-                        <input type="tel" id="telepon" name="telepon" required>
-                        <p id="telepon-hint" class="input-hint hidden">contoh format: 081330639240</p>
+                        <input type="tel" id="telepon" name="telepon" required placeholder="08xxxxxxxxxx">
                     </div>
                     <div class="form-group"><label for="fileKtp">Upload Identitas (KTP/SIM)</label><input type="file" id="fileKtp" name="fileKtp" accept=".jpg,.jpeg,.png,.pdf" required></div>
                 </fieldset>
+
+                <!-- STEP 2: TUJUAN PENGISIAN -->
+                <fieldset>
+                    <legend>Tujuan Pengisian</legend>
+                    <div class="form-group radio-group">
+                        <label><input type="radio" name="jenisPengajuan" value="Pendaftaran Baru" onchange="toggleSections()" required> Daftar Baru</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Rubah Nomor Kendaraan" onchange="toggleSections()" required> Rubah Nopol</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Hapus Nomor Kendaraan" onchange="toggleSections()" required> Hapus Kendaraan</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Tambah Kendaraan Baru" onchange="toggleSections()" required> Tambah Kendaraan</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Buat/Ganti Kartu Parkir" onchange="toggleSections()" required> Buat/Ganti Kartu Parkir</label>
+                        <label><input type="radio" name="jenisPengajuan" value="Lainnya" onchange="toggleSections()" required> Lainnya</label>
+                    </div>
+                </fieldset>
+
                 <fieldset id="update-section" class="hidden">
                     <legend>Data Kendaraan Lama</legend>
                     <div class="form-group radio-group">
@@ -286,10 +438,10 @@
                     </div>
                     <div class="form-group"><label for="noPolisiLama">Nomor Polisi Lama</label><input type="text" id="noPolisiLama" name="noPolisiLama"></div>
                 </fieldset>
+
                 <fieldset id="card-replacement-section" class="hidden">
-                    <legend>Alasan Pembuatan/Penggantian Kartu Parkir</legend>
+                    <legend>Alasan Kartu Parkir</legend>
                     <div class="form-group">
-                        <label>Pilih Alasan</label>
                         <div class="radio-group">
                             <label><input type="radio" name="alasanPenggantian" value="Kartu Rusak/Hilang" onchange="handleAlasanChange(); handleRadioStyle(this)"> Kartu Rusak/Hilang</label>
                             <label><input type="radio" name="alasanPenggantian" value="Belum pernah menerima kartu" onchange="handleAlasanChange(); handleRadioStyle(this)"> Belum pernah menerima kartu</label>
@@ -298,6 +450,7 @@
                     </div>
                     <div class="form-group hidden" id="alasanLainnya-group"><label for="alasanPenggantianLainnya">Sebutkan Alasan Lainnya</label><input type="text" id="alasanPenggantianLainnya" name="alasanPenggantianLainnya"></div>
                 </fieldset>
+
                 <fieldset id="new-vehicle-section" class="hidden">
                     <legend>Detail Kendaraan Baru</legend>
                     <div class="form-group radio-group">
@@ -307,435 +460,419 @@
                     </div>
                     <div class="form-group"><label for="noPolisiBaru">Nomor Polisi Baru</label><input type="text" id="noPolisiBaru" name="noPolisiBaru"></div>
                 </fieldset>
+
                 <fieldset id="lainnya-section" class="hidden"><legend>Keterangan Lainnya</legend><div class="form-group"><label for="keteranganLainnya">Tulis keterangan lengkap Anda</label><textarea id="keteranganLainnya" name="keteranganLainnya" rows="5"></textarea></div></fieldset>
+                
                 <button type="submit" id="submit-button">Kirim Formulir</button>
             </form>
         </div>
     </div>
-    
-    <!-- HALAMAN ADMIN DIMULAI DI SINI -->
-    <div id="admin-login-page" class="hidden">
-        <div class="container">
-            <header><h1>Login Admin</h1></header>
-            <div class="admin-container">
-                <div class="form-group"><label for="admin-password">Password</label><input type="password" id="admin-password" required></div>
-                <button id="admin-login-button">Login</button>
-                <p id="login-error" class="hidden" style="color:red; text-align:center; margin-top:10px;"></p>
-            </div>
-        </div>
-    </div>
+
+    <!-- 4. HALAMAN DASHBOARD ADMIN (KHUSUS SUPERADMIN) -->
     <div id="admin-dashboard" class="hidden">
         <div class="container">
-            <header><h1>Dashboard Admin</h1></header>
-            <div class="admin-container">
-                <div class="admin-section">
-                    <h2>Pengaturan Formulir</h2>
-                    <div class="toggle-switch">
-                        <label>Formulir:</label>
-                        <div id="form-status-toggle" onclick="toggleFormStatus()"><span></span></div>
-                        <strong id="form-status-text"></strong>
-                    </div>
+            <header>
+                <h1>Dashboard Admin</h1>
+                <div class="user-info-bar" style="background: transparent; color: white; border: none; justify-content: center;">
+                    <span id="admin-display-name">Superadmin Mode</span>
                 </div>
-                <div class="admin-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                        <h2>Data Submisi</h2>
-                        <button id="refresh-data" style="width:auto; padding: 5px 10px; font-size: 0.8em;" onclick="fetchPage(1)">Refresh</button>
+            </header>
+            
+            <div class="admin-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                         <h3 style="margin:0; color: var(--primary-color);">Kontrol Formulir</h3>
+                         <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                            <button id="toggle-form-btn" onclick="toggleFormStatus()" style="width: auto; padding: 5px 15px; font-size: 0.9em; background: #666;">Status: Loading...</button>
+                         </div>
                     </div>
-                    <div class="admin-controls">
-                        <input type="text" id="search-input" placeholder="Cari data...">
-                        <select id="status-filter">
+                    <button onclick="handleLogout()" style="width: auto; background-color: var(--error-color);">Logout</button>
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                        <input type="text" id="search-input" placeholder="Cari Nama / Nopol..." style="flex: 1;">
+                        <select id="status-filter" style="flex: 0 0 150px;">
                             <option value="Semua">Semua Status</option>
                             <option value="Belum diproses">Belum diproses</option>
                             <option value="Selesai">Selesai</option>
                             <option value="Ditolak">Ditolak</option>
                         </select>
-                        <button id="download-xlsx" class="download-button">Unduh .xlsx</button>
+                        <button onclick="fetchPage(1)" style="width: auto;">Cari</button>
+                        <button id="download-xlsx" style="width: auto; background-color: var(--success-color);">Download Excel</button>
                     </div>
-                    <div class="table-container">
+
+                    <div style="overflow-x: auto;">
                         <table id="submissions-table">
                             <thead></thead>
                             <tbody></tbody>
                         </table>
                     </div>
-                    <div id="pagination-controls" class="pagination-controls"></div>
+                    <div id="pagination-controls" style="margin-top: 20px; text-align: center;"></div>
                 </div>
-                <button id="logout-button">Logout</button>
             </div>
         </div>
     </div>
-    <!-- HALAMAN ADMIN BERAKHIR DI SINI -->
-
-    <footer style="text-align: center; color: #fff; font-size: 0.8em; padding: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">ver 1.6 | Developed with ❤️ by : syam</footer>
 
     <script>
-        // Variabel global
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbz4BFMq1gjZhyzKZx5qzqPEcoNxzrQZG0NHAX_g8ym4xFU6fBFpWmONkpxgjAXxxqNY/exec';
-        let formDataToSubmit = null; 
+        // --- KONFIGURASI ---
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz4BFMq1gjZhyzKZx5qzqPEcoNxzrQZG0NHAX_g8ym4xFU6fBFpWmONkpxgjAXxxqNY/exec';
+        const SUPERADMIN_EMAIL = 'syamsul18782@gmail.com';
+        
+        let currentUserEmail = '';
         let submissionHeaders = [];
         let currentPage = 1;
-        let rejectionContext = {
-            rowIndex: null,
-            selectElement: null,
-            previousValue: ''
-        };
-        
-        // Elemen DOM
-        const mainFormContainer = document.getElementById('main-form-container');
-        const adminLoginPage = document.getElementById('admin-login-page');
-        const adminDashboard = document.getElementById('admin-dashboard');
-        const searchInput = document.getElementById('search-input');
-        const statusFilter = document.getElementById('status-filter');
-        const downloadButton = document.getElementById('download-xlsx');
 
-        // --- ROUTING APLIKASI ---
-        window.addEventListener('hashchange', handleRouteChange);
-        window.addEventListener('load', handleRouteChange);
+        // --- GOOGLE SSO HANDLER ---
+        function handleCredentialResponse(response) {
+            const responsePayload = decodeJwtResponse(response.credential);
+            
+            console.log("ID: " + responsePayload.sub);
+            console.log('Full Name: ' + responsePayload.name);
+            console.log('Given Name: ' + responsePayload.given_name);
+            console.log('Family Name: ' + responsePayload.family_name);
+            console.log("Image URL: " + responsePayload.picture);
+            console.log("Email: " + responsePayload.email);
 
-        function handleRouteChange() {
-            if (window.location.hash === '#admin') {
-                sessionStorage.getItem('isAdminAuthenticated') === 'true' ? showDashboard() : showAdminLogin();
+            currentUserEmail = responsePayload.email;
+            
+            // Simpan sesi di localStorage
+            localStorage.setItem('userEmail', currentUserEmail);
+            localStorage.setItem('userName', responsePayload.name);
+
+            document.getElementById('login-page').classList.add('hidden');
+
+            if (currentUserEmail === SUPERADMIN_EMAIL) {
+                // LOGIKA ADMIN
+                document.getElementById('admin-display-name').textContent = `Admin: ${responsePayload.name}`;
+                showDashboard();
             } else {
+                // LOGIKA USER BIASA
+                document.getElementById('user-display-name').textContent = `Login sebagai: ${responsePayload.name}`;
+                document.getElementById('emailAkunGoogle').value = currentUserEmail;
+                
+                // Auto-fill Nama Lengkap jika belum diisi manual
+                const namaInput = document.getElementById('namaLengkap');
+                if(!namaInput.value) namaInput.value = responsePayload.name;
+                
                 showMainForm();
             }
         }
-        function showMainForm() { mainFormContainer.classList.remove('hidden'); adminLoginPage.classList.add('hidden'); adminDashboard.classList.add('hidden'); document.body.classList.remove('admin-view'); checkFormStatusForUser(); }
-        function showAdminLogin() { mainFormContainer.classList.add('hidden'); adminLoginPage.classList.remove('hidden'); adminDashboard.classList.add('hidden'); document.body.classList.remove('admin-view'); }
-        function showDashboard() { mainFormContainer.classList.add('hidden'); adminLoginPage.classList.add('hidden'); adminDashboard.classList.remove('hidden'); document.body.classList.add('admin-view'); loadAdminData(); }
+
+        // Fungsi Decode JWT tanpa library eksternal yang berat
+        function decodeJwtResponse(token) {
+            var base64Url = token.split('.')[1];
+            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName');
+            location.reload(); // Refresh halaman untuk kembali ke login screen
+        }
+
+        // Cek sesi saat load (opsional, tapi Google Button menangani ini dengan baik)
+        window.onload = function() {
+            // Kita biarkan tombol Google yang menangani flow login agar token selalu segar
+            // Tapi jika ingin persistensi refresh, bisa ditambahkan logika cek localStorage di sini
+            
+            // Inisialisasi UI
+            toggleSections();
+        };
+
+        function showMainForm() {
+            document.getElementById('main-form-container').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.body.classList.remove('admin-view');
+            checkFormStatusForUser();
+        }
+
+        function showDashboard() {
+            document.getElementById('main-form-container').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            document.body.classList.add('admin-view');
+            loadAdminData();
+        }
+
+        // --- FORM LOGIC (SAMA SEPERTI SEBELUMNYA DENGAN PENYESUAIAN) ---
         
-        // --- LOGIKA FORMULIR PENGGUNA ---
-        document.getElementById('parkingForm').addEventListener('submit', function(e) {
+        document.getElementById('parkingForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             if (!this.checkValidity()) {
-                alert('Mohon lengkapi semua kolom yang wajib diisi.');
+                alert('Mohon lengkapi semua kolom yang wajib diisi (termasuk Foto Identitas).');
                 return;
             }
-            formDataToSubmit = new FormData(this);
-            displayConfirmationSummary(formDataToSubmit);
-        });
-        function displayConfirmationSummary(formData) {
-            const summaryContainer = document.getElementById('summary-content');
-            let summaryHTML = '';
-            const fieldLabels = {
-                jenisPengajuan: 'Tujuan Pengajuan', namaLengkap: 'Nama Lengkap', statusKepegawaian: 'Status Kepegawaian',
-                unitKerja: 'Unit Kerja', unitKerjaLainnya: 'Unit Kerja Lainnya', afiliasiLainnya: 'Instansi/Perusahaan',
-                tanggalSelesai: 'Selesai Tugas s/d',
-                telepon: 'Nomor Telepon', fileKtp: 'File Identitas', jenisKendaraanLama: 'Jenis Kendaraan Lama',
-                noPolisiLama: 'Nopol Lama', alasanPenggantian: 'Alasan Ganti Kartu', alasanPenggantianLainnya: 'Alasan Lainnya',
-                jenisKendaraanBaru: 'Jenis Kendaraan Baru', noPolisiBaru: 'Nopol Baru', keteranganLainnya: 'Keterangan Lainnya'
-            };
-            for (let [key, value] of formData.entries()) {
-                if (value && value.toString().trim() !== '') {
-                    let displayValue = value instanceof File ? value.name : value;
-                    if (key === 'unitKerja' && value === 'LAINNYA') continue;
-                    summaryHTML += `<p><span class="summary-label">${fieldLabels[key] || key}:</span> <span class="summary-value">${displayValue}</span></p>`;
-                }
+
+            // Validasi tambahan: Pastikan email tersimpan
+            if (!currentUserEmail) {
+                alert("Sesi login berakhir. Silakan refresh halaman dan login kembali.");
+                return;
             }
-            summaryContainer.innerHTML = summaryHTML;
-            document.getElementById('confirmation-modal').style.display = 'flex';
-        }
-        document.getElementById('edit-data-btn').addEventListener('click', () => {
-            document.getElementById('confirmation-modal').style.display = 'none';
-            formDataToSubmit = null;
+
+            if(confirm("Apakah data yang Anda masukkan sudah benar?\n\nKlik OK untuk mengirim.")) {
+                const formData = new FormData(this);
+                await submitFinalData(formData);
+            }
         });
-        document.getElementById('confirm-submit-btn').addEventListener('click', () => {
-            document.getElementById('confirmation-modal').style.display = 'none';
-            if (formDataToSubmit) submitFinalData(formDataToSubmit);
-        });
+
         async function submitFinalData(formData) {
-            showLoading(true, "Mengirim data...");
+            showLoading(true, "Mengirim data ke server...");
             const formDataObject = Object.fromEntries(formData.entries());
+            
             try {
+                // Handle File Upload
                 const fileInput = formData.get('fileKtp');
-                if (fileInput && fileInput.size > 0) formDataObject.fileKtp = await compressAndReadFile(fileInput);
-                const response = await fetch(webAppUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(formDataObject) });
+                if (fileInput && fileInput.size > 0) {
+                    formDataObject.fileKtp = await compressAndReadFile(fileInput);
+                }
+
+                const response = await fetch(WEB_APP_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(formDataObject) 
+                });
+                
                 const result = await response.json();
                 if (result.status === 'success') {
-                    alert('Pengajuan Anda telah berhasil dikirim!');
+                    alert('Pengajuan Berhasil! Terima kasih.');
                     document.getElementById('parkingForm').reset();
+                    document.getElementById('namaLengkap').value = localStorage.getItem('userName') || ''; // Reset nama kembali
+                    document.getElementById('emailAkunGoogle').value = currentUserEmail; // Reset email
                     toggleSections();
-                    handleStatusKepegawaianChange();
-                    handleAlasanChange();
-                } else { throw new Error(result.message || 'Terjadi kesalahan di server.'); }
+                } else { 
+                    throw new Error(result.message); 
+                }
             } catch(error) {
-                console.error('Submit Error:', error);
-                alert('Terjadi kesalahan koneksi. Pesan: ' + error.message);
+                alert('Gagal mengirim: ' + error.message);
             } finally {
                 showLoading(false);
-                formDataToSubmit = null;
             }
         }
-        
-        // --- LOGIKA HALAMAN ADMIN ---
-        document.getElementById('admin-login-button').addEventListener('click', adminLogin);
-        document.getElementById('logout-button').addEventListener('click', adminLogout);
-        searchInput.addEventListener('keyup', () => fetchPage(1));
-        statusFilter.addEventListener('change', () => fetchPage(1));
-        downloadButton.addEventListener('click', downloadXLSX);
 
-        async function adminLogin() {
-            const password = document.getElementById('admin-password').value;
-            const loginError = document.getElementById('login-error');
-            showLoading(true, "Memverifikasi...");
-            try {
-                const response = await fetch(`${webAppUrl}?action=adminLogin&password=${encodeURIComponent(password)}`);
-                const result = await response.json();
-                if (result.status === 'success') {
-                    sessionStorage.setItem('isAdminAuthenticated', 'true');
-                    loginError.classList.add('hidden');
-                    document.getElementById('admin-password').value = '';
-                    showDashboard();
-                } else {
-                    loginError.textContent = result.message || "Password salah.";
-                    loginError.classList.remove('hidden');
-                }
-            } catch (error) { loginError.textContent = "Gagal terhubung ke server."; loginError.classList.remove('hidden'); } 
-            finally { showLoading(false); }
+        // --- ADMIN LOGIC ---
+        async function loadAdminData() {
+            await loadSettings();
+            await fetchPage(1);
         }
-        function adminLogout() { sessionStorage.removeItem('isAdminAuthenticated'); document.body.classList.remove('admin-view'); window.location.hash = ''; }
-        async function loadAdminData() { await loadSettings(); await fetchPage(1); }
+
         async function loadSettings() {
             try {
-                const response = await fetch(`${webAppUrl}?action=getSettings`);
+                const response = await fetch(`${WEB_APP_URL}?action=getSettings`);
                 const result = await response.json();
                 if (result.status === 'success') {
                     const status = result.data.formStatus;
-                    const toggle = document.getElementById('form-status-toggle');
-                    toggle.classList.toggle('on', status === 'ON');
-                    document.getElementById('form-status-text').textContent = status;
+                    const btn = document.getElementById('toggle-form-btn');
+                    btn.textContent = `Status Formulir: ${status}`;
+                    btn.style.background = status === 'ON' ? 'var(--success-color)' : 'var(--error-color)';
+                    btn.dataset.status = status;
                 }
-            } catch (e) { console.error("Gagal memuat pengaturan:", e); }
+            } catch (e) { console.error(e); }
         }
+
         async function toggleFormStatus() {
-            const newStatus = document.getElementById('form-status-toggle').classList.contains('on') ? 'OFF' : 'ON';
-            showLoading(true, 'Memperbarui...');
+            const currentStatus = document.getElementById('toggle-form-btn').dataset.status;
+            const newStatus = currentStatus === 'ON' ? 'OFF' : 'ON';
+            showLoading(true, 'Mengupdate status...');
             try {
-                await fetch(`${webAppUrl}?action=updateSettings&formStatus=${newStatus}`);
+                await fetch(`${WEB_APP_URL}?action=updateSettings&formStatus=${newStatus}`);
                 await loadSettings();
-            } catch (e) { console.error("Gagal mengubah status:", e); }
+            } catch (e) { alert("Gagal update status"); }
             finally { showLoading(false); }
         }
+
         async function fetchPage(page) {
             currentPage = page;
-            const searchTerm = searchInput.value;
-            const status = statusFilter.value;
-            showLoading(true, "Memuat data...");
-            const tableBody = document.querySelector('#submissions-table tbody');
-            tableBody.innerHTML = `<tr><td colspan="15" style="text-align:center;">Memuat data...</td></tr>`;
+            showLoading(true, "Mengambil data...");
+            const searchTerm = document.getElementById('search-input').value;
+            const status = document.getElementById('status-filter').value;
+            
             try {
-                const url = new URL(webAppUrl);
-                url.searchParams.append('action', 'getSubmissions');
-                url.searchParams.append('page', page);
-                url.searchParams.append('searchTerm', searchTerm);
-                url.searchParams.append('statusFilter', status);
+                const url = `${WEB_APP_URL}?action=getSubmissions&page=${page}&searchTerm=${encodeURIComponent(searchTerm)}&statusFilter=${encodeURIComponent(status)}`;
                 const response = await fetch(url);
                 const result = await response.json();
+                
                 if (result.status === 'success') {
-                    const { headers, pageData, currentPage, totalPages } = result.data;
-                    submissionHeaders = headers;
-                    displayData(pageData);
-                    setupPagination(currentPage, totalPages);
-                } else { tableBody.innerHTML = `<tr><td colspan="15" style="text-align:center; color:red;">Gagal: ${result.message}</td></tr>`; }
-            } catch (e) { tableBody.innerHTML = `<tr><td colspan="15" style="text-align:center; color:red;">Gagal terhubung.</td></tr>`; } 
+                    submissionHeaders = result.data.headers;
+                    renderTable(result.data.pageData);
+                    renderPagination(result.data.currentPage, result.data.totalPages);
+                }
+            } catch(e) { console.error(e); }
             finally { showLoading(false); }
         }
-        function displayData(pageData) {
-            const tableBody = document.querySelector('#submissions-table tbody');
-            const tableHead = document.querySelector('#submissions-table thead');
-            tableBody.innerHTML = '';
-            tableHead.innerHTML = `<tr>${submissionHeaders.map(h => `<th>${h}</th>`).join('')}</tr>`;
-            if (!pageData || pageData.length === 0) {
-                tableBody.innerHTML = `<tr><td data-label="Info" colspan="${submissionHeaders.length || 1}" style="text-align:center;">Data tidak ditemukan.</td></tr>`;
+
+        function renderTable(data) {
+            const tbody = document.querySelector('#submissions-table tbody');
+            const thead = document.querySelector('#submissions-table thead');
+            tbody.innerHTML = '';
+            
+            if(!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Tidak ada data.</td></tr>';
                 return;
             }
-            pageData.forEach(item => {
-                const { rowData, originalIndex } = item;
+
+            // Render Header
+            thead.innerHTML = `<tr>${submissionHeaders.map(h => `<th>${h}</th>`).join('')}</tr>`;
+
+            // Render Rows
+            data.forEach(item => {
                 const tr = document.createElement('tr');
-                rowData.forEach((cell, cellIndex) => {
+                item.rowData.forEach((cell, idx) => {
                     const td = document.createElement('td');
-                    const header = submissionHeaders[cellIndex];
-                    td.setAttribute('data-label', header);
-                    if (header === 'Status') {
+                    td.setAttribute('data-label', submissionHeaders[idx]);
+                    
+                    if (submissionHeaders[idx] === 'Status') {
                         const select = document.createElement('select');
                         select.innerHTML = `<option value="Belum diproses">Belum diproses</option><option value="Selesai">Selesai</option><option value="Ditolak">Ditolak</option><option value="Hapus">Hapus</option>`;
                         select.value = cell;
-                        select.setAttribute('data-previous-value', cell);
-                        select.onchange = (event) => handleStatusChange(event.target, originalIndex);
+                        select.onchange = (e) => updateStatus(e.target.value, item.originalIndex);
+                        
+                        // Styling select
+                        select.className = cell === 'Selesai' ? 'status-selesai' : (cell === 'Ditolak' ? 'status-ditolak' : 'status-pending');
                         td.appendChild(select);
-                        updateSelectColor(select);
-                    } else if (header === 'Link File Identitas' && cell && cell.startsWith('http')) {
-                        td.innerHTML = `<a href="${cell}" target="_blank" rel="noopener noreferrer">Lihat File</a>`;
-                    } else { td.textContent = cell; }
-                    if (header !== 'Status' && (!cell || cell.toString().trim() === '')) td.classList.add('empty-cell');
+                    } else if (submissionHeaders[idx].includes('Link') && cell.includes('http')) {
+                        td.innerHTML = `<a href="${cell}" target="_blank" style="color:var(--primary-color);font-weight:bold;">Lihat File</a>`;
+                    } else {
+                        td.textContent = cell;
+                    }
                     tr.appendChild(td);
                 });
-                tableBody.appendChild(tr);
+                tbody.appendChild(tr);
             });
         }
-        function setupPagination(currentPage, totalPages) {
-            const paginationControls = document.getElementById('pagination-controls');
-            if (totalPages <= 1) { paginationControls.innerHTML = ''; return; }
-            paginationControls.innerHTML = `<button onclick="fetchPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>«</button><span class="page-info">Hal ${currentPage} dari ${totalPages}</span><button onclick="fetchPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>»</button>`;
-        }
-        function handleStatusChange(selectElement, rowIndex) {
-            const newStatus = selectElement.value;
-            const previousStatus = selectElement.getAttribute('data-previous-value');
-            updateSelectColor(selectElement);
 
-            if (newStatus === 'Ditolak') {
-                rejectionContext = {
-                    rowIndex: rowIndex,
-                    selectElement: selectElement,
-                    previousValue: previousStatus
-                };
-                document.getElementById('rejection-reason').value = '';
-                document.getElementById('rejection-modal').style.display = 'flex';
-            } else if (newStatus === 'Hapus') {
-                if (confirm('Apakah Anda yakin ingin menghapus data ini secara permanen?')) {
-                    updateStatus(newStatus, rowIndex);
-                } else {
-                   selectElement.value = previousStatus;
-                   updateSelectColor(selectElement);
-                }
-            } else {
-                updateStatus(newStatus, rowIndex);
+        function renderPagination(current, total) {
+            const container = document.getElementById('pagination-controls');
+            if (total <= 1) { container.innerHTML = ''; return; }
+            container.innerHTML = `
+                <button onclick="fetchPage(${current - 1})" ${current === 1 ? 'disabled' : ''} style="width:auto; display:inline-block;">&laquo;</button>
+                <span style="margin: 0 10px;">Halaman ${current} dari ${total}</span>
+                <button onclick="fetchPage(${current + 1})" ${current === total ? 'disabled' : ''} style="width:auto; display:inline-block;">&raquo;</button>
+            `;
+        }
+
+        async function updateStatus(newStatus, rowIndex) {
+            if(newStatus === 'Hapus' && !confirm("Yakin ingin menghapus data ini permanen?")) {
+                fetchPage(currentPage); return;
             }
-        }
-        function updateSelectColor(selectElement) {
-            selectElement.className = '';
-            const value = selectElement.value;
-            if (value === 'Belum diproses') selectElement.classList.add('status-pending');
-            else if (value === 'Selesai') selectElement.classList.add('status-selesai');
-            else if (value === 'Ditolak') selectElement.classList.add('status-ditolak');
-        }
-        async function updateStatus(newStatus, rowIndex, reason = '') {
-            showLoading(true, 'Menyimpan...');
+            
+            showLoading(true, "Menyimpan perubahan...");
             try {
-                const url = new URL(webAppUrl);
-                url.searchParams.append('action', 'updateStatus');
-                url.searchParams.append('rowIndex', rowIndex);
-                url.searchParams.append('status', newStatus);
-                if (reason) {
-                    url.searchParams.append('reason', reason);
-                }
-                await fetch(url);
-                if (newStatus === 'Hapus') {
-                    await fetchPage(currentPage);
-                } else {
-                    const selectElement = document.querySelector(`select[onchange="handleStatusChange(this, ${rowIndex})"]`);
-                    if (selectElement) {
-                       selectElement.setAttribute('data-previous-value', newStatus);
-                    }
-                }
-            } catch (e) { 
-                alert("Gagal menyimpan status."); 
-                if (rejectionContext.selectElement) {
-                    rejectionContext.selectElement.value = rejectionContext.previousValue;
-                    updateSelectColor(rejectionContext.selectElement);
-                }
-            } 
-            finally { showLoading(false); }
-        }
-        async function downloadXLSX() {
-            showLoading(true, "Mempersiapkan unduhan...");
-            try {
-                const url = new URL(webAppUrl);
-                url.searchParams.append('action', 'downloadData');
-                url.searchParams.append('searchTerm', searchInput.value);
-                url.searchParams.append('statusFilter', statusFilter.value);
-                const response = await fetch(url);
-                const result = await response.json();
-                if (result.status === 'success' && result.data.rows.length > 0) {
-                    const { headers, rows } = result.data;
-                    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
-                    const workbook = XLSX.utils.book_new();
-                    XLSX.utils.book_append_sheet(workbook, worksheet, "Submisi");
-                    XLSX.writeFile(workbook, "Data_Parkir_Karyawan.xlsx");
-                } else { alert("Tidak ada data untuk diunduh."); }
-            } catch(e) { alert("Gagal mengunduh data."); } 
+                await fetch(`${WEB_APP_URL}?action=updateStatus&rowIndex=${rowIndex}&status=${newStatus}`);
+                if(newStatus === 'Hapus') fetchPage(currentPage);
+            } catch(e) { alert("Gagal update status"); }
             finally { showLoading(false); }
         }
 
-        // --- FUNGSI HELPERS & INISIALISASI ---
-        async function checkFormStatusForUser() { try { const response = await fetch(`${webAppUrl}?action=getSettings`); const result = await response.json(); const isOff = result.status === 'success' && result.data.formStatus === 'OFF'; document.getElementById('parkingForm').classList.toggle('hidden', isOff); document.getElementById('form-closed-message').classList.toggle('hidden', !isOff); } catch(e) { console.error("Gagal memeriksa status form.", e); } }
-        const formSections = { update: document.getElementById('update-section'), cardReplacement: document.getElementById('card-replacement-section'), newVehicle: document.getElementById('new-vehicle-section'), lainnya: document.getElementById('lainnya-section') };
-        function toggleSections(){ const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value; handleRadioStyle(document.querySelector(`input[name="jenisPengajuan"][value="${choice}"]`)); const allDescriptions = document.querySelectorAll('.keterangan-text'); const keteranganBox = document.getElementById('keterangan-tujuan-box'); allDescriptions.forEach(desc => desc.classList.add('hidden')); keteranganBox.classList.add('hidden'); if (choice) { const descriptionId = `desc-${choice.toLowerCase().replace(/\//g, '-').replace(/ /g, '-')}`; const descriptionEl = document.getElementById(descriptionId); if (descriptionEl) { keteranganBox.classList.remove('hidden'); descriptionEl.classList.remove('hidden'); } } Object.values(formSections).forEach(s => s.style.display = 'none'); if (!choice) return; const show = (keys) => keys.forEach(k => formSections[k].style.display = 'block'); switch(choice){ case 'Pendaftaran Baru': case 'Tambah Kendaraan Baru': show(['newVehicle']); break; case 'Rubah Nomor Kendaraan': show(['update', 'newVehicle']); break; case 'Hapus Nomor Kendaraan': show(['update']); break; case 'Buat/Ganti Kartu Parkir': show(['update', 'cardReplacement']); handleAlasanChange(); break; case 'Lainnya': show(['lainnya']); break; } }
-        
-        // DIMODIFIKASI: untuk menampilkan/menyembunyikan kolom tanggal
+        document.getElementById('download-xlsx').addEventListener('click', async () => {
+            showLoading(true, "Mendownload...");
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=downloadData`);
+                const result = await response.json();
+                if(result.status === 'success') {
+                    const ws = XLSX.utils.aoa_to_sheet([result.data.headers, ...result.data.rows]);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Data Parkir");
+                    XLSX.writeFile(wb, "Data_Parkir_RSUD.xlsx");
+                }
+            } catch(e) { alert("Gagal download"); }
+            finally { showLoading(false); }
+        });
+
+        // --- UTILS ---
+        async function checkFormStatusForUser() { 
+            try { 
+                const response = await fetch(`${WEB_APP_URL}?action=getSettings`); 
+                const result = await response.json(); 
+                const isOff = result.status === 'success' && result.data.formStatus === 'OFF'; 
+                document.getElementById('parkingForm').classList.toggle('hidden', isOff); 
+                document.getElementById('form-closed-message').classList.toggle('hidden', !isOff); 
+            } catch(e) {} 
+        }
+
+        const formSections = { 
+            update: document.getElementById('update-section'), 
+            cardReplacement: document.getElementById('card-replacement-section'), 
+            newVehicle: document.getElementById('new-vehicle-section'), 
+            lainnya: document.getElementById('lainnya-section') 
+        };
+
+        function toggleSections(){ 
+            const choice = document.querySelector('input[name="jenisPengajuan"]:checked')?.value; 
+            handleRadioStyle(document.querySelector(`input[name="jenisPengajuan"][value="${choice}"]`)); 
+            
+            Object.values(formSections).forEach(s => s.classList.add('hidden')); 
+            if (!choice) return; 
+            
+            if(['Pendaftaran Baru', 'Tambah Kendaraan Baru', 'Rubah Nomor Kendaraan'].includes(choice)) formSections.newVehicle.classList.remove('hidden');
+            if(['Rubah Nomor Kendaraan', 'Hapus Nomor Kendaraan', 'Buat/Ganti Kartu Parkir'].includes(choice)) formSections.update.classList.remove('hidden');
+            if(choice === 'Buat/Ganti Kartu Parkir') formSections.cardReplacement.classList.remove('hidden');
+            if(choice === 'Lainnya') formSections.lainnya.classList.remove('hidden');
+        }
+
         function handleStatusKepegawaianChange() { 
             const choice = document.querySelector('input[name="statusKepegawaian"]:checked')?.value; 
             const rsudSection = document.getElementById('rsud-employee-section'); 
             const otherSection = document.getElementById('other-employee-section'); 
-            const unitKerjaSelect = document.getElementById('unitKerja'); 
-            const afiliasiInput = document.getElementById('afiliasiLainnya');
-            const tanggalSelesaiGroup = document.getElementById('tanggalSelesai-group');
-            const tanggalSelesaiInput = document.getElementById('tanggalSelesai');
-
+            
             if (choice === 'Karyawan RSUD') { 
-                rsudSection.classList.remove('hidden'); 
-                otherSection.classList.add('hidden'); 
-                unitKerjaSelect.required = true; 
-                afiliasiInput.required = false; 
-                afiliasiInput.value = ''; 
-                tanggalSelesaiGroup.classList.add('hidden');
-                tanggalSelesaiInput.required = false;
-                tanggalSelesaiInput.value = '';
-            } else if (choice === 'Pihak Ketiga') { 
-                rsudSection.classList.add('hidden'); 
-                otherSection.classList.remove('hidden'); 
-                unitKerjaSelect.required = false; 
-                afiliasiInput.required = true; 
-                unitKerjaSelect.value = ''; 
-                handleUnitKerjaChange(unitKerjaSelect); 
-                tanggalSelesaiGroup.classList.remove('hidden');
-                tanggalSelesaiInput.required = true;
+                rsudSection.classList.remove('hidden'); otherSection.classList.add('hidden'); 
+                document.getElementById('unitKerja').required = true; 
+                document.getElementById('afiliasiLainnya').required = false; 
             } else { 
-                rsudSection.classList.add('hidden'); 
-                otherSection.classList.add('hidden'); 
-                unitKerjaSelect.required = false; 
-                afiliasiInput.required = false;
-                tanggalSelesaiGroup.classList.add('hidden');
-                tanggalSelesaiInput.required = false;
+                rsudSection.classList.add('hidden'); otherSection.classList.remove('hidden'); 
+                document.getElementById('unitKerja').required = false; 
+                document.getElementById('afiliasiLainnya').required = true; 
             } 
         }
 
-        function handleAlasanChange() { const choice = document.querySelector('input[name="alasanPenggantian"]:checked')?.value; const lainnyaGroup = document.getElementById('alasanLainnya-group'); const lainnyaInput = document.getElementById('alasanPenggantianLainnya'); const isLainnya = choice === 'Lainnya'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
-        function handleRadioStyle(radioElement) { if (!radioElement) return; const radioName = radioElement.name; const allLabels = document.querySelectorAll(`input[name="${radioName}"]`); allLabels.forEach(radio => { radio.parentElement.classList.remove('selected-label'); }); radioElement.parentElement.classList.add('selected-label'); }
-        function handleUnitKerjaChange(select){ const lainnyaGroup = document.getElementById('unitKerjaLainnya-group'); const lainnyaInput = document.getElementById('unitKerjaLainnya'); const isLainnya = select.value === 'LAINNYA'; lainnyaGroup.classList.toggle('hidden', !isLainnya); lainnyaInput.required = isLainnya; if (!isLainnya) lainnyaInput.value = ''; }
-        function compressAndReadFile(file){ return new Promise((resolve, reject) => { if (!file.type.startsWith('image/')) { const reader = new FileReader(); reader.onload = () => resolve({ base64: reader.result.split(',')[1], type: file.type, name: file.name }); reader.onerror = reject; reader.readAsDataURL(file); return; } const reader = new FileReader(); reader.onload = e => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d'); const MAX_WIDTH = 1024; const scaleSize = MAX_WIDTH / img.width; canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize; ctx.drawImage(img, 0, 0, canvas.width, canvas.height); const dataUrl = canvas.toDataURL('image/jpeg', 0.8); resolve({ base64: dataUrl.split(',')[1], type: 'image/jpeg', name: 'compressed_id.jpg' }); }; img.src = e.target.result; }; reader.onerror = reject; reader.readAsDataURL(file); }); }
-        function showLoading(show, message = "Mohon tunggu...") { const overlay = document.getElementById('loading-overlay'); overlay.style.display = show ? 'flex' : 'none'; overlay.querySelector('p').textContent = message; }
-        
-        window.addEventListener('load', () => { 
-            handleRouteChange(); 
-            toggleSections(); 
+        function handleUnitKerjaChange(select){ 
+            const isLainnya = select.value === 'LAINNYA'; 
+            document.getElementById('unitKerjaLainnya-group').classList.toggle('hidden', !isLainnya); 
+            document.getElementById('unitKerjaLainnya').required = isLainnya; 
+        }
 
-            document.getElementById('cancel-rejection-btn').addEventListener('click', () => {
-                if (rejectionContext.selectElement) {
-                    rejectionContext.selectElement.value = rejectionContext.previousValue;
-                    updateSelectColor(rejectionContext.selectElement);
-                }
-                document.getElementById('rejection-modal').style.display = 'none';
-            });
+        function handleAlasanChange() {
+             const isLainnya = document.querySelector('input[name="alasanPenggantian"]:checked')?.value === 'Lainnya';
+             document.getElementById('alasanLainnya-group').classList.toggle('hidden', !isLainnya);
+             document.getElementById('alasanPenggantianLainnya').required = isLainnya;
+        }
 
-            document.getElementById('confirm-rejection-btn').addEventListener('click', () => {
-                const reason = document.getElementById('rejection-reason').value.trim();
-                if (!reason) {
-                    alert('Alasan penolakan tidak boleh kosong.');
-                    return;
-                }
-                if (rejectionContext.rowIndex !== null) {
-                    updateStatus('Ditolak', rejectionContext.rowIndex, reason);
-                }
-                document.getElementById('rejection-modal').style.display = 'none';
-            });
+        function handleRadioStyle(radioElement) { 
+            if (!radioElement) return; 
+            const name = radioElement.name;
+            document.querySelectorAll(`input[name="${name}"]`).forEach(r => r.parentElement.classList.remove('selected-label'));
+            radioElement.parentElement.classList.add('selected-label');
+        }
 
-            const teleponInput = document.getElementById('telepon');
-            const teleponHint = document.getElementById('telepon-hint');
-            if (teleponInput && teleponHint) {
-                teleponInput.addEventListener('focus', () => { teleponHint.classList.remove('hidden'); });
-                teleponInput.addEventListener('blur', () => { teleponHint.classList.add('hidden'); });
-            }
-        });
+        function compressAndReadFile(file){ 
+            return new Promise((resolve, reject) => { 
+                const reader = new FileReader(); 
+                reader.readAsDataURL(file); 
+                reader.onload = event => { 
+                    const img = new Image(); 
+                    img.src = event.target.result; 
+                    img.onload = () => { 
+                        const canvas = document.createElement('canvas'); 
+                        const ctx = canvas.getContext('2d'); 
+                        const scale = 1024 / img.width; 
+                        canvas.width = 1024; 
+                        canvas.height = img.height * scale; 
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height); 
+                        resolve({ base64: canvas.toDataURL('image/jpeg', 0.7).split(',')[1], type: 'image/jpeg', name: 'id_card.jpg' }); 
+                    }; 
+                }; 
+                reader.onerror = error => reject(error); 
+            }); 
+        }
+
+        function showLoading(show, message) { 
+            const ol = document.getElementById('loading-overlay'); 
+            ol.style.display = show ? 'flex' : 'none'; 
+            ol.querySelector('p').textContent = message || 'Loading...'; 
+        }
     </script>
 </body>
 </html>
-
