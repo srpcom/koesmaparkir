@@ -14,6 +14,7 @@
     <style>
         :root {
             --primary-color: #005A9C; --primary-dark: #00487a;
+            --success-color: #28a745; --error-color: #dc3545;
             --glass-bg: rgba(255, 255, 255, 0.95);
             --border-radius: 12px;
             --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -31,6 +32,7 @@
             background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); z-index: -1;
         }
 
+        /* Container Default */
         .container { 
             max-width: 1000px; width: 95%; margin: 30px auto; 
             background-color: var(--glass-bg); 
@@ -40,6 +42,7 @@
             transition: all 0.3s ease-in-out;
         }
 
+        /* Container Full Screen (Admin View) */
         .container.admin-mode {
             max-width: 100%; width: 100%; margin: 0; border-radius: 0; min-height: 100vh;
             background-color: #ffffff;
@@ -143,37 +146,63 @@
         
         form { padding: 20px; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: #555; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9em; color: #333; }
         
+        /* GENERAL INPUT STYLING */
         input, select, textarea { 
-            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; 
-            font-size: 1em; box-sizing: border-box;
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; 
+            font-size: 1em; box-sizing: border-box; background-color: #fff;
         }
-        input:focus { border-color: var(--primary-color); outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 2px rgba(0,90,156,0.1); }
 
+        /* --- PERBAIKAN TOMBOL UPLOAD --- */
         input[type="file"] {
-            padding: 6px;
-            background: #f9f9f9; 
+            padding: 8px;
+            background: #f8f9fa; 
+            border: 1px solid #ccc;
             cursor: pointer;
         }
+        /* Style untuk tombol "Choose File" bawaan browser */
         input[type="file"]::file-selector-button {
             margin-right: 15px;
             border: none;
             background: var(--primary-color);
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 6px;
             color: #fff;
             cursor: pointer;
             font-weight: bold;
             transition: background .2s ease-in-out;
         }
-        input[type="file"]::file-selector-button:hover {
+        input[type="file"]::-webkit-file-upload-button {
+            margin-right: 15px;
+            border: none;
+            background: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background .2s ease-in-out;
+        }
+        input[type="file"]::file-selector-button:hover,
+        input[type="file"]::-webkit-file-upload-button:hover {
             background: var(--primary-dark);
         }
         
+        /* --- PERBAIKAN TOMBOL SAVE --- */
         .btn-submit {
-            width: 100%; padding: 12px; background: var(--success-color); color: white;
-            border: none; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer;
+            width: 100%; padding: 15px; 
+            background-color: var(--success-color) !important; /* Hijau Kuat */
+            color: white !important;
+            border: none; border-radius: 8px; 
+            font-weight: bold; font-size: 1.1em; 
+            cursor: pointer; margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+        }
+        .btn-submit:hover {
+            background-color: #218838 !important;
+            transform: translateY(-1px);
         }
 
         /* Admin Styles */
@@ -187,6 +216,7 @@
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
+        /* ROW COLORS FOR ADMIN TABLE */
         tr.row-pending td { background-color: #fff9db !important; }
         tr.row-approved td { background-color: #e6fcf5 !important; }
         tr.row-rejected td { background-color: #fff5f5 !important; }
@@ -196,6 +226,7 @@
             background: white; cursor: pointer;
         }
 
+        /* Utils & Status */
         .hidden { display: none !important; }
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
         .st-active { background: #e6fcf5; color: #087f5b; }
@@ -365,7 +396,9 @@
                 <div class="form-group">
                     <label>Upload Foto KTP/SIM (Sekali saja)</label>
                     <input type="file" id="prof-file" accept="image/*">
-                    <small id="ktp-status" style="color:green; display:none;">Sudah ada file KTP. Upload ulang jika ingin mengganti.</small>
+                    <small id="ktp-status" style="color:green; display:none; margin-top:5px;">
+                        <i class="fas fa-check-circle"></i> Sudah ada file KTP.
+                    </small>
                 </div>
                 <button type="submit" class="btn-submit">Simpan Profil</button>
             </form>
@@ -483,7 +516,6 @@
                 
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                
                 userProfile = json.profile;
                 currentUserRole = json.role || 'USER';
                 
@@ -491,11 +523,8 @@
                     initAdmin();
                 } else {
                     initUserDashboard(googleName);
-                    // LOGIKA UTAMA: Jika user baru, paksa buka modal
                     if (json.status === 'new_user' || json.status === 'incomplete_profile') {
-                        // Pastikan target email kosong agar menggunakan currentUserEmail (diri sendiri)
-                        offlineTargetEmail = ''; 
-                        openProfileModal(false); 
+                        offlineTargetEmail = email; openProfileModal(false); 
                     }
                 }
             } catch (e) {
@@ -538,15 +567,9 @@
                 logoutBtn.style.display = 'block';
             }
 
-            // LOGIKA PENTING:
-            // Jika user biasa login -> target adalah diri sendiri (currentUserEmail)
-            // Jika Admin sedang mode offline -> target adalah offlineTargetEmail
-            const isAdminMode = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail);
-            const dataToShow = isAdminMode ? offlineUserProfile : userProfile;
-            const targetEmail = isAdminMode ? offlineTargetEmail : currentUserEmail;
-
+            const dataToShow = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) ? offlineUserProfile : userProfile;
+            const targetEmail = (currentUserRole !== 'USER' && offlineTargetEmail) ? offlineTargetEmail : currentUserEmail;
             document.getElementById('prof-target-email').value = targetEmail;
-
             if (dataToShow) {
                 document.getElementById('prof-nama').value = dataToShow.nama || '';
                 document.getElementById('prof-status').value = dataToShow.statusPegawai || '';
@@ -573,16 +596,12 @@
             e.preventDefault();
             const targetEmail = document.getElementById('prof-target-email').value || currentUserEmail;
             const fileInput = document.getElementById('prof-file');
-            
-            // Cek file requirement (tergantung konteks)
             const currentContextProfile = (targetEmail === currentUserEmail) ? userProfile : offlineUserProfile;
             if (!currentContextProfile && fileInput.files.length === 0) {
                 Swal.fire('Wajib Upload', 'Silakan upload foto KTP/SIM.', 'warning');
                 return;
             }
-
             Swal.fire({ title: 'Menyimpan Profil...', didOpen: () => Swal.showLoading() });
-
             const payload = {
                 email: targetEmail,
                 nama: document.getElementById('prof-nama').value,
@@ -591,42 +610,22 @@
                 hp: document.getElementById('prof-hp').value,
                 existingKtp: currentContextProfile ? currentContextProfile.linkKtp : ''
             };
-
-            if (fileInput.files.length > 0) {
-                payload.fileKtp = await compressImage(fileInput.files[0]);
-            }
-
+            if (fileInput.files.length > 0) payload.fileKtp = await compressImage(fileInput.files[0]);
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=saveProfile`, { method: 'POST', body: JSON.stringify(payload) });
                 const json = await res.json();
-                
                 if (json.status === 'success') {
                     const updatedProfile = { ...payload, linkKtp: json.linkKtp };
                     delete updatedProfile.fileKtp;
-
-                    // Update local state
                     if (targetEmail === currentUserEmail) {
                         userProfile = updatedProfile;
                         if(currentUserRole === 'USER') initUserDashboard(userProfile.nama);
-                    } else {
-                        // Admin Mode
-                        offlineUserProfile = updatedProfile;
-                    }
-                    
+                    } else { offlineUserProfile = updatedProfile; }
                     Swal.fire('Berhasil', 'Profil disimpan.', 'success');
                     closeProfileModal();
-
-                    // Jika ini flow Admin Offline, lanjut ke pengajuan
-                    if (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) {
-                         openSubmissionModal();
-                    }
-
-                } else {
-                    throw new Error(json.message);
-                }
-            } catch (err) {
-                Swal.fire('Gagal', err.message, 'error');
-            }
+                    if (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) openSubmissionModal();
+                } else { throw new Error(json.message); }
+            } catch (err) { Swal.fire('Gagal', err.message, 'error'); }
         });
 
         function openAdminOfflineInput() {
