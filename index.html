@@ -91,7 +91,6 @@
         .btn-logout { color: var(--error-color); border-color: #ffdce0; background: #fff0f1; }
         .btn-edit-profile { color: var(--primary-color); border-color: #d0ebff; background: #e7f5ff; }
         
-        /* TOMBOL STATUS FORMULIR ADMIN */
         .btn-status-on { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
         .btn-status-off { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
 
@@ -304,7 +303,6 @@
                     <span id="admin-role-badge" class="role-badge role-admin">ADMIN</span>
                 </div>
                 <div class="action-buttons">
-                    <!-- Tombol Toggle Status Formulir -->
                     <button id="btn-toggle-status" class="btn-small btn-status-on" onclick="toggleFormStatus()">
                         <i class="fas fa-toggle-on"></i> Formulir: Loading...
                     </button>
@@ -340,7 +338,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-id-card"></i> Data User</h3>
-                <button id="close-profile-btn" class="btn-close" onclick="closeProfileModal()">&times;</button>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <!-- UPDATE: Tombol Logout khusus untuk modal profil yang terkunci -->
+                    <button id="logout-profile-btn" class="btn-small btn-logout hidden" onclick="handleLogout()" style="padding:5px 10px; font-size:0.8em;">
+                        <i class="fas fa-sign-out-alt"></i> Keluar
+                    </button>
+                    <button id="close-profile-btn" class="btn-close" onclick="closeProfileModal()">&times;</button>
+                </div>
             </div>
             <form id="profileForm">
                 <input type="hidden" id="prof-target-email"> 
@@ -524,8 +528,19 @@
         function openProfileModal(canClose) {
             const modal = document.getElementById('profile-modal');
             const closeBtn = document.getElementById('close-profile-btn');
+            const logoutBtn = document.getElementById('logout-profile-btn');
+            
             modal.style.display = 'flex';
-            closeBtn.style.display = canClose ? 'block' : 'none';
+            
+            // LOGIKA TOMBOL MODAL: Jika wajib isi (canClose=false), tombol X hilang, tapi tombol Logout muncul
+            if (canClose) {
+                closeBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+            } else {
+                closeBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+            }
+
             const dataToShow = (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) ? offlineUserProfile : userProfile;
             const targetEmail = (currentUserRole !== 'USER' && offlineTargetEmail) ? offlineTargetEmail : currentUserEmail;
             document.getElementById('prof-target-email').value = targetEmail;
