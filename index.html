@@ -103,6 +103,20 @@
         }
         .btn-icon-wa:hover { transform: scale(1.1); background-color: #128C7E; }
 
+        /* --- STYLES UNTUK MENYEMBUNYIKAN KOLOM --- */
+        .optional-col { display: none; }
+        
+        /* Jika tabel memiliki class table-detailed, maka optional-col ditampilkan */
+        .table-detailed .optional-col { display: table-cell; }
+
+        /* Style untuk tombol toggle detail */
+        .btn-toggle-detail {
+            background-color: #6c757d; color: white; border: none;
+        }
+        .btn-toggle-detail.active {
+            background-color: var(--primary-color);
+        }
+
         .dashboard-content { padding: 25px; }
         .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; border-left: 4px solid var(--primary-color); padding-left: 10px; color: #444; }
 
@@ -183,6 +197,9 @@
             tr { border: 1px solid #eee; margin-bottom: 10px; padding: 10px; border-radius: 8px; }
             td { display: flex; justify-content: space-between; border: none; padding: 5px 0; flex-wrap: wrap; }
             td::before { content: attr(data-label); font-weight: bold; color: #777; width: 40%; }
+            /* Pada mobile, optional-col juga harus disembunyikan/ditampilkan */
+            .optional-col { display: none !important; }
+            .table-detailed .optional-col { display: flex !important; }
         }
     </style>
 </head>
@@ -293,6 +310,11 @@
                     </select>
                     
                     <button onclick="fetchSubmissions(1)" class="btn-small" style="height: 42px;">Refresh</button>
+
+                    <!-- TOMBOL TAMPILKAN DETAIL -->
+                    <button id="btn-detail-toggle" onclick="toggleDetails()" class="btn-small btn-toggle-detail" style="height: 42px;">
+                        <i class="fas fa-eye"></i> Tampilkan Detail
+                    </button>
                 </div>
 
                 <div style="overflow-x:auto;">
@@ -319,6 +341,7 @@
 
     <!-- MODAL PROFIL (User & Admin Input) -->
     <div id="profile-modal" class="modal-overlay">
+        <!-- ... content modal sama ... -->
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-id-card"></i> Data User</h3>
@@ -458,6 +481,7 @@
 
     <!-- MODAL ADMIN INPUT EMAIL -->
     <div id="admin-input-modal" class="modal-overlay">
+        <!-- ... content modal sama ... -->
         <div class="modal-content" style="max-width:400px;">
             <div class="modal-header">
                 <h3>Input Offline</h3>
@@ -473,6 +497,7 @@
 
     <!-- MODAL PENGAJUAN -->
     <div id="submission-modal" class="modal-overlay">
+        <!-- ... content modal sama ... -->
         <div class="modal-content">
             <div class="modal-header">
                 <h3><i class="fas fa-parking"></i> Ajukan Layanan</h3>
@@ -538,6 +563,7 @@
         let currentFormStatus = 'ON';
         let currentSortCol = '', currentSortDir = 'asc', searchTimeout = null;
         let clientIP = 'Tidak Terdeteksi'; // Variable Global untuk IP
+        let showDetailsMode = false; // Status tampilan detail kolom
 
         // FUNGSI VALIDASI NOPOL OTOMATIS
         function setupNopolFormatter(inputId) {
@@ -1053,7 +1079,24 @@
             if(t==='submissions') fetchSubmissions(1);
         }
 
-        // --- FETCH SUBMISSIONS WITH WA BUTTON LOGIC ---
+        // --- NEW: Toggle Detail Function ---
+        function toggleDetails() {
+            showDetailsMode = !showDetailsMode;
+            const table = document.getElementById('submissions-table');
+            const btn = document.getElementById('btn-detail-toggle');
+            
+            if (showDetailsMode) {
+                table.classList.add('table-detailed');
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i> Sembunyikan Detail';
+            } else {
+                table.classList.remove('table-detailed');
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fas fa-eye"></i> Tampilkan Detail';
+            }
+        }
+
+        // --- FETCH SUBMISSIONS WITH WA BUTTON LOGIC & HIDING COLUMNS ---
         function formatWA(n) {
             if(!n) return '';
             let c = n.toString().replace(/[^\d]/g,'');
@@ -1069,6 +1112,10 @@
             const tbody = document.querySelector('#submissions-table tbody');
             const thead = document.querySelector('#submissions-table thead');
             tbody.innerHTML = '';
+            
+            // Kolom yang akan disembunyikan secara default
+            const columnsToHide = ['Email Akun Google', 'Status Kepegawaian', 'Jenis Kendaraan Baru', 'Jenis Kendaraan Lama'];
+
             let headerHtml = '<tr>';
             json.data.headers.forEach(h => {
                 let sortClass = 'sortable'; let sortIcon = '<i class="fas fa-sort sort-icon"></i>';
@@ -1076,7 +1123,14 @@
                     sortClass += currentSortDir === 'asc' ? ' asc' : ' desc';
                     sortIcon = currentSortDir === 'asc' ? '<i class="fas fa-sort-up sort-icon"></i>' : '<i class="fas fa-sort-down sort-icon"></i>';
                 }
-                headerHtml += `<th class="${sortClass}" onclick="handleSort('${h}')">${h} ${sortIcon}</th>`;
+                
+                // Tambahkan class optional-col jika kolom termasuk yang disembunyikan
+                let extraClass = '';
+                if (columnsToHide.includes(h)) {
+                    extraClass = ' optional-col';
+                }
+
+                headerHtml += `<th class="${sortClass}${extraClass}" onclick="handleSort('${h}')">${h} ${sortIcon}</th>`;
             });
             headerHtml += '</tr>';
             thead.innerHTML = headerHtml;
@@ -1125,8 +1179,15 @@
                 const waButtonHtml = cleanHP ? `<a href="${waLink}" target="_blank" class="btn-icon-wa" title="Kirim WA ke ${nama}"><i class="fab fa-whatsapp"></i></a>` : '';
 
                 const rowHtml = rowData.map((c, i) => {
-                    if(json.data.headers[i] === 'Status') {
-                        return `<td>
+                    const headerName = json.data.headers[i];
+                    let cellClass = '';
+                    // Tambahkan class optional-col pada cell data juga
+                    if (columnsToHide.includes(headerName)) {
+                        cellClass = 'class="optional-col"';
+                    }
+
+                    if(headerName === 'Status') {
+                        return `<td ${cellClass}>
                                     <div class="status-cell-content">
                                         <select class="status-select" onchange="updateSubStatus(this.value, ${r.originalIndex}, this)">
                                             <option value="Belum diproses" ${c==='Belum diproses'?'selected':''}>Belum diproses</option>
@@ -1138,11 +1199,17 @@
                                     </div>
                                 </td>`;
                     }
-                    if(String(c).includes('http')) return `<td><a href="${c}" target="_blank">Lihat</a></td>`;
-                    return `<td>${c}</td>`;
+                    if(String(c).includes('http')) return `<td ${cellClass}><a href="${c}" target="_blank">Lihat</a></td>`;
+                    return `<td ${cellClass}>${c}</td>`;
                 }).join('');
                 tr.innerHTML = rowHtml; tbody.appendChild(tr);
             });
+            
+            // Re-apply current state class to table in case of re-render
+            const table = document.getElementById('submissions-table');
+            if (showDetailsMode) table.classList.add('table-detailed');
+            else table.classList.remove('table-detailed');
+
             renderPagination(json.data.currentPage, json.data.totalPages);
         }
 
