@@ -92,16 +92,18 @@
         .btn-status-on { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
         .btn-status-off { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
 
-        /* NEW BUTTON WHATSAPP STYLE */
-        .btn-icon-wa {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 32px; height: 32px;
-            background-color: #25D366; color: white;
-            border-radius: 50%; text-decoration: none;
-            margin-left: 8px; transition: transform 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        /* LINK TELEPON DI TABEL */
+        a.phone-link { 
+            color: var(--success-color); 
+            font-weight: bold; 
+            text-decoration: none; 
+            border-bottom: 1px dashed var(--success-color); 
+            transition: all 0.2s;
         }
-        .btn-icon-wa:hover { transform: scale(1.1); background-color: #128C7E; }
+        a.phone-link:hover { 
+            background-color: #f0fff4; 
+            border-bottom-style: solid;
+        }
 
         /* --- STYLES UNTUK MENYEMBUNYIKAN KOLOM --- */
         .optional-col { display: none; }
@@ -159,7 +161,8 @@
         .admin-panel { display: none; padding: 20px; background: white; }
         .admin-panel.active { display: block; }
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.9em; margin-top: 15px; }
+        /* TABLE ADMIN FONT SIZE REDUCED FROM 0.9em to 0.8em */
+        table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 15px; }
         th { background: #f1f3f5; padding: 10px; text-align: left; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
 
@@ -1176,14 +1179,20 @@
 
                 const cleanHP = formatWA(hp);
                 const waLink = cleanHP ? `https://wa.me/${cleanHP}?text=${encodeURIComponent(waText)}` : '#';
-                const waButtonHtml = cleanHP ? `<a href="${waLink}" target="_blank" class="btn-icon-wa" title="Kirim WA ke ${nama}"><i class="fab fa-whatsapp"></i></a>` : '';
-
+                
                 const rowHtml = rowData.map((c, i) => {
                     const headerName = json.data.headers[i];
                     let cellClass = '';
-                    // Tambahkan class optional-col pada cell data juga
                     if (columnsToHide.includes(headerName)) {
                         cellClass = 'class="optional-col"';
+                    }
+
+                    // --- NEW LOGIC: LINK ON PHONE COLUMN ---
+                    if (headerName === 'Telepon') {
+                        if (cleanHP) {
+                            return `<td ${cellClass}><a href="${waLink}" target="_blank" class="phone-link" title="Klik untuk kirim WA">${c}</a></td>`;
+                        }
+                        return `<td ${cellClass}>${c}</td>`;
                     }
 
                     if(headerName === 'Status') {
@@ -1195,7 +1204,6 @@
                                             <option value="Ditolak" ${c==='Ditolak'?'selected':''}>Ditolak</option>
                                             <option value="Hapus">Hapus</option>
                                         </select>
-                                        ${waButtonHtml}
                                     </div>
                                 </td>`;
                     }
