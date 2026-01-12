@@ -119,6 +119,33 @@
             background-color: var(--primary-color);
         }
 
+        /* --- IMAGE HOVER PREVIEW --- */
+        #image-preview-popup {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            border: 3px solid #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            background: #fff;
+            max-width: 300px;
+            max-height: 400px;
+            border-radius: 8px;
+            pointer-events: none; /* Agar kursor tidak terganggu saat bergerak di atas popup */
+            overflow: hidden;
+        }
+        #image-preview-popup img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+        }
+        #image-preview-popup .loading {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #666;
+        }
+
         .dashboard-content { padding: 25px; }
         .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; border-left: 4px solid var(--primary-color); padding-left: 10px; color: #444; }
 
@@ -207,6 +234,12 @@
     </style>
 </head>
 <body>
+
+    <!-- POPUP IMAGE PREVIEW CONTAINER -->
+    <div id="image-preview-popup">
+        <div class="loading">Memuat...</div>
+        <img src="" alt="Preview Identitas">
+    </div>
 
     <!-- LOGIN PAGE -->
     <div id="login-page">
@@ -1099,6 +1132,35 @@
             }
         }
 
+        // --- IMAGE PREVIEW FUNCTIONS ---
+        function showImagePreview(e, url) {
+            const popup = document.getElementById('image-preview-popup');
+            const img = popup.querySelector('img');
+            img.src = url;
+            popup.style.display = 'block';
+            moveImagePreview(e);
+        }
+
+        function moveImagePreview(e) {
+            const popup = document.getElementById('image-preview-popup');
+            // Offset sedikit dari kursor
+            let x = e.clientX + 15;
+            let y = e.clientY + 15;
+            
+            // Cek agar tidak keluar layar kanan/bawah (sederhana)
+            if (x + 300 > window.innerWidth) x = e.clientX - 315;
+            if (y + 400 > window.innerHeight) y = e.clientY - 415;
+
+            popup.style.left = x + 'px';
+            popup.style.top = y + 'px';
+        }
+
+        function hideImagePreview() {
+            const popup = document.getElementById('image-preview-popup');
+            popup.style.display = 'none';
+            popup.querySelector('img').src = '';
+        }
+
         // --- FETCH SUBMISSIONS WITH WA BUTTON LOGIC & HIDING COLUMNS ---
         function formatWA(n) {
             if(!n) return '';
@@ -1163,7 +1225,7 @@
                 const nopol = rowData[h.indexOf('Nomor Polisi Baru')] || rowData[h.indexOf('Nomor Polisi Lama')] || '-';
                 
                 let footer = "Pengajuan Anda sedang kami proses.";
-                if(statusVal === 'Selesai') footer = "Data anda telah terdaftar dalam sistem parkir RSUD dr. R. Koesma.";
+                if(statusVal === 'Selesai') footer = "Data anda telah terdaftar dalam sistem parkir RSUD dr. R. Koesma. Silakan ambil kartu/stiker parkir.";
                 if(statusVal === 'Ditolak') footer = "Mohon maaf, pengajuan Anda belum dapat kami setujui.";
 
                 let waText = `👮 [SIPARKIR KOESMA] Status Update\n`;
@@ -1187,7 +1249,7 @@
                         cellClass = 'class="optional-col"';
                     }
 
-                    // --- NEW LOGIC: LINK ON PHONE COLUMN ---
+                    // --- LINK ON PHONE COLUMN ---
                     if (headerName === 'Telepon') {
                         if (cleanHP) {
                             return `<td ${cellClass}><a href="${waLink}" target="_blank" class="phone-link" title="Klik untuk kirim WA">${c}</a></td>`;
@@ -1207,7 +1269,17 @@
                                     </div>
                                 </td>`;
                     }
-                    if(String(c).includes('http')) return `<td ${cellClass}><a href="${c}" target="_blank">Lihat</a></td>`;
+                    // --- HOVER PREVIEW ON 'LIHAT' LINK ---
+                    if(String(c).includes('http')) {
+                        return `<td ${cellClass}>
+                            <a href="${c}" target="_blank"
+                               onmouseenter="showImagePreview(event, '${c}')"
+                               onmouseleave="hideImagePreview()"
+                               onmousemove="moveImagePreview(event)">
+                               Lihat
+                            </a>
+                        </td>`;
+                    }
                     return `<td ${cellClass}>${c}</td>`;
                 }).join('');
                 tr.innerHTML = rowHtml; tbody.appendChild(tr);
