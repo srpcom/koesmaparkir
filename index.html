@@ -92,6 +92,17 @@
         .btn-status-on { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
         .btn-status-off { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
 
+        /* NEW BUTTON WHATSAPP STYLE */
+        .btn-icon-wa {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px;
+            background-color: #25D366; color: white;
+            border-radius: 50%; text-decoration: none;
+            margin-left: 8px; transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-icon-wa:hover { transform: scale(1.1); background-color: #128C7E; }
+
         .dashboard-content { padding: 25px; }
         .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; border-left: 4px solid var(--primary-color); padding-left: 10px; color: #444; }
 
@@ -146,7 +157,9 @@
         /* Merah untuk rejected */
         tr.row-rejected td { background-color: #ef9a9a !important; color: #000; }
         
-        .status-select { padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold; background: white; cursor: pointer; }
+        .status-select { padding: 5px; border-radius: 5px; border: 1px solid #ccc; font-weight: bold; background: white; cursor: pointer; width: 100%; max-width: 140px; }
+        .status-cell-content { display: flex; align-items: center; gap: 5px; }
+
         .hidden { display: none !important; }
         .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
         .st-active { background: #e6fcf5; color: #087f5b; }
@@ -1039,6 +1052,15 @@
             if(t==='users') fetchUsers();
             if(t==='submissions') fetchSubmissions(1);
         }
+
+        // --- FETCH SUBMISSIONS WITH WA BUTTON LOGIC ---
+        function formatWA(n) {
+            if(!n) return '';
+            let c = n.toString().replace(/[^\d]/g,'');
+            if(c.startsWith('0')) c = '62'+c.substring(1);
+            return c;
+        }
+
         async function fetchSubmissions(p) {
             const search = document.getElementById('search-input').value;
             const status = document.getElementById('status-filter').value;
@@ -1058,18 +1080,63 @@
             });
             headerHtml += '</tr>';
             thead.innerHTML = headerHtml;
+            
+            // HEADERS MAP untuk akses data lebih mudah
+            const h = json.data.headers;
+            
             json.data.pageData.forEach(r => {
                 const rowData = r.rowData;
-                const statusIdx = json.data.headers.indexOf('Status');
-                const status = rowData[statusIdx];
+                const statusIdx = h.indexOf('Status');
+                const statusVal = rowData[statusIdx];
+                
                 let rowClass = 'row-pending';
-                if (status === 'Selesai') rowClass = 'row-approved';
-                if (status === 'Ditolak') rowClass = 'row-rejected';
+                if (statusVal === 'Selesai') rowClass = 'row-approved';
+                if (statusVal === 'Ditolak') rowClass = 'row-rejected';
+                
                 const tr = document.createElement('tr');
                 tr.className = rowClass;
+                
+                // --- PREPARE WA DATA ---
+                const regId = rowData[h.indexOf('Nomor Registrasi')] || '-';
+                const nama = rowData[h.indexOf('Nama Lengkap')] || '-';
+                const hp = rowData[h.indexOf('Telepon')] || '';
+                const email = rowData[h.indexOf('Email Akun Google')] || '-';
+                const unit = rowData[h.indexOf('Unit Kerja')] || rowData[h.indexOf('Afiliasi Pihak Ketiga')] || '-';
+                const tujuan = rowData[h.indexOf('Jenis Pengajuan')] || '-';
+                const nopol = rowData[h.indexOf('Nomor Polisi Baru')] || rowData[h.indexOf('Nomor Polisi Lama')] || '-';
+                
+                let footer = "Pengajuan Anda sedang kami proses.";
+                if(statusVal === 'Selesai') footer = "Data anda telah terdaftar dalam sistem parkir RSUD dr. R. Koesma. Silakan ambil kartu/stiker parkir.";
+                if(statusVal === 'Ditolak') footer = "Mohon maaf, pengajuan Anda belum dapat kami setujui.";
+
+                let waText = `👮 [SIPARKIR KOESMA] Status Update\n`;
+                waText += `Reg ID: ${regId}\n`;
+                waText += `Nama: ${nama}\n`;
+                waText += `Nomor HP: ${hp}\n`;
+                waText += `Email: ${email}\n`;
+                waText += `Unit: ${unit}\n`;
+                waText += `Tujuan: ${tujuan}\n`;
+                waText += `Kendaraan: ${nopol}\n`;
+                waText += `Status: ${statusVal.toUpperCase()}\n`;
+                waText += footer;
+
+                const cleanHP = formatWA(hp);
+                const waLink = cleanHP ? `https://wa.me/${cleanHP}?text=${encodeURIComponent(waText)}` : '#';
+                const waButtonHtml = cleanHP ? `<a href="${waLink}" target="_blank" class="btn-icon-wa" title="Kirim WA ke ${nama}"><i class="fab fa-whatsapp"></i></a>` : '';
+
                 const rowHtml = rowData.map((c, i) => {
                     if(json.data.headers[i] === 'Status') {
-                        return `<td><select class="status-select" onchange="updateSubStatus(this.value, ${r.originalIndex}, this)"><option value="Belum diproses" ${c==='Belum diproses'?'selected':''}>Belum diproses</option><option value="Selesai" ${c==='Selesai'?'selected':''}>Disetujui/Selesai</option><option value="Ditolak" ${c==='Ditolak'?'selected':''}>Ditolak</option><option value="Hapus">Hapus</option></select></td>`;
+                        return `<td>
+                                    <div class="status-cell-content">
+                                        <select class="status-select" onchange="updateSubStatus(this.value, ${r.originalIndex}, this)">
+                                            <option value="Belum diproses" ${c==='Belum diproses'?'selected':''}>Belum diproses</option>
+                                            <option value="Selesai" ${c==='Selesai'?'selected':''}>Disetujui/Selesai</option>
+                                            <option value="Ditolak" ${c==='Ditolak'?'selected':''}>Ditolak</option>
+                                            <option value="Hapus">Hapus</option>
+                                        </select>
+                                        ${waButtonHtml}
+                                    </div>
+                                </td>`;
                     }
                     if(String(c).includes('http')) return `<td><a href="${c}" target="_blank">Lihat</a></td>`;
                     return `<td>${c}</td>`;
@@ -1078,6 +1145,7 @@
             });
             renderPagination(json.data.currentPage, json.data.totalPages);
         }
+
         function handleSort(colName) {
             if (currentSortCol === colName) { currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc'; } 
             else { currentSortCol = colName; currentSortDir = 'asc'; }
@@ -1127,7 +1195,7 @@
                     const roleClass = role === 'SUPERADMIN' ? 'role-super' : (role === 'ADMIN' ? 'role-admin' : 'role-user');
                     tbody.innerHTML += `<tr><td data-label="Email">${email}</td><td data-label="Nama">${name}</td><td data-label="Role"><span class="role-badge ${roleClass}">${role}</span></td><td data-label="Status"><span class="status-badge ${isBlocked?'st-blocked':'st-active'}">${status}</span></td><td data-label="Aksi">${actions || '-'}</td></tr>`;
                 });
-            } catch(e) { tbody.innerHTML = '<tr><td colspan="5" style="color:red">Error.</td></tr>'; }
+            } catch(e) { tbody.innerHTML = '<tr><td colspan=\"5\" style=\"color:red\">Error.</td></tr>'; }
         }
         async function changeRole(email, newRole) {
             const confirm = await Swal.fire({ title: 'Ubah Role?', text: `Ubah ${email} menjadi ${newRole}?`, icon: 'question', showCancelButton: true });
