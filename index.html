@@ -524,6 +524,7 @@
         let offlineUserProfile = null;
         let currentFormStatus = 'ON';
         let currentSortCol = '', currentSortDir = 'asc', searchTimeout = null;
+        let clientIP = 'Tidak Terdeteksi'; // Variable Global untuk IP
 
         // FUNGSI VALIDASI NOPOL OTOMATIS
         function setupNopolFormatter(inputId) {
@@ -537,8 +538,22 @@
                 });
             }
         }
+        
+        // --- FETCH IP OTOMATIS SAAT LOAD ---
+        async function fetchClientIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const json = await res.json();
+                clientIP = json.ip;
+                console.log('IP Detected:', clientIP);
+            } catch (e) {
+                console.warn('Gagal ambil IP:', e);
+            }
+        }
 
         window.addEventListener('load', () => {
+            fetchClientIP(); // Panggil fetch IP
+
             const savedEmail = localStorage.getItem('userEmail');
             const savedName = localStorage.getItem('userName');
 
@@ -576,8 +591,12 @@
 
         async function checkUserBackend(email, googleName) {
             if (!Swal.isVisible()) Swal.fire({ title: 'Memuat Profil...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            // --- KIRIM IP & DEVICE KE BACKEND ---
+            const userDevice = navigator.userAgent;
+            
             try {
-                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${encodeURIComponent(email)}&name=${encodeURIComponent(googleName)}`);
+                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${encodeURIComponent(email)}&name=${encodeURIComponent(googleName)}&ip=${encodeURIComponent(clientIP)}&device=${encodeURIComponent(userDevice)}`);
                 const json = await res.json();
                 Swal.close();
                 
@@ -950,7 +969,7 @@
             if(!email) return Swal.fire('Error', 'Masukkan email', 'warning');
             Swal.fire({ title: 'Mengecek User...', didOpen: () => Swal.showLoading() });
             try {
-                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${encodeURIComponent(email)}&name=OfflineUser`);
+                const res = await fetch(`${WEB_APP_URL}?action=checkUser&email=${encodeURIComponent(email)}&name=OfflineUser&ip=AdminInput&device=AdminDevice`);
                 const json = await res.json();
                 Swal.close();
                 offlineTargetEmail = email;
