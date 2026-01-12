@@ -119,37 +119,6 @@
             background-color: var(--primary-color);
         }
 
-        /* --- IMAGE HOVER PREVIEW --- */
-        #image-preview-popup {
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            background: #fff;
-            padding: 5px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            max-width: 300px;
-            max-height: 400px;
-            pointer-events: none; /* Agar kursor tidak terganggu */
-            overflow: hidden;
-        }
-        #image-preview-popup img {
-            width: 100%;
-            height: auto;
-            display: none; /* Hidden by default until loaded */
-            object-fit: contain;
-            border-radius: 4px;
-        }
-        #image-preview-popup .loading {
-            padding: 20px;
-            text-align: center;
-            font-size: 0.85em;
-            color: #555;
-            display: block;
-            background: #f8f9fa;
-        }
-
         .dashboard-content { padding: 25px; }
         .section-title { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; border-left: 4px solid var(--primary-color); padding-left: 10px; color: #444; }
 
@@ -238,12 +207,6 @@
     </style>
 </head>
 <body>
-
-    <!-- POPUP IMAGE PREVIEW CONTAINER -->
-    <div id="image-preview-popup">
-        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Memuat...</div>
-        <img src="" alt="Preview Identitas">
-    </div>
 
     <!-- LOGIN PAGE -->
     <div id="login-page">
@@ -515,6 +478,73 @@
                     </small>
                 </div>
                 <button type="submit" class="btn-submit">Simpan Profil</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL ADMIN INPUT EMAIL -->
+    <div id="admin-input-modal" class="modal-overlay">
+        <!-- ... content modal sama ... -->
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header">
+                <h3>Input Offline</h3>
+                <button class="btn-close" onclick="document.getElementById('admin-input-modal').style.display='none'">&times;</button>
+            </div>
+            <div style="padding:20px;">
+                <p>Masukkan Email User (Pemilik Kendaraan):</p>
+                <input type="email" id="offline-email-input" placeholder="user@gmail.com" style="margin-bottom:15px;">
+                <button class="btn-submit" onclick="checkOfflineUser()">Cek & Lanjut</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PENGAJUAN -->
+    <div id="submission-modal" class="modal-overlay">
+        <!-- ... content modal sama ... -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-parking"></i> Ajukan Layanan</h3>
+                <button class="btn-close" onclick="closeSubmissionModal()">&times;</button>
+            </div>
+            <div style="padding:10px 20px; background:#e8f4fc; display:none;" id="sub-admin-notice">
+                <small><strong>Mode Admin:</strong> Mengajukan atas nama <span id="sub-target-user"></span></small>
+            </div>
+            <form id="submissionForm">
+                <input type="hidden" id="sub-target-email-hidden">
+
+                <div class="form-group">
+                    <label>Tujuan Pengajuan</label>
+                    <select id="sub-tujuan" onchange="toggleSubFields()" required>
+                        <option value="">-- Pilih Tujuan --</option>
+                        <option value="Pendaftaran Baru">Daftar Kendaraan Baru</option>
+                        <option value="Rubah Nomor Kendaraan">Ganti Plat Nomor</option>
+                        <option value="Hapus Nomor Kendaraan">Hapus Kendaraan</option> 
+                        <option value="Buat/Ganti Kartu Parkir">Kartu Hilang/Rusak</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div id="sub-kendaraan-baru" class="hidden">
+                    <div class="form-group">
+                        <label>Jenis Kendaraan</label>
+                        <select id="sub-jenis">
+                            <option value="Motor">Motor</option>
+                            <option value="Mobil">Mobil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor Polisi (Baru)</label>
+                        <input type="text" id="sub-nopol-baru" style="text-transform:uppercase;" placeholder="CTH: S 1234 XX">
+                    </div>
+                </div>
+                <div id="sub-kendaraan-lama" class="hidden form-group">
+                    <label id="lbl-nopol-lama">Nomor Polisi Lama</label>
+                    <input type="text" id="sub-nopol-lama" style="text-transform:uppercase;" placeholder="CTH: S1234XX">
+                </div>
+                <div class="form-group">
+                    <label>Keterangan Tambahan</label>
+                    <textarea id="sub-ket" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Kirim Pengajuan</button>
             </form>
         </div>
     </div>
@@ -1069,53 +1099,6 @@
             }
         }
 
-        // --- IMAGE PREVIEW FUNCTIONS ---
-        function showImagePreview(e, url) {
-            const popup = document.getElementById('image-preview-popup');
-            const img = popup.querySelector('img');
-            const loading = popup.querySelector('.loading');
-
-            // Reset Previous State
-            img.style.display = 'none';
-            loading.style.display = 'block';
-            loading.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
-            
-            popup.style.display = 'block';
-            moveImagePreview(e);
-
-            // Load Image
-            img.src = url;
-            
-            img.onload = function() {
-                loading.style.display = 'none';
-                img.style.display = 'block';
-            };
-            
-            img.onerror = function() {
-                loading.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Gagal memuat.<br><small>Klik "Lihat" untuk buka.</small>';
-            };
-        }
-
-        function moveImagePreview(e) {
-            const popup = document.getElementById('image-preview-popup');
-            // Offset sedikit dari kursor
-            let x = e.clientX + 15;
-            let y = e.clientY + 15;
-            
-            // Cek agar tidak keluar layar kanan/bawah (sederhana)
-            if (x + 300 > window.innerWidth) x = e.clientX - 315;
-            if (y + 400 > window.innerHeight) y = e.clientY - 415;
-
-            popup.style.left = x + 'px';
-            popup.style.top = y + 'px';
-        }
-
-        function hideImagePreview() {
-            const popup = document.getElementById('image-preview-popup');
-            popup.style.display = 'none';
-            popup.querySelector('img').src = '';
-        }
-
         // --- FETCH SUBMISSIONS WITH WA BUTTON LOGIC & HIDING COLUMNS ---
         function formatWA(n) {
             if(!n) return '';
@@ -1180,10 +1163,10 @@
                 const nopol = rowData[h.indexOf('Nomor Polisi Baru')] || rowData[h.indexOf('Nomor Polisi Lama')] || '-';
                 
                 let footer = "Pengajuan Anda sedang kami proses.";
-                if(statusVal === 'Selesai') footer = "Data anda telah terdaftar dalam sistem parkir RSUD dr. R. Koesma. Silakan ambil kartu/stiker parkir.";
+                if(statusVal === 'Selesai') footer = "Data anda telah terdaftar dalam sistem parkir RSUD dr. R. Koesma.";
                 if(statusVal === 'Ditolak') footer = "Mohon maaf, pengajuan Anda belum dapat kami setujui.";
 
-                let waText = `👮 [SIPARKIR KOESMA] Status Update\n`;
+                let waText = `ðŸ‘® [SIPARKIR KOESMA] Status Update\n`;
                 waText += `Reg ID: ${regId}\n`;
                 waText += `Nama: ${nama}\n`;
                 waText += `Nomor HP: ${hp}\n`;
@@ -1196,8 +1179,7 @@
 
                 const cleanHP = formatWA(hp);
                 const waLink = cleanHP ? `https://wa.me/${cleanHP}?text=${encodeURIComponent(waText)}` : '#';
-                const waButtonHtml = cleanHP ? `<a href="${waLink}" target="_blank" class="btn-icon-wa" title="Kirim WA ke ${nama}"><i class="fab fa-whatsapp"></i></a>` : '';
-
+                
                 const rowHtml = rowData.map((c, i) => {
                     const headerName = json.data.headers[i];
                     let cellClass = '';
@@ -1205,7 +1187,7 @@
                         cellClass = 'class="optional-col"';
                     }
 
-                    // --- LINK ON PHONE COLUMN ---
+                    // --- NEW LOGIC: LINK ON PHONE COLUMN ---
                     if (headerName === 'Telepon') {
                         if (cleanHP) {
                             return `<td ${cellClass}><a href="${waLink}" target="_blank" class="phone-link" title="Klik untuk kirim WA">${c}</a></td>`;
@@ -1222,21 +1204,10 @@
                                             <option value="Ditolak" ${c==='Ditolak'?'selected':''}>Ditolak</option>
                                             <option value="Hapus">Hapus</option>
                                         </select>
-                                        ${waButtonHtml}
                                     </div>
                                 </td>`;
                     }
-                    // --- HOVER PREVIEW ON 'LIHAT' LINK ---
-                    if(String(c).includes('http')) {
-                        return `<td ${cellClass}>
-                            <a href="${c}" target="_blank"
-                               onmouseenter="showImagePreview(event, '${c}')"
-                               onmouseleave="hideImagePreview()"
-                               onmousemove="moveImagePreview(event)">
-                               Lihat
-                            </a>
-                        </td>`;
-                    }
+                    if(String(c).includes('http')) return `<td ${cellClass}><a href="${c}" target="_blank">Lihat</a></td>`;
                     return `<td ${cellClass}>${c}</td>`;
                 }).join('');
                 tr.innerHTML = rowHtml; tbody.appendChild(tr);
