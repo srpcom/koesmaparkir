@@ -42,14 +42,14 @@
             content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: url('https://raw.githubusercontent.com/srpcom/koesmaparkir/main/foto%20ipit.jpg'); 
             background-size: cover; background-position: center; background-attachment: fixed;
-            filter: blur(3px) brightness(0.6);
+            filter: blur(4px) brightness(0.3); /* Dibuat lebih gelap agar efek neon menyala */
             z-index: -2;
         }
 
         /* Gradient Overlay untuk nuansa Biru/Emerald */
         body::after {
             content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 90, 156, 0.6), rgba(0, 210, 255, 0.2));
+            background: linear-gradient(135deg, rgba(0, 20, 40, 0.8), rgba(0, 90, 156, 0.3));
             z-index: -1;
             pointer-events: none;
         }
@@ -63,18 +63,29 @@
             perspective: 1000px; /* Enable 3D perspective */
         }
 
-        /* Decorative Orbs (Bola Cahaya) */
+        /* --- NEW: CANVAS FOR SMART SENSOR MESH --- */
+        #sensorMeshCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1; /* Di atas background, di bawah kartu */
+            pointer-events: none;
+        }
+
+        /* Decorative Orbs (Bola Cahaya) - Adjusted opacity for Mesh visibility */
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(60px);
-            z-index: -1;
-            opacity: 0.6;
+            filter: blur(80px); /* Blur lebih kuat agar tidak mengganggu mesh */
+            z-index: 0; 
+            opacity: 0.3;
             animation: floatOrb 10s infinite ease-in-out alternate;
         }
         .orb-1 { width: 300px; height: 300px; background: #005A9C; top: -50px; left: -50px; animation-duration: 8s; }
         .orb-2 { width: 250px; height: 250px; background: #00d2ff; bottom: -50px; right: -50px; animation-duration: 12s; }
-        .orb-3 { width: 150px; height: 150px; background: #28a745; bottom: 20%; left: 20%; animation-duration: 15s; opacity: 0.4; }
+        .orb-3 { width: 150px; height: 150px; background: #28a745; bottom: 20%; left: 20%; animation-duration: 15s; opacity: 0.2; }
 
         @keyframes floatOrb {
             0% { transform: translate(0, 0) scale(1); }
@@ -83,22 +94,19 @@
 
         .login-card { 
             position: relative;
-            background: rgba(255, 255, 255, 0.1); /* Ultra Transparent */
-            backdrop-filter: blur(20px); /* Heavy Blur */
-            -webkit-backdrop-filter: blur(20px);
+            z-index: 10; /* Pastikan di atas canvas */
+            background: rgba(10, 20, 35, 0.65); /* Dark Glass */
+            backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px);
             padding: 50px 40px; 
             border-radius: 24px; 
             text-align: center; 
             width: 90%; max-width: 420px;
             
-            /* Glass Border Effect */
-            border-top: 1px solid rgba(255, 255, 255, 0.5);
-            border-left: 1px solid rgba(255, 255, 255, 0.5);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            /* Glass Border Effect - Lebih tegas */
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 90, 156, 0.2), inset 0 0 20px rgba(0, 210, 255, 0.05);
             
-            /* 3D Shadow */
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 0 15px rgba(255,255,255,0.05);
             transform-style: preserve-3d;
             animation: cardEntrance 0.8s ease-out forwards;
         }
@@ -117,7 +125,7 @@
 
         .login-title {
             color: #ffffff; margin: 0; font-size: 1.8rem; font-weight: 800;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 0 15px rgba(0, 210, 255, 0.5); /* Neon Text Shadow */
             letter-spacing: 1px;
         }
 
@@ -135,7 +143,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             transition: transform 0.2s;
         }
-        .g-btn-wrapper:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+        .g-btn-wrapper:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
 
 
         /* --- MAIN APP CONTAINER --- */
@@ -318,7 +326,10 @@
 
     <!-- LOGIN PAGE (3D Glass Style) -->
     <div id="login-page">
-        <!-- Elemen Dekorasi 3D Orbs -->
+        <!-- SMART SENSOR MESH CANVAS -->
+        <canvas id="sensorMeshCanvas"></canvas>
+
+        <!-- Elemen Dekorasi 3D Orbs (Tetap ada sebagai background ambience) -->
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
@@ -706,6 +717,9 @@
             const savedName = localStorage.getItem('userName');
 
             if (savedEmail && savedName) {
+                // Hentikan animasi mesh jika login tersimpan
+                if(window.meshAnimationId) cancelAnimationFrame(window.meshAnimationId);
+                
                 // Efek transisi halus
                 document.getElementById('login-page').style.opacity = '0';
                 setTimeout(() => {
@@ -727,6 +741,9 @@
         });
 
         function handleCredentialResponse(response) {
+            // Hentikan animasi mesh
+            if(window.meshAnimationId) cancelAnimationFrame(window.meshAnimationId);
+            
             // Efek transisi halus saat login
             const loginPage = document.getElementById('login-page');
             loginPage.style.opacity = '0';
@@ -1283,6 +1300,197 @@
                 fetchUsers();
             }
         }
+    </script>
+    
+    <!-- SMART SENSOR MESH ANIMATION -->
+    <script>
+    (function() {
+        const canvas = document.getElementById('sensorMeshCanvas');
+        if(!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let dots = [];
+        const spacing = 50; 
+        const mouseRadius = 200; // Radius interaksi mouse lebih besar
+        
+        // Scan line radar
+        let scanAngle = 0;
+        
+        // Mouse Interaction
+        let mouse = { x: -999, y: -999 };
+        window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            initDots();
+        }
+        window.addEventListener('resize', resize);
+
+        class Dot {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.baseAlpha = 0.2; // Lebih terang defaultnya
+                this.alpha = this.baseAlpha;
+                this.active = false;
+                this.timer = Math.random() * 200;
+            }
+
+            update() {
+                // Logic Scan Mouse (Lebih responsif)
+                const dx = mouse.x - this.x;
+                const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                // Logic Radar Scanner
+                // Bayangkan garis berputar dari tengah layar
+                const cx = width / 2;
+                const cy = height / 2;
+                const angleToDot = Math.atan2(this.y - cy, this.x - cx);
+                // Normalisasi angle
+                let diffAngle = Math.abs(angleToDot - scanAngle);
+                if (diffAngle > Math.PI) diffAngle = (2 * Math.PI) - diffAngle;
+                
+                // Jika kena scan radar
+                if (diffAngle < 0.1) {
+                    this.alpha = 1; // Flash terang
+                }
+
+                if (dist < mouseRadius) {
+                    this.alpha = 1 - (dist / mouseRadius);
+                    if(this.alpha < 0.2) this.alpha = 0.2;
+                } else {
+                    // Random Pulse
+                    this.timer++;
+                    if(this.timer > 300) { 
+                        this.active = true; 
+                        this.timer = 0;
+                    }
+                    
+                    if(this.active) {
+                        this.alpha += 0.05;
+                        if(this.alpha >= 1) { this.active = false; }
+                    } else {
+                        // Fade out perlahan setelah kena radar atau pulse
+                        if(this.alpha > this.baseAlpha) this.alpha -= 0.01;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2); // Titik sedikit lebih besar
+                
+                // Warna Neon Cyan/Emerald
+                ctx.fillStyle = `rgba(0, 255, 200, ${this.alpha})`; 
+                
+                // Efek Glow Neon (hanya jika cukup terang agar performa aman)
+                if(this.alpha > 0.4) {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = `rgba(0, 255, 200, ${this.alpha})`;
+                } else {
+                    ctx.shadowBlur = 0;
+                }
+                
+                ctx.fill();
+                ctx.shadowBlur = 0; // Reset
+            }
+        }
+
+        function initDots() {
+            dots = [];
+            for (let x = 20; x < width; x += spacing) {
+                for (let y = 20; y < height; y += spacing) {
+                    dots.push(new Dot(x, y));
+                }
+            }
+        }
+
+        function animate() {
+            const loginPage = document.getElementById('login-page');
+            // Cek jika login page ada dan tidak hidden. Jika hidden (user login), stop animasi.
+            if(loginPage && loginPage.classList.contains('hidden')) {
+                // Optional: cancelAnimationFrame di sini jika mau
+                return;
+            }
+
+            ctx.clearRect(0, 0, width, height);
+            
+            // Putar Radar
+            scanAngle += 0.02;
+            if(scanAngle > Math.PI) scanAngle = -Math.PI;
+
+            // Update & Draw Dots
+            dots.forEach(dot => {
+                dot.update();
+                dot.draw();
+            });
+
+            // Draw Connection Lines (Grid Logic)
+            ctx.lineWidth = 1; // Garis lebih tebal dikit
+            for(let i=0; i<dots.length; i++) {
+                let d1 = dots[i];
+                // Hanya gambar garis jika titik ini sedang aktif/terang
+                if(d1.alpha < 0.3) continue;
+
+                // Optimization: Cek tetangga kanan dan bawah saja dalam grid 
+                // untuk menghindari perhitungan n*n
+                // Tapi array dots kita urut linear, jadi agak susah cari tetangga grid exact tanpa 2D array.
+                // Fallback ke distance check untuk tetangga terdekat (simple & robust untuk resolusi layar beda2)
+                
+                for(let j=i+1; j<dots.length; j++) {
+                    let d2 = dots[j];
+                    
+                    // Cek jarak kasar dulu
+                    if (Math.abs(d1.x - d2.x) > spacing * 1.5 || Math.abs(d1.y - d2.y) > spacing * 1.5) continue;
+
+                    let distSq = (d1.x-d2.x)*(d1.x-d2.x) + (d1.y-d2.y)*(d1.y-d2.y);
+                    
+                    // Hubungkan jika jarak <= diagonal grid
+                    if(distSq <= (spacing*spacing * 2.2)) {
+                        ctx.beginPath();
+                        // Opacity garis tergantung seberapa terang kedua titik
+                        let lineAlpha = Math.min(d1.alpha, d2.alpha) * 0.6;
+                        if(lineAlpha > 0.05) {
+                            ctx.strokeStyle = `rgba(0, 255, 200, ${lineAlpha})`;
+                            ctx.moveTo(d1.x, d1.y);
+                            ctx.lineTo(d2.x, d2.y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            // Gambar garis radar pemindai (opsional, visualisasi scanner)
+            /*
+            ctx.save();
+            ctx.translate(width/2, height/2);
+            ctx.rotate(scanAngle);
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.lineTo(Math.max(width, height), 0);
+            ctx.strokeStyle = "rgba(0, 255, 200, 0.1)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Efek gradasi scanner
+            let gradient = ctx.createLinearGradient(0, 0, Math.max(width, height), 0);
+            gradient.addColorStop(0, "rgba(0, 255, 200, 0)");
+            gradient.addColorStop(1, "rgba(0, 255, 200, 0.2)");
+            ctx.fillStyle = gradient;
+            ctx.arc(0, 0, Math.max(width, height), 0, 0.2); // Sektor kecil
+            ctx.fill();
+            ctx.restore();
+            */
+
+            window.meshAnimationId = requestAnimationFrame(animate);
+        }
+
+        resize();
+        animate();
+    })();
     </script>
 </body>
 </html>
