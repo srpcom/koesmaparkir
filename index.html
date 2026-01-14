@@ -472,6 +472,7 @@
                                 <th>No. HP</th> 
                                 <th>Role</th>
                                 <th>Status</th>
+                                <th>Masa Tugas</th> <!-- ADDED THIS COLUMN -->
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -1303,6 +1304,17 @@
                     const status = u[3];
                     const hp = u[7] || '';
                     
+                    // NEW: MASA TUGAS Logic (Index 9)
+                    let tglDisplay = '-';
+                    if (u[9]) {
+                        const d = new Date(u[9]);
+                        if(!isNaN(d.getTime())) {
+                             tglDisplay = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                        } else {
+                             tglDisplay = u[9]; // Tampilkan apa adanya jika bukan format tanggal standard
+                        }
+                    }
+
                     const cleanHP = formatWA(hp);
                     const waLink = cleanHP ? `https://wa.me/${cleanHP}` : '#';
                     const hpCell = cleanHP ? `<a href="${waLink}" target="_blank" class="phone-link">${hp}</a>` : hp;
@@ -1330,6 +1342,7 @@
                         <td data-label="No. HP">${hpCell || '-'}</td>
                         <td data-label="Role"><span class="role-badge ${roleClass}">${role}</span></td>
                         <td data-label="Status"><span class="status-badge ${isBlocked?'st-blocked':'st-active'}">${status}</span></td>
+                        <td data-label="Masa Tugas">${tglDisplay}</td>
                         <td data-label="Aksi">${actions || '-'}</td>
                     </tr>`;
                 });
