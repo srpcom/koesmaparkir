@@ -201,6 +201,7 @@
         .btn-small:hover { transform: translateY(-2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .btn-logout { color: var(--error-color); border-color: #ffdce0; background: #fff0f1; }
         .btn-edit-profile { color: var(--primary-color); border-color: #d0ebff; background: #e7f5ff; }
+        .btn-add-user { background: #212529; color: white; border-color: #000; }
         
         .btn-status-on { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
         .btn-status-off { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
@@ -308,6 +309,7 @@
         .btn-demote { background: #e9ecef; color: #666; }
         .btn-block { background: #ffe3e3; color: #e03131; }
         .btn-unblock { background: #d3f9d8; color: #2b8a3e; }
+        .btn-edit { background: #d0ebff; color: var(--primary-color); }
 
         @media (max-width: 768px) {
             .container { width: 100%; margin: 0; border-radius: 0; box-shadow: none; }
@@ -459,13 +461,15 @@
             <!-- TAB USERS -->
             <div id="tab-users" class="admin-panel">
                 <button onclick="fetchUsers()" class="btn-small" style="margin-bottom:15px;"><i class="fas fa-sync-alt"></i> Refresh User</button>
+                <button onclick="openAddUserModal()" class="btn-small btn-add-user hidden" id="btn-add-user-admin" style="margin-bottom:15px; margin-left:10px;"><i class="fas fa-user-plus"></i> Tambah User</button>
+                
                 <div style="overflow-x:auto;">
                     <table id="users-table">
                         <thead>
                             <tr>
                                 <th>Email</th>
                                 <th>Nama</th>
-                                <th>No. HP</th> <!-- NEW COLUMN HEADER -->
+                                <th>No. HP</th> 
                                 <th>Role</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
@@ -699,6 +703,9 @@
         let currentSortCol = '', currentSortDir = 'asc', searchTimeout = null;
         let clientIP = 'Tidak Terdeteksi'; 
         let showDetailsMode = false;
+        
+        // Simpan data semua user untuk akses edit cepat
+        let allUsersData = [];
 
         function setupNopolFormatter(inputId) {
             const el = document.getElementById(inputId);
@@ -940,7 +947,14 @@
                     Swal.fire('Berhasil', 'Profil disimpan.', 'success');
                     closeProfileModal();
 
-                    if (currentUserRole !== 'USER' && offlineTargetEmail && offlineTargetEmail !== currentUserEmail) { openSubmissionModal(); }
+                    if (currentUserRole !== 'USER') {
+                        // Jika Admin sedang edit user, refresh list user
+                        if(document.getElementById('tab-users').classList.contains('active')) {
+                            fetchUsers();
+                        } else if (offlineTargetEmail && offlineTargetEmail !== currentUserEmail) { 
+                            openSubmissionModal(); 
+                        }
+                    }
 
                 } else { throw new Error(json.message); }
             } catch (err) { Swal.fire('Gagal', err.message, 'error'); }
@@ -1080,6 +1094,12 @@
             const badge = document.getElementById('admin-role-badge');
             badge.textContent = currentUserRole;
             badge.className = `role-badge ${currentUserRole === 'SUPERADMIN' ? 'role-super' : 'role-admin'}`;
+            
+            // Show/Hide Add User Button based on role (Superadmin only or both? Request said Superadmin, assuming both admins can manage but superadmin has priority)
+            if(currentUserRole === 'SUPERADMIN') {
+                 document.getElementById('btn-add-user-admin').classList.remove('hidden');
+            }
+
             const lastTab = localStorage.getItem('lastAdminTab') || 'submissions';
             switchTab(lastTab);
             loadFormStatus();
@@ -1264,6 +1284,7 @@
             Swal.close();
             fetchSubmissions(1);
         }
+        
         async function fetchUsers() {
             const tbody = document.querySelector('#users-table tbody');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Memuat...</td></tr>';
@@ -1271,21 +1292,28 @@
                 const res = await fetch(`${WEB_APP_URL}?action=getUsersList`);
                 const json = await res.json();
                 tbody.innerHTML = '';
-                json.data.forEach(u => {
+                allUsersData = json.data; // Simpan untuk edit
+
+                json.data.forEach((u, index) => {
+                    // Data Structure from GS: 
+                    // [Email, Nama, Role, Status, TS, StatusPeg, Unit, HP, KTP, TglSelesai]
                     const email = u[0]; 
                     const name = u[1]; 
                     const role = u[2]; 
                     const status = u[3];
-                    
-                    // u[7] adalah kolom 'Telepon' (Index ke-7 di array data)
                     const hp = u[7] || '';
+                    
                     const cleanHP = formatWA(hp);
                     const waLink = cleanHP ? `https://wa.me/${cleanHP}` : '#';
                     const hpCell = cleanHP ? `<a href="${waLink}" target="_blank" class="phone-link">${hp}</a>` : hp;
 
                     const isSuper = role === 'SUPERADMIN'; const isBlocked = status === 'BLOCKED';
                     let actions = '';
+                    
                     if (currentUserRole === 'SUPERADMIN') {
+                        // Tombol Edit
+                        actions += `<button class="btn-action btn-edit" onclick="openEditUser('${email}')"><i class="fas fa-edit"></i></button>`;
+
                         if (!isSuper) {
                              if (role === 'USER') actions += `<button class="btn-action btn-promote" onclick="changeRole('${email}', 'ADMIN')">Admin</button>`;
                              if (role === 'ADMIN') actions += `<button class="btn-action btn-demote" onclick="changeRole('${email}', 'USER')">User</button>`;
@@ -1310,6 +1338,62 @@
                 tbody.innerHTML = '<tr><td colspan=\"6\" style=\"color:red; text-align:center;\">Gagal memuat data user.</td></tr>'; 
             }
         }
+
+        function openEditUser(targetEmail) {
+            // Cari data user dari allUsersData
+            const user = allUsersData.find(u => u[0] === targetEmail);
+            if (!user) return Swal.fire('Error', 'Data user tidak ditemukan', 'error');
+
+            // Set global variable agar modal tahu kita sedang edit orang lain
+            offlineTargetEmail = targetEmail; 
+            
+            // Format data agar sesuai struktur userProfile object
+            offlineUserProfile = {
+                nama: user[1],
+                role: user[2],
+                statusPegawai: user[5],
+                unit: user[6],
+                hp: user[7],
+                linkKtp: user[8],
+                tglSelesai: user[9]
+            };
+
+            // Buka Modal
+            openProfileModal(true);
+        }
+
+        async function openAddUserModal() {
+            const { value: email } = await Swal.fire({
+                title: 'Tambah User Baru',
+                input: 'email',
+                inputLabel: 'Masukkan Email User',
+                inputPlaceholder: 'user@gmail.com',
+                showCancelButton: true
+            });
+
+            if (email) {
+                Swal.fire({ title: 'Menambahkan...', didOpen: () => Swal.showLoading() });
+                try {
+                    const res = await fetch(`${WEB_APP_URL}?action=adminAddUser`, {
+                        method: 'POST',
+                        body: JSON.stringify({ email: email })
+                    });
+                    const json = await res.json();
+                    
+                    if(json.status === 'success') {
+                        Swal.fire('Berhasil', 'User ditambahkan. Silakan lengkapi profilnya.', 'success').then(() => {
+                            // Refresh table dan langsung buka edit modal
+                            fetchUsers().then(() => openEditUser(email));
+                        });
+                    } else {
+                        Swal.fire('Gagal', json.message, 'error');
+                    }
+                } catch(e) {
+                    Swal.fire('Error', 'Koneksi gagal', 'error');
+                }
+            }
+        }
+
         async function changeRole(email, newRole) {
             const confirm = await Swal.fire({ title: 'Ubah Role?', text: `Ubah ${email} menjadi ${newRole}?`, icon: 'question', showCancelButton: true });
             if (confirm.isConfirmed) {
