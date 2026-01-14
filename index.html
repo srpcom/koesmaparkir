@@ -461,7 +461,16 @@
                 <button onclick="fetchUsers()" class="btn-small" style="margin-bottom:15px;"><i class="fas fa-sync-alt"></i> Refresh User</button>
                 <div style="overflow-x:auto;">
                     <table id="users-table">
-                        <thead><tr><th>Email</th><th>Nama</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Nama</th>
+                                <th>No. HP</th> <!-- NEW COLUMN HEADER -->
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -1257,13 +1266,23 @@
         }
         async function fetchUsers() {
             const tbody = document.querySelector('#users-table tbody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Memuat...</td></tr>';
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=getUsersList`);
                 const json = await res.json();
                 tbody.innerHTML = '';
                 json.data.forEach(u => {
-                    const email = u[0]; const name = u[1]; const role = u[2]; const status = u[3];
+                    const email = u[0]; 
+                    const name = u[1]; 
+                    const role = u[2]; 
+                    const status = u[3];
+                    
+                    // u[7] adalah kolom 'Telepon' (Index ke-7 di array data)
+                    const hp = u[7] || '';
+                    const cleanHP = formatWA(hp);
+                    const waLink = cleanHP ? `https://wa.me/${cleanHP}` : '#';
+                    const hpCell = cleanHP ? `<a href="${waLink}" target="_blank" class="phone-link">${hp}</a>` : hp;
+
                     const isSuper = role === 'SUPERADMIN'; const isBlocked = status === 'BLOCKED';
                     let actions = '';
                     if (currentUserRole === 'SUPERADMIN') {
@@ -1276,9 +1295,20 @@
                          actions += `<button class="btn-action ${isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${email}', '${status}')">${isBlocked ? 'Aktifkan' : 'Blokir'}</button>`;
                     }
                     const roleClass = role === 'SUPERADMIN' ? 'role-super' : (role === 'ADMIN' ? 'role-admin' : 'role-user');
-                    tbody.innerHTML += `<tr><td data-label="Email">${email}</td><td data-label="Nama">${name}</td><td data-label="Role"><span class="role-badge ${roleClass}">${role}</span></td><td data-label="Status"><span class="status-badge ${isBlocked?'st-blocked':'st-active'}">${status}</span></td><td data-label="Aksi">${actions || '-'}</td></tr>`;
+                    
+                    tbody.innerHTML += `<tr>
+                        <td data-label="Email">${email}</td>
+                        <td data-label="Nama">${name}</td>
+                        <td data-label="No. HP">${hpCell || '-'}</td>
+                        <td data-label="Role"><span class="role-badge ${roleClass}">${role}</span></td>
+                        <td data-label="Status"><span class="status-badge ${isBlocked?'st-blocked':'st-active'}">${status}</span></td>
+                        <td data-label="Aksi">${actions || '-'}</td>
+                    </tr>`;
                 });
-            } catch(e) { tbody.innerHTML = '<tr><td colspan=\"5\" style=\"color:red\">Error.</td></tr>'; }
+            } catch(e) { 
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan=\"6\" style=\"color:red; text-align:center;\">Gagal memuat data user.</td></tr>'; 
+            }
         }
         async function changeRole(email, newRole) {
             const confirm = await Swal.fire({ title: 'Ubah Role?', text: `Ubah ${email} menjadi ${newRole}?`, icon: 'question', showCancelButton: true });
@@ -1462,29 +1492,6 @@
                     }
                 }
             }
-            
-            // Gambar garis radar pemindai (opsional, visualisasi scanner)
-            /*
-            ctx.save();
-            ctx.translate(width/2, height/2);
-            ctx.rotate(scanAngle);
-            ctx.beginPath();
-            ctx.moveTo(0,0);
-            ctx.lineTo(Math.max(width, height), 0);
-            ctx.strokeStyle = "rgba(0, 255, 200, 0.1)";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            // Efek gradasi scanner
-            let gradient = ctx.createLinearGradient(0, 0, Math.max(width, height), 0);
-            gradient.addColorStop(0, "rgba(0, 255, 200, 0)");
-            gradient.addColorStop(1, "rgba(0, 255, 200, 0.2)");
-            ctx.fillStyle = gradient;
-            ctx.arc(0, 0, Math.max(width, height), 0, 0.2); // Sektor kecil
-            ctx.fill();
-            ctx.restore();
-            */
-
             window.meshAnimationId = requestAnimationFrame(animate);
         }
 
